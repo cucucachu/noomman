@@ -87,8 +87,7 @@
             <h5>Create, Read, Update, and Delete Control</h5>
             <p>
                 Noomman provides a dynamic framework for controlling in what circumstances any object may be
-                created, read, updated, or deleted. A default privilege exists for administrators or developers, which
-                bypasses these controls. Otherwise, CRUD privileges can be programmatically defined by providing an
+                created, read, updated, or deleted. CRUD privileges can be programmatically defined by providing an
                 asynchronus function in the class model schema for a class. These functions should throw an error if 
                 the operation is not allowed, and resolve otherwise. Each CRUD operation can have its own function 
                 for determining if a particular operation is allowed, or you can use the same function for multiple 

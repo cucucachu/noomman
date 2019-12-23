@@ -1,6 +1,7 @@
 {
   "name": "noomman",
-  "version": "0.5.0",
+  "version": "0.5.1",
+  "main" : "noomman.js",
   "private": false,
   "scripts": {
     "test": "mocha"
