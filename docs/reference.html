@@ -33,6 +33,9 @@
                     <a class="navbar-link" href="./index.html">Introduction</a>
                 </li>
                 <li class="navbar-item">
+                    <a class="navbar-link" href="./gettingstarted.html">Getting Started</a>
+                </li>
+                <li class="navbar-item">
                     <a class="navbar-link" href="./reference.html">Reference</a>
                 </li>
                 <li class="navbar-item">
@@ -44,10 +47,12 @@
     
     <div class="docs-section">
         <div class="container">
-            <h3>Noomman Reference</h3>
+            <h3>Reference</h3>
 
             <p>
-                This reference attempts to walk through the basic usage of Noomman.
+                This reference walks through all the features of noomman. If this is your 
+                first experience with noomman, I suggest starting with the 
+                <a href="./gettingstarted.html">Getting Started</a> guide.
             </p>
 
             <ul>
@@ -118,7 +123,7 @@
                 <p>
                     Schemas are defined using a javascript object, with particular properties laid out below.
                 </p>
-                <p>Here is an example Noomman class model schema for a User Account.</p>
+                <p>Here is an example Noomman ClassModel schema for a User Account.</p>
                 <pre>
                     <code>
 {
@@ -183,7 +188,7 @@
                         <strong>className</strong>
                     </div>
                     <div class="ten columns">
-                        A unique name for a class model. This name is used in the 'toClass' field when defining relationships to this class model.
+                        A unique name for a ClassModel. This name is used in the 'toClass' field when defining relationships to this ClassModel.
                     </div>
                 </div>
                 <br>
@@ -193,7 +198,7 @@
                         <strong>superClasses</strong>
                     </div>
                     <div class="ten columns">
-                        An array containing all the class models that this class model inherits from.
+                        An array containing all the ClassModels that this ClassModel inherits from.
                     </div>
                 </div>
                 <br>
@@ -203,13 +208,13 @@
                         <strong>useParentCollection</strong>
                     </div>
                     <div class="ten columns">
-                        A boolean which indicates whether this class model stores its instances in the
-                        same collection as its super class model. If true, this class model's instances will
-                        be stored in the same collection as its super class model, if false or undefined, it will have 
-                        its own collection. This can only be set to true if the class model has one and only
-                        one super class model. When multiple class models share a collection, can be distinguised
-                        by an extra indexed field in the collection '__c', which will be set to the className of 
-                        the class model of each instance.
+                        A boolean which indicates whether this ClassModel stores its instances in the
+                        same collection as its super ClassModel. If true, this ClassModel's instances will
+                        be stored in the same collection as its super ClassModel, if false or undefined, it will have 
+                        its own collection. This can only be set to true if the ClassModel has one and only
+                        one super ClassModel. When multiple ClassModels share a collection, can be distinguised
+                        by an extra indexed field in the collection '__t', which will be set to the className of 
+                        the Class Model of each Instance.
                     </div>
                 </div>
                 <br>
@@ -219,7 +224,7 @@
                         <strong>auditable</strong>
                     </div>
                     <div class="ten columns">
-                        A boolean which indicates if a change log should be kept of all the updates to each instance of this class model.
+                        A boolean which indicates if a change log should be kept of all the updates to each instance of this ClassModel.
                     </div>
                 </div>
                 <br>
@@ -240,8 +245,8 @@
                         <strong>relationships</strong>
                     </div>
                     <div class="ten columns">
-                        An array containing objects which define each relationship from this class model to another 
-                        (or to this class model).
+                        An array containing objects which define each relationship from this ClassModel to another 
+                        (or to this ClassModel).
                     </div>
                 </div>
                 <br>
@@ -253,7 +258,7 @@
                     <div class="ten columns">
                         An object which can have up to five properties: createControl, readControl, updateControl, 
                         deleteControl, and sensitiveControl. Set each of these properties to an asynchonous function 
-                        which will resolve if the particular operation is allowed on a given instance of this class model,
+                        which will resolve if the particular operation is allowed on a given instance of this ClassModel,
                         and throw an error otherwise. If any of these properties is left undefined, it is equivalent to 
                         setting the property to a function which returns a promise which immediately resolves to true.
                     </div>
@@ -301,7 +306,7 @@
                     <div class="eight columns">
                         <p>
                             The name for this attribute. 
-                            This must be unique among the names of attributes and relationships for this class model.
+                            This must be unique among the names of attributes and relationships for this ClassModel.
                         </p>
                     </div>
                     <div class="two columns">
@@ -380,7 +385,7 @@
                     <div class="eight columns">
                         <p>
                             A boolean indicating whether this attribute must have a unique value among every instance of this
-                            class model. If this is set to true, an error will be thrown when attempting to save an instance with
+                            ClassModel. If this is set to true, an error will be thrown when attempting to save an instance with
                             this value set to the same value for this attribute in another instance. This funtionallity only applies 
                             to non-list attributes. If undefined or false, this attribute is not required to be unique.
                         </p>
@@ -433,7 +438,7 @@
                     <div class="eight columns">
                         <p>
                             The name for this attribute. 
-                            This must be unique among the names of attributes and relationships for this class model.
+                            This must be unique among the names of attributes and relationships for this ClassModel.
                         </p>
                     </div>
                     <div class="two columns">
@@ -444,7 +449,7 @@
                     <div class="two columns"><strong>toClass</strong></div>
                     <div class="eight columns">
                         <p>
-                            A string set to the className of the class model this relationship is to. This must match
+                            A string set to the className of the ClassModel this relationship is to. This must match
                             the className of the related class exactly and is case-sensitive.
                         </p>
                     </div>
@@ -470,10 +475,10 @@
                     <div class="two columns"><strong>owns</strong></div>
                     <div class="eight columns">
                         <p>
-                            A boolean indicating whether an instance of this class model owns the related instance. 
-                            If set to true, whenever an instance of this class model is deleted, the instance related
+                            A boolean indicating whether an instance of this ClassModel owns the related instance. 
+                            If set to true, whenever an instance of this ClassModel is deleted, the instance related
                             to the deleted instance through an owns relationship will also be deleted. If false or
-                            undefined, then deleting an instance of this class model will not delete the related
+                            undefined, then deleting an instance of this ClassModel will not delete the related
                             instance.
                         </p>
                     </div>
@@ -564,7 +569,7 @@
                             An asynchronus function which will be called whenever a new instance is saved (i.e.
                             an insert operation). If the function throws an error, the instance will not be saved. 
                             If the function resolves, the save will be allowed to continue. If not set, all new instances
-                            of this class model can be saved.
+                            of this ClassModel can be saved.
                         </p>
                     </div>
                 </div>
@@ -586,7 +591,7 @@
                             An asynchronus function which will be called whenever an existing instance is saved (i.e.
                             an update operation). If the function throws an error, the instance will not be saved. 
                             If the function resolves, the save will be allowed to continue. If not set, all new 
-                            instances of this class model can be saved.
+                            instances of this ClassModel can be saved.
                         </p>
                     </div>
                 </div>
@@ -597,7 +602,7 @@
                             An asynchronus function which will be called whenever an instance is deleted. 
                             If the function throws an error, the instance will not be deleted. If the function
                             resolves, the delete will be allowed to continue. If not set, all instances of this 
-                            class model can be saved.
+                            ClassModel can be saved.
                         </p>
                     </div>
                 </div>
@@ -647,7 +652,7 @@
             <h5><strong>Creating a Class Model</strong></h5>
             <p>
                 The first class you will encounter when using Noomman is the ClassModel class. This class
-                is used to define a class model. You create a new class model by calling new ClassModel()
+                is used to define a ClassModel. You create a new ClassModel by calling new ClassModel()
                 and passing in the schema you would like to use. 
             </p>
 
@@ -739,8 +744,8 @@ module.exports = UserAccount;
 
                 <p>
                     The next Noomman class you'll need is the Instance class. Use the instance class
-                    to create instances of your class model. Continuing with our example UserAccount
-                    class model...
+                    to create instances of your ClassModel. Continuing with our example UserAccount
+                    ClassModel...
                 </p>
 
                 <pre>
@@ -825,7 +830,7 @@ console.log(newUserAccount === savedUserAccount);
 
                 <p>
                     If there is an error, instance.save() will throw the error for your code to handle. A save error
-                    may occur due to your custom validations defined on you class model schema, a missing required 
+                    may occur due to your custom validations defined on you ClassModel schema, a missing required 
                     attribute or relationship, or a mutex or required group validation. It is up to you to handle these
                     errors. If your code is assuming that your instance should pass all these validations, then you might
                     want to log the error in your application's error log for debugging. If you are taking in potentially 
@@ -865,7 +870,7 @@ await newUserAccount.delete();
 
             <p>
                 Noomman uses the concept of instance sets to collect and manipulate multiple instances of 
-                the same class model at the same time. This is done using the Noomman class InstanceSet.
+                the same ClassModel at the same time. This is done using the Noomman class InstanceSet.
                 InstanceSet is a sub class of the native JavaScript Set class, with added methods for 
                 set mathematics, instance manipulation, and querying. 
             </p>
@@ -876,11 +881,11 @@ await newUserAccount.delete();
     
                 <p>
                     InstanceSets are created using new InstanceSet(). At a minimum, you must supply the 
-                    InstanceSet constructor with the class model of the instances it is holding. There is
+                    InstanceSet constructor with the ClassModel of the instances it is holding. There is
                     second arguemnt, instances, which you can use if you already have instances you would
                     like to add to the set. The second argument must be an iterable object containing instances.
                     All instances added to an InstanceSet (whether during construction
-                    or after construction) must be of the same class model of the InstanceSet, or a sub class
+                    or after construction) must be of the same ClassModel of the InstanceSet, or a sub class
                     thereof. 
                 </p>
                 <pre>
@@ -902,7 +907,7 @@ const userAccounts = new InstanceSet(UserAccount);
                     method. When adding instances using the constructor or with the instanceSet.addInstances()
                     method, you must pass in an iterable object (array, set, or InstanceSet) containing instances.
                     Whatever method you use, an error will be thrown if any instance you try to add is not 
-                    an instance of the class model or a sub class of the class model of the InstanceSet.
+                    an instance of the ClassModel or a sub class of the ClassModel of the InstanceSet.
                 </p>
                 <pre>
                     <code>
@@ -972,7 +977,7 @@ userAccounts.removeInstances([userAccount1, userAccount2]);
     
                 <p>
                     The InstanceSet class provides non-static methods for set math on InstanceSets. All 
-                    of these methods return a new InstanceSet, with the class model of the InstanceSet that 
+                    of these methods return a new InstanceSet, with the ClassModel of the InstanceSet that 
                     the method was called on. These methods do not update the original InstanceSets.
                     There are four set math methods, union(), difference(), intersection(),
                     and symmetricDifference(). These correspond to the basic set math opperations. For information on
@@ -1029,7 +1034,7 @@ const symmetricDifference = userAccounts1.symmetricDifference(userAccounts2);
                         instead of an Array. These methods are instanceSet.mapToInstanceSet() and 
                         instanceSet.filterToInstanceSet(). They take the same arguments and operate the
                         same as the regular map and filter methods, except that they return an InstanceSet
-                        with the same class model as the InstanceSet that the method was called on. 
+                        with the same ClassModel as the InstanceSet that the method was called on. 
                     </p>
 
                     <pre>
@@ -1053,7 +1058,7 @@ const filteredUserAccounts = new InstanceSet(UserAccount, filteredUserAccountsAr
                             InstanceSet has a non-static query method, which allows you to filter the InstanceSet
                             using MongoDB style filter objects. This does not make a database call, rather it is 
                             just another convenient way to filter an Instance Set. The query method returns 
-                            a new InstanceSet with the same class model as the original set and does not update
+                            a new InstanceSet with the same ClassModel as the original set and does not update
                             the original InstanceSet. This is implemented using the npm package mingo.
                         </p>
     
@@ -1101,7 +1106,7 @@ await userAccounts.save();
                         <p>
                             InstanceSet has non-static method delete which will delete all of the
                             instances in the InstanceSet. It will run the deleteControl function(s) for 
-                            each instance using the instances class model. If an error is thrown for
+                            each instance using the instances ClassModel. If an error is thrown for
                             any instance by a deleteControl function, the error will be thrown by the
                             delete method and none of the instances will be deleted. 
                         </p>
@@ -1126,13 +1131,13 @@ await userAccounts.delete();
             <h5><strong>Queries</strong></h5>
 
             <p>
-                All database queries in Noomman are done through non-static methods on the class model
+                All database queries in Noomman are done through non-static methods on the ClassModel
                 of the instances you wish to find. All the query methods take a mongo compliant filter
                 object as an argument. Each method is asynchronus and will resolve with the instances found.
                 Queries respect inheritance, so running a query on 
-                a class model which is a super class will also query/return instances of all its sub
-                class models. If there are multiple levels of inheritance, this will proceed all the way
-                down the tree of class models. If no instances are found matching the query, an empty
+                a ClassModel which is a super class will also query/return instances of all its sub
+                ClassModels. If there are multiple levels of inheritance, this will proceed all the way
+                down the tree of ClassModels. If no instances are found matching the query, an empty
                 InstanceSet is returned.
             </p>
 
@@ -1142,8 +1147,8 @@ await userAccounts.delete();
     
                 <p>
                     The find method is the most basic query method. It will return an InstanceSet
-                    with the same class model as the class model that you called find on. The returned
-                    InstanceSet will contain all the instances of the class model (and its sub class models)
+                    with the same ClassModel as the ClassModel that you called find on. The returned
+                    InstanceSet will contain all the instances of the ClassModel (and its sub ClassModels)
                     from the database matching your query. 
                 </p>
 
@@ -1168,9 +1173,9 @@ const coolUser1InstanceSet = await UserAccount.find({ userName: 'coolUser1' });
                     single instance, rather than an InstanceSet. If multiple instances would match
                     your query, only the first one found will be returned (there is no guarantee
                     which instance would be the 'first one found'). Note that even if you query from 
-                    a super class model, and an instance of a sub class model is found, 
-                    that sub class model instance will have its class model properly set to the sub 
-                    class model. If no instance is found matching the query, null will be returned.
+                    a super ClassModel, and an instance of a sub ClassModel is found, 
+                    that sub ClassModel instance will have its ClassModel properly set to the sub 
+                    ClassModel. If no instance is found matching the query, null will be returned.
                 </p>
 
                 <p>
@@ -1223,13 +1228,13 @@ console.log(coolUser1.equals(coolUser1UsingFindById));
             <p>
                 Relationships in Noomman abstract away the underlying foriegn key management and
                 querying a developer would normally need to worry about when working with a database. 
-                Relationships are well defined in class model schema, so that Noomman can do the querying
+                Relationships are well defined in ClassModel schema, so that Noomman can do the querying
                 for you, properly respecting inheritance.
             </p>
 
             <p>
-                For the following examples, we'll be using the UserAccount class model we have been 
-                working with, along with a new class model called Person, defined below.
+                For the following examples, we'll be using the UserAccount ClassModel we have been 
+                working with, along with a new ClassModel called Person, defined below.
             </p>
 
             <pre>
@@ -1297,7 +1302,7 @@ module.exports = Person;
             </pre>
 
             <p>
-                Notice that our new Person class model has a singular relationship to the 
+                Notice that our new Person ClassModel has a singular relationship to the 
                 UserAccount for this Person, and a two non-singular relationships to other 
                 Persons. The two non-singular relationships are actually the two sides of 
                 the same relationship, i.e. a person can have many 'friends', and a person 
@@ -1313,8 +1318,8 @@ module.exports = Person;
                     Setting a relationship on an instance is as easy as setting a property on an object.
                     Singular relationships must be set to an Instance and non-singular relationships must 
                     be set to an InstanceSet. Whether singular or non-singular, the Instance or InstanceSet
-                    that you set a relationship to must be of the same class model that set as the 'toClass'
-                    in the class model schema (or a sub class model there of). Otherwise an error will be 
+                    that you set a relationship to must be of the same ClassModel that set as the 'toClass'
+                    in the ClassModel schema (or a sub ClassModel there of). Otherwise an error will be 
                     thrown.
                 </p>
 
