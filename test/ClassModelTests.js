@@ -6224,5 +6224,20 @@ describe('Class Model Tests', () => {
 
     });
 
+    describe('ClassModel.getAllClassModelNames()', () => {
+    
+        it('All classNames returned.', () => {
+            const names = ClassModel.getAllClassModelNames();
+
+            if (names.length == 0) {
+                throw new Error('No names returned.');
+            }
+            if (names.includes('NoommanClassModel')) {
+                throw new Error('Names includes NoommanClassModel.');
+            }
+        });
+
+    })
+
 });
 

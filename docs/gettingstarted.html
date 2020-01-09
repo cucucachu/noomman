@@ -26,6 +26,7 @@
             <p><strong>N</strong>odejs <strong>O</strong>bject-<strong>O</strong>riented <strong>M</strong>ongoDB <strong>Man</strong>ager</p>
         </section>
     </div>
+
     <div class="navbar">
         <div class="container">
             <ul class="navbar-list">
@@ -341,8 +342,8 @@ parentsOfStewart.forEach(parent => console.log(parent.name));
             <p>
                 This deserves some explanation. Calling "stewart.parents" actualy executes a query for the related Instances,
                 populates the parents property on Stewart so that if called again, we can skip the query, and then returns
-                the InstanceSet containing the related Instances. Also shown here, we can use InstanceSet.forEach() method
-                to loop through all the Instances in the InstanceSet and execute some code.
+                a Promise which resolves to an InstanceSet containing the related Instances. Also shown here, we can use 
+                InstanceSet.forEach() method to loop through all the Instances in the InstanceSet and execute some code.
             </p>
         </div>
     </div>
@@ -436,7 +437,7 @@ module.exports = Pet;
             <p>
                 Now that Animal has sub Class Models, we may decide that we shouldn't be creating instances of Animal
                 itself. To accomplish this, lets add the "abstract" property to our Animal class schema. This will
-                have noomman through an error if any code attempts to create an Instance of Animal directly by 
+                have noomman throw an error if any code attempts to create an Instance of Animal directly by 
                 calling new Instance(Animal).
             </p>
             <pre>
@@ -618,9 +619,9 @@ await spot.save();
                 comfortable with the basics of noomman. 
             </p>
             <p>
-                For more detailed walkthroughs please checkout the
+                For more information please checkout the
                 <a href="./reference.html">reference</a>
-                section, which contains more detailed explanations and examples of all the features of noomman,
+                section, which contains more thorough explanations and examples of all the features of noomman,
                 and the 
                 <a href="./documentation.html">documentation</a>
                 section, which has detailed documentation of all the methods and classes contained in noomman. 

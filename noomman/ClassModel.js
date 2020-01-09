@@ -76,7 +76,6 @@ class ClassModel {
      * - NoommanConstructorError - If constructorValidations() method throws a NoommanConstructorError.
      */
     constructor(schema) {
-
         this.constructorValidations(schema);
 
         this.className = schema.className;
@@ -624,6 +623,25 @@ class ClassModel {
      */
     static getClassModel(className) {
         return AllClassModels[className];
+    }
+
+    /* 
+     * getAllClassModelNames()
+     * Retrieves all the classNames of all created ClassModels, except NoommanClassModel.
+     * Returns
+     * - Array<String> - the classNames of all created ClassModels, except NoommanClassModel.
+     */
+
+    static getAllClassModelNames() {
+        const names = [];
+        for (const index in AllClassModels) {
+            const classModel = AllClassModels[index];
+            if (classModel.className !== 'NoommanClassModel') {
+                names.push(classModel.className);
+            }
+        }
+        
+        return names;
     }
 
     /* 

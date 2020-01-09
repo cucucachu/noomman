@@ -27,7 +27,7 @@ async function connect(uri, databaseName) {
 		throw new NoommanErrors.NoommanDatabaseError('Attempt to connect to database twice.');
 	}
 	
-	client = new MongoClient(uri, { useNewUrlParser: true });
+	client = new MongoClient(uri, { useNewUrlParser: true, useUnifiedTopology: true});
 
 	await client.connect();
 	db = client.db(databaseName);
