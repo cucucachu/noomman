@@ -60,6 +60,7 @@ const objectsEqual = TestingFunctions.objectsEqual;
     var TwoWayRelationshipClass2 = TestClassModels.TwoWayRelationshipClass2;
     var ClassOwnsOtherClass = TestClassModels.ClassOwnsOtherClass;
     var ClassOwnedByOtherClass = TestClassModels.ClassOwnedByOtherClass;
+    var TreeClass = TestClassModels.TreeClass;
 
     // Update Controlled Classes
     var UpdateControlledSuperClass = TestClassModels.UpdateControlledSuperClass;
@@ -3165,6 +3166,10 @@ describe('Instance Tests', () => {
             await instanceOfClassControlsUpdateControlledSuperClassNotAllowed.save();
             await instanceOfClassControlsCreateControlledSuperClassAllowed.save();
             await instanceOfClassControlsCreateControlledSuperClassNotAllowed.save();
+
+            await TreeClass.clear();
+            await TwoWayRelationshipClass1.clear();
+            await TwoWayRelationshipClass2.clear();
         });
 
         after(async () => {
@@ -3179,8 +3184,6 @@ describe('Instance Tests', () => {
             await CompareClass2.clear();
             await AuditableSuperClass.clear();
             await database.clearCollection('audit_' + AuditableSuperClass.collection);
-            await TwoWayRelationshipClass1.clear();
-            await TwoWayRelationshipClass2.clear();
             await SensitiveControlledSuperClass.clear();
         });
 
@@ -4449,6 +4452,166 @@ describe('Instance Tests', () => {
 
             });
 
+            describe('Updating Existing Relationships', () => {
+
+                describe('One to One Relationship', () => {
+
+                    it.skip('Updating a one to one relationship to a new value unhooks original relationship target.', async () => {
+                        let instance = new Instance(TwoWayRelationshipClass1);
+                        let relatedInstance1 = new Instance(TwoWayRelationshipClass2);
+                        let relatedInstance2 = new Instance(TwoWayRelationshipClass2);
+
+                        instance.name = 'Home Instance: Update One to One';
+                        relatedInstance1.name = 'Related Instance1: Update One to One';
+                        relatedInstance2.name = 'Related Instance2: Update One to One';
+
+                        instance.oneToOne = relatedInstance1;
+
+                        await instance.save();
+                        await relatedInstance2.save();
+
+                        instance.oneToOne = relatedInstance2;
+
+                        await instance.save();
+
+                        instance = await TwoWayRelationshipClass1.findById(instance._id);
+                        relatedInstance1 = await TwoWayRelationshipClass2.findById(relatedInstance1._id);
+                        relatedInstance2 = await TwoWayRelationshipClass2.findById(relatedInstance2._id);
+
+                        if (!(await instance.oneToOne).equals(relatedInstance2)) {
+                            throw new Error('Relationship not updated properly.');
+                        }
+
+                        if (!(await relatedInstance2.oneToOne).equals(instance)) {
+                            throw new Error('New reverse relationship not set correctly.');
+                        }
+
+                        if ((await relatedInstance1.oneToOne) !== null) {
+                            throw new Error('Original reverse relationship not set correctly.');
+                        }
+                    });
+
+                });
+
+                describe('One to Many Relationship', () => {
+
+                    it('Updating a one to many relationship to a new value unhooks original relationship target.', async () => {
+                        let child1 = new Instance(TreeClass);
+                        let child2 = new Instance(TreeClass);
+                        let parent = new Instance(TreeClass);
+
+                        child1.name = 'Child1: Updating One To Many',
+                        child2.name = 'Child2: Updating One To Many',
+                        parent.name = 'Parent: Updating One To Many',
+
+                        parent.children = new InstanceSet(TreeClass, [child1]);
+
+                        await parent.save();
+                        await child2.save();
+
+                        parent.children = new InstanceSet(TreeClass, [child2]);
+
+                        await parent.save();
+
+                        child1 = await TreeClass.findById(child1._id);
+                        child2 = await TreeClass.findById(child2._id);
+                        parent = await TreeClass.findById(parent._id);
+
+                        if (!(await parent.children).hasInstance(child2) || (await parent.children).hasInstance(child1)) {
+                            throw new Error('Relationship not set correctly.');
+                        }
+
+                        if (!(await child2.parent).equals(parent)) {
+                            throw new Error('New reverse relationship not set correctly.');
+                        }
+
+                        if (await child1.parent !== null) {
+                            throw new Error('Original reverse relationship not updated correctly.');
+                        }
+                    });
+
+                });
+
+                describe('Many to One Relationship', () => {
+
+                    it.skip('Updating a many to one relationship to a new value unhooks original relationship target.', async () => {
+                        let child = new Instance(TreeClass);
+                        let parent1 = new Instance(TreeClass);
+                        let parent2 = new Instance(TreeClass);
+
+                        child.name = 'Child: Updating Many To One',
+                        parent1.name = 'Parent1: Updating Many To One',
+                        parent2.name = 'Parent2: Updating Many To One',
+                        child.parent = parent1;
+
+                        await child.save();
+                        await parent2.save();
+
+                        child.parent = parent2;
+
+                        await child.save();
+
+                        child = await TreeClass.findById(child._id);
+                        parent1 = await TreeClass.findById(parent1._id);
+                        parent2 = await TreeClass.findById(parent2._id);
+
+                        if (!(await child.parent).equals(parent2)) {
+                            throw new Error('Relationship was not updated correctly.');
+                        }
+
+                        if (!(await parent2.children).hasInstance(child)) {
+                            throw new Error('New reverse relationship not updated correctly.');
+                        }
+
+                        if ((await parent1.children).hasInstance(child)) {
+                            throw new Error('Oringinal reverse relationship not updated correctly.');
+                        }
+                    });
+
+                });
+
+                describe('Many to Many Relationship', () => {
+
+                    it('Updating a many to many relationship to a new value unhooks original relationship target.', async () => {
+                        let instance = new Instance(TwoWayRelationshipClass1);
+                        let relatedInstance1 = new Instance(TwoWayRelationshipClass2);
+                        let relatedInstance2 = new Instance(TwoWayRelationshipClass2);
+
+                        instance.name = 'Home Instance: Update Many to Many';
+                        relatedInstance1.name = 'Related Instance1: Update Many to Many';
+                        relatedInstance2.name = 'Related Instance2: Update Many to Many';
+
+                        instance.manyToMany = new InstanceSet(TwoWayRelationshipClass2, [relatedInstance1]);
+
+                        await instance.save();
+                        await relatedInstance2.save();
+
+                        instance.manyToMany = new InstanceSet(TwoWayRelationshipClass2, [relatedInstance2]);
+
+                        await instance.save();
+
+                        instance = await TwoWayRelationshipClass1.findById(instance._id);
+                        relatedInstance1 = await TwoWayRelationshipClass2.findById(relatedInstance1._id);
+                        relatedInstance2 = await TwoWayRelationshipClass2.findById(relatedInstance2._id);
+
+                        if (!(await instance.manyToMany).hasInstance(relatedInstance2)) {
+                            throw new Error('Relationship not updated properly.');
+                        }
+
+                        if (!(await relatedInstance2.manyToMany).hasInstance(instance)) {
+                            throw new Error('New reverse relationship not set correctly.');
+                        }
+
+                        if (!(await relatedInstance1.manyToMany).isEmpty()) {
+                            throw new Error('Original reverse relationship not set correctly.');
+                        }
+
+                    });
+
+                });
+
+            });
+
         });
 
         describe('Saving Sensitive Controlled Instances (Stripped Instances)', () => {
@@ -4501,14 +4664,14 @@ describe('Instance Tests', () => {
         before(async () => {
             await instanceOfClassControlsDeleteControlledSuperClassAllowed.save();
             await instanceOfClassControlsDeleteControlledSuperClassNotAllowed.save();
+            await TwoWayRelationshipClass1.clear();
+            await TwoWayRelationshipClass2.clear();
         });
 
         after(async () => {
             await AllFieldsRequiredClass.clear();
             await DeleteControlledSuperClass.clear();
             await DeleteControlledClassDeleteControlledByParameters.clear();
-            await TwoWayRelationshipClass1.clear();
-            await TwoWayRelationshipClass2.clear();
             await AuditableSuperClass.clear();
             await ClassOwnsOtherClass.clear();
             await ClassOwnedByOtherClass.clear();

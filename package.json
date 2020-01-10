@@ -1,14 +1,14 @@
 {
   "name": "noomman",
   "version": "0.5.2",
-  "main" : "noomman.js",
+  "main": "noomman.js",
   "private": false,
   "scripts": {
     "test": "mocha"
   },
   "dependencies": {
     "moment": "^2.24.0",
-    "mongodb": "^3.1.13"
+    "mongodb": "^3.4.1"
   },
   "devDependencies": {
     "mocha": "^5.2.0"

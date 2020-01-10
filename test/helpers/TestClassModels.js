@@ -775,6 +775,30 @@ const ClassModel = require('../../noomman/ClassModel');
             ]
         });
 
+        var TreeClass = new ClassModel({
+            className: 'TreeClass',
+            attributes: [
+                {
+                    name: 'name',
+                    type: String,
+                },
+            ],
+            relationships: [
+                {
+                    name: 'parent',
+                    toClass: 'TreeClass',
+                    mirrorRelationship: 'children',
+                    singular: true,
+                },
+                {
+                    name: 'children',
+                    toClass: 'TreeClass',
+                    mirrorRelationship: 'parent',
+                    singular: false,
+                },
+            ],
+        })
+
     }
 
     // CreateControlled Classes
@@ -1600,6 +1624,7 @@ module.exports = {
     SubClassOfNonSingularRelationshipClass,
     TwoWayRelationshipClass1,
     TwoWayRelationshipClass2,
+    TreeClass,
     ClassOwnsOtherClass,
     ClassOwnedByOtherClass,
     CreateControlledSuperClass, 
