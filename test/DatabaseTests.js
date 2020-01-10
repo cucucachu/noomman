@@ -204,7 +204,7 @@ describe('Database Tests', () => {
 
         after(async () => {
             await database.clearCollection(collection);
-            database.close();
+            await database.close();
         });
 
         describe('database.find()', () => {
@@ -332,7 +332,7 @@ describe('Database Tests', () => {
 
         after(async () => {
             await database.clearCollection(collection);
-            database.close();
+            await database.close();
         });
 
         describe('database.deleteOne()', () => {

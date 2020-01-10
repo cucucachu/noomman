@@ -798,6 +798,11 @@ describe('Diffable Tests', () => {
 
     describe('instance.relatedDiffs()', () => {
 
+        before(async () => {
+            await TwoWayRelationshipClass1.clear();
+            await TwoWayRelationshipClass2.clear();
+        })
+
         describe('$set', () => {
 
             describe('One to One', () => {
@@ -815,6 +820,31 @@ describe('Diffable Tests', () => {
 
                     if (!relatedDiffs[relationship][relatedInstance.id][mirrorOperation][mirrorRelationship].equals(instance._id)){
                         throw new Error('Related Diff is incorrect.');
+                    }
+                });
+
+                it('Setting a one to one relationship that was previously set.', async () => {
+                    const relationship = 'oneToOne';
+                    const mirrorRelationship = 'oneToOne';
+                    const mirrorOperation = '$set';
+
+                    const instance = new Instance(TwoWayRelationshipClass1);
+                    const relatedInstance1 = new Instance(TwoWayRelationshipClass2);
+                    const relatedInstance2 = new Instance(TwoWayRelationshipClass2);
+
+                    instance[relationship] = relatedInstance1;
+                    await instance.save();
+
+                    instance[relationship] = relatedInstance2;
+
+                    const relatedDiffs = instance.relatedDiffs();
+
+                    if (!relatedDiffs[relationship][relatedInstance2.id][mirrorOperation][mirrorRelationship].equals(instance._id)){
+                        throw new Error('New relationship not set');
+                    }
+
+                    if(!relatedDiffs[relationship][relatedInstance1.id]['$unset'][mirrorRelationship].equals(instance._id)) {
+                        throw new Error('Previous relationship was not unset.');
                     }
                 });
 
@@ -1038,6 +1068,33 @@ describe('Diffable Tests', () => {
 
                     if (!relatedDiffs[relationship][relatedInstance.id][mirrorOperation][mirrorRelationship].equals(instance._id)){
                         throw new Error('Related Diff is incorrect.');
+                    }
+                });
+
+                it('Setting a many to one relationship, replacing previous value.', async () => {
+                    const relationship = 'manyToOne';
+                    const mirrorRelationship = 'oneToMany';
+                    const mirrorOperation = '$addToSet';
+
+                    const instance = new Instance(TwoWayRelationshipClass1);
+                    const relatedInstance1 = new Instance(TwoWayRelationshipClass2);
+                    const relatedInstance2 = new Instance(TwoWayRelationshipClass2);
+
+                    instance.manyToOne = relatedInstance1;
+
+                    await instance.save();
+                    await relatedInstance2.save();
+
+                    instance.manyToOne = relatedInstance2;
+
+                    const relatedDiffs = instance.relatedDiffs();
+
+                    if (!relatedDiffs[relationship][relatedInstance2.id][mirrorOperation][mirrorRelationship].equals(instance._id)){
+                        throw new Error('New relationship not set');
+                    }
+
+                    if(!relatedDiffs[relationship][relatedInstance1.id]['$pull'][mirrorRelationship].equals(instance._id)) {
+                        throw new Error('Previous relationship was not unset.');
                     }
                 });
 

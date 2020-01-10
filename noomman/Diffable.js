@@ -216,6 +216,7 @@ class Diffable {
 
                 for (const operator of operators) {
                     const value = Diffable.valueForOperator(diff, operator, relationship.name);
+                    const previousValue = this.previousState ? this.previousState[relationship.name] : null;
 
                     if (value !== undefined) {
                         relatedDiffObject[relationship.name] = relatedDiffObject[relationship.name] !== undefined ? relatedDiffObject[relationship.name] : {};
@@ -224,6 +225,15 @@ class Diffable {
                         for (const relatedInstance of value) {
                             relatedDiffObject[relationship.name][relatedInstance.toString()] = {
                                 [mirrorOperator]: {
+                                    [relationship.mirrorRelationship]: this._id,
+                                }
+                            };
+                        }
+                        if (cardinality.to === '1' && operator === '$set' && previousValue) {
+                            const previousId =  previousValue instanceof Diffable ? previousValue._id : previousValue;
+                            const mirrorOperator2 = cardinality.from === '1' ? '$unset' : '$pull';
+                            relatedDiffObject[relationship.name][previousId.toString()] = {
+                                [mirrorOperator2]: {
                                     [relationship.mirrorRelationship]: this._id,
                                 }
                             };

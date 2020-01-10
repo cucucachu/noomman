@@ -4456,7 +4456,7 @@ describe('Instance Tests', () => {
 
                 describe('One to One Relationship', () => {
 
-                    it.skip('Updating a one to one relationship to a new value unhooks original relationship target.', async () => {
+                    it('Updating a one to one relationship to a new value unhooks original relationship target.', async () => {
                         let instance = new Instance(TwoWayRelationshipClass1);
                         let relatedInstance1 = new Instance(TwoWayRelationshipClass2);
                         let relatedInstance2 = new Instance(TwoWayRelationshipClass2);
@@ -4534,7 +4534,7 @@ describe('Instance Tests', () => {
 
                 describe('Many to One Relationship', () => {
 
-                    it.skip('Updating a many to one relationship to a new value unhooks original relationship target.', async () => {
+                    it('Updating a many to one relationship to a new value unhooks original relationship target.', async () => {
                         let child = new Instance(TreeClass);
                         let parent1 = new Instance(TreeClass);
                         let parent2 = new Instance(TreeClass);

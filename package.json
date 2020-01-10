@@ -1,6 +1,6 @@
 {
   "name": "noomman",
-  "version": "0.5.2",
+  "version": "0.5.3",
   "main": "noomman.js",
   "private": false,
   "scripts": {
