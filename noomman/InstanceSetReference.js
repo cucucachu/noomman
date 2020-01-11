@@ -126,17 +126,34 @@ class InstanceSetReference {
         }
         else {
             const diffObject = {};
-            const thisSet = new SuperSet(this._ids);
-            const thatSet = new SuperSet(that._ids);
+            const thisSet = new SuperSet(this.ids);
+            const thatSet = new SuperSet(that.ids);
 
             const toInsert = [...thisSet.difference(thatSet)];
             const toRemove = [...thatSet.difference(thisSet)];
 
             if (toInsert.length && !toRemove.length) {
-                diffObject.$addToSet = toInsert;
+                const toInsertObjectIds = [];
+                for (const id of toInsert) {
+                    for (const _id of this._ids) {
+                        if (_id.toHexString() === id) {
+                            toInsertObjectIds.push(_id);
+                        }                        
+                    }
+                }
+
+                diffObject.$addToSet = toInsertObjectIds;
             }
             else if (toRemove.length && !toInsert.length) {
-                diffObject.$pull = toRemove;
+                const toRemoveObjectIds = [];
+                for (const id of toRemove) {
+                    for (const _id of that._ids) {
+                        if (_id.toHexString() === id) {
+                            toRemoveObjectIds.push(_id);
+                        }                        
+                    }
+                }
+                diffObject.$pull = toRemoveObjectIds;
             }
             else {
                 diffObject.$set = this._ids;
@@ -187,17 +204,34 @@ class InstanceSetReference {
         }
         else {
             const diffObject = {};
-            const thisSet = new SuperSet(this._ids);
-            const thatSet = new SuperSet(that._ids);
+            const thisSet = new SuperSet(this.ids);
+            const thatSet = new SuperSet(that.ids);
 
             const toInsert = [...thisSet.difference(thatSet)];
             const toRemove = [...thatSet.difference(thisSet)];
+            const toInsertObjectIds = [];
+            const toRemoveObjectIds = [];
 
             if (toInsert.length) {
-                diffObject.$addToSet = toInsert;
+                for (const id of toInsert) {
+                    for (const _id of this._ids) {
+                        if (_id.toHexString() === id) {
+                            toInsertObjectIds.push(_id);
+                        }                        
+                    }
+                }
+
+                diffObject.$addToSet = toInsertObjectIds;
             }
             if (toRemove.length) {
-                diffObject.$pull = toRemove;
+                for (const id of toRemove) {
+                    for (const _id of that._ids) {
+                        if (_id.toHexString() === id) {
+                            toRemoveObjectIds.push(_id);
+                        }                        
+                    }
+                }
+                diffObject.$pull = toRemoveObjectIds;
             }
             return diffObject;            
         }

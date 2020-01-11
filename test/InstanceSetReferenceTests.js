@@ -377,7 +377,7 @@ describe('InstanceSetReference Tests', () => {
         
         describe('Diff When Ids Are Different Objects', () => {
 
-            it.skip('If instanceSetReference contains all _ids as argument _ids, plus additional, diff has $addToSet.', () => {
+            it('If instanceSetReference contains all _ids as argument _ids, plus additional, diff has $addToSet.', () => {
                 const instanceSetReference1 = new InstanceSetReference();
                 const instanceSetReference2 = new InstanceSetReference();
                 const ids = [database.ObjectId().toHexString(), database.ObjectId().toHexString()];
@@ -393,7 +393,7 @@ describe('InstanceSetReference Tests', () => {
                 }
             });
     
-            it.skip('If argument _ids contains all instanceSetReference _ids, plus additional, diff has $pull.', () => {
+            it('If argument _ids contains all instanceSetReference _ids, plus additional, diff has $pull.', () => {
                 const instanceSetReference1 = new InstanceSetReference();
                 const instanceSetReference2 = new InstanceSetReference();
                 const ids = [database.ObjectId().toHexString(), database.ObjectId().toHexString()];
@@ -553,7 +553,7 @@ describe('InstanceSetReference Tests', () => {
         
         describe('Diff When Ids Are Different Objects', () => {
 
-            it.skip('If instanceSetReference contains all _ids as argument _ids, plus additional, diff has $addToSet.', () => {
+            it('If instanceSetReference contains all _ids as argument _ids, plus additional, diff has $addToSet.', () => {
                 const instanceSetReference1 = new InstanceSetReference();
                 const instanceSetReference2 = new InstanceSetReference();
                 const ids = [database.ObjectId().toHexString(), database.ObjectId().toHexString()];
@@ -564,14 +564,12 @@ describe('InstanceSetReference Tests', () => {
                 
                 const diff = instanceSetReference1.splitDiff(instanceSetReference2);
 
-                console.log(JSON.stringify(diff, null, 2));
-
                 if (!diff.$addToSet || !arraysEqual(diff.$addToSet, additionalIds)) {
                     throw new Error('Diff is not as expected.');
                 }
             });
     
-            it.skip('If argument _ids contains all instanceSetReference _ids, plus additional, diff has $pull.', () => {
+            it('If argument _ids contains all instanceSetReference _ids, plus additional, diff has $pull.', () => {
                 const instanceSetReference1 = new InstanceSetReference();
                 const instanceSetReference2 = new InstanceSetReference();
                 const ids = [database.ObjectId().toHexString(), database.ObjectId().toHexString()];
@@ -581,15 +579,13 @@ describe('InstanceSetReference Tests', () => {
                 instanceSetReference2._ids = [...(ids.map(id => database.ObjectId(id))), ...additionalIds];
                 
                 const diff = instanceSetReference1.splitDiff(instanceSetReference2);
-
-                console.log(JSON.stringify(diff, null, 2));
     
                 if (!diff.$pull || !arraysEqual(diff.$pull, additionalIds)) {
                     throw new Error('Diff is not as expected.');
                 }
             });
     
-            it.skip('If argument _ids and instanceSetReference _ids are not supersets one way or another, diff has $addToSet and $pull.', () => {
+            it('If argument _ids and instanceSetReference _ids are not supersets one way or another, diff has $addToSet and $pull.', () => {
                 const instanceSetReference1 = new InstanceSetReference();
                 const instanceSetReference2 = new InstanceSetReference();
                 const overlappingIds = [database.ObjectId().toHexString(), database.ObjectId().toHexString()];
