@@ -260,9 +260,357 @@ describe('InstanceSetReference Tests', () => {
 
     describe('InstanceSetReference.diff()', () => {
 
+        it('If argument is null, and instanceSetReference is empty, then diff is empty object.', () => {
+            const instanceSetReference1 = new InstanceSetReference();
+            
+            const diff = instanceSetReference1.diff(null);
+
+            if (Object.keys(diff).length !== 0) {
+                throw new Error('Diff object is not empty and should be.');
+            }
+        });
+
+        it('If argument is null, and instanceSetReference has _ids, diff has $set equal to _ids.', () => {
+            const instanceSetReference1 = new InstanceSetReference();
+            
+            instanceSetReference1._ids = [database.ObjectId(), database.ObjectId()];
+            
+            const diff = instanceSetReference1.diff(null);
+
+            if (!arraysEqual(diff.$set, instanceSetReference1._ids)) {
+                throw new Error('Diff is not as expected.');
+            }
+        });
+
+        it('If instanceSetReferences are equal, then diff is empty object.', () => {
+            const instanceSetReference1 = new InstanceSetReference();
+            const instanceSetReference2 = new InstanceSetReference();
+            const _ids = [database.ObjectId(), database.ObjectId()];
+            
+            instanceSetReference1._ids = _ids;
+            instanceSetReference2._ids = _ids;
+            
+            const diff = instanceSetReference1.diff(instanceSetReference2);
+
+            if (Object.keys(diff).length !== 0) {
+                throw new Error('Diff object is not empty and should be.');
+            }
+        });
+
+        it('If instanceSetReference has _ids, but argument is empty isntanceSetReference, diff has $set equal to _ids.', () => {
+            const instanceSetReference1 = new InstanceSetReference();
+            const instanceSetReference2 = new InstanceSetReference();
+            const _ids = [database.ObjectId(), database.ObjectId()];
+            
+            instanceSetReference1._ids = _ids;
+            
+            const diff = instanceSetReference1.diff(instanceSetReference2);
+
+            if (!arraysEqual(diff.$set, instanceSetReference1._ids)) {
+                throw new Error('Diff is not as expected.');
+            }
+        });
+
+        it('If instanceSetReference is empty, and argument has _ids, diff has $unset equal to arguments _ids.', () => {
+            const instanceSetReference1 = new InstanceSetReference();
+            const instanceSetReference2 = new InstanceSetReference();
+            const _ids = [database.ObjectId(), database.ObjectId()];
+            
+            instanceSetReference2._ids = _ids;
+            
+            const diff = instanceSetReference1.diff(instanceSetReference2);
+
+            if (!arraysEqual(diff.$unset, instanceSetReference2._ids)) {
+                throw new Error('Diff is not as expected.');
+            }
+
+        });
+
+        it('If instanceSetReference contains all _ids as argument _ids, plus additional, diff has $addToSet.', () => {
+            const instanceSetReference1 = new InstanceSetReference();
+            const instanceSetReference2 = new InstanceSetReference();
+            const _ids = [database.ObjectId(), database.ObjectId()];
+            const additionalIds = [database.ObjectId(), database.ObjectId()];
+            
+            instanceSetReference1._ids = [..._ids, ...additionalIds];
+            instanceSetReference2._ids = _ids;
+            
+            const diff = instanceSetReference1.diff(instanceSetReference2);
+
+            if (!arraysEqual(diff.$addToSet, additionalIds)) {
+                throw new Error('Diff is not as expected.');
+            }
+        });
+
+        it('If argument _ids contains all instanceSetReference _ids, plus additional, diff has $pull.', () => {
+            const instanceSetReference1 = new InstanceSetReference();
+            const instanceSetReference2 = new InstanceSetReference();
+            const _ids = [database.ObjectId(), database.ObjectId()];
+            const additionalIds = [database.ObjectId(), database.ObjectId()];
+            
+            instanceSetReference2._ids = [..._ids, ...additionalIds];
+            instanceSetReference1._ids = _ids;
+            
+            const diff = instanceSetReference1.diff(instanceSetReference2);
+
+            if (!arraysEqual(diff.$pull, additionalIds)) {
+                throw new Error('Diff is not as expected.');
+            }
+        });
+
+        it('If argument _ids and instanceSetReference _ids are not supersets one way or another, diff has $set equal to _ids.', () => {
+            const instanceSetReference1 = new InstanceSetReference();
+            const instanceSetReference2 = new InstanceSetReference();
+            const overlappingIds = [database.ObjectId(), database.ObjectId()];
+            const _ids1 = [database.ObjectId(), database.ObjectId()];
+            const _ids2 = [database.ObjectId(), database.ObjectId()];
+            
+            instanceSetReference1._ids = [..._ids1, ...overlappingIds];
+            instanceSetReference2._ids = [..._ids2, ...overlappingIds];
+            
+            const diff = instanceSetReference1.diff(instanceSetReference2);
+
+            if (!arraysEqual(diff.$set, instanceSetReference1._ids)) {
+                throw new Error('Diff is not as expected.');
+            }
+        });
+        
+        describe('Diff When Ids Are Different Objects', () => {
+
+            it.skip('If instanceSetReference contains all _ids as argument _ids, plus additional, diff has $addToSet.', () => {
+                const instanceSetReference1 = new InstanceSetReference();
+                const instanceSetReference2 = new InstanceSetReference();
+                const ids = [database.ObjectId().toHexString(), database.ObjectId().toHexString()];
+                const additionalIds = [database.ObjectId(), database.ObjectId()];
+                
+                instanceSetReference1._ids = [...(ids.map(id => database.ObjectId(id))), ...additionalIds];
+                instanceSetReference2._ids = ids.map(id => database.ObjectId(id));
+                
+                const diff = instanceSetReference1.diff(instanceSetReference2);
+
+                if (!diff.$addToSet || !arraysEqual(diff.$addToSet, additionalIds)) {
+                    throw new Error('Diff is not as expected.');
+                }
+            });
+    
+            it.skip('If argument _ids contains all instanceSetReference _ids, plus additional, diff has $pull.', () => {
+                const instanceSetReference1 = new InstanceSetReference();
+                const instanceSetReference2 = new InstanceSetReference();
+                const ids = [database.ObjectId().toHexString(), database.ObjectId().toHexString()];
+                const additionalIds = [database.ObjectId(), database.ObjectId()];
+                
+                instanceSetReference1._ids = ids.map(id => database.ObjectId(id));
+                instanceSetReference2._ids = [...(ids.map(id => database.ObjectId(id))), ...additionalIds];
+                
+                const diff = instanceSetReference1.diff(instanceSetReference2);
+    
+                if (!diff.$pull || !arraysEqual(diff.$pull, additionalIds)) {
+                    throw new Error('Diff is not as expected.');
+                }
+            });
+    
+            it('If argument _ids and instanceSetReference _ids are not supersets one way or another, diff has $set equal to _ids.', () => {
+                const instanceSetReference1 = new InstanceSetReference();
+                const instanceSetReference2 = new InstanceSetReference();
+                const overlappingIds = [database.ObjectId().toHexString(), database.ObjectId().toHexString()];
+                const _ids1 = [database.ObjectId(), database.ObjectId()];
+                const _ids2 = [database.ObjectId(), database.ObjectId()];
+                
+                instanceSetReference1._ids = [..._ids1, ...overlappingIds.map(id => database.ObjectId(id))];
+                instanceSetReference2._ids = [..._ids2, ...overlappingIds.map(id => database.ObjectId(id))];
+                
+                const diff = instanceSetReference1.diff(instanceSetReference2);
+    
+                if (!diff.$set || !arraysEqual(diff.$set, instanceSetReference1._ids)) {
+                    throw new Error('Diff is not as expected.');
+                }
+            });
+
+        });
+
     });
 
     describe('InstanceSetReference.splitDiff()', () => {
+
+        it('If argument is null, and instanceSetReference is empty, then diff is empty object.', () => {
+            const instanceSetReference1 = new InstanceSetReference();
+            
+            const diff = instanceSetReference1.splitDiff(null);
+
+            if (Object.keys(diff).length !== 0) {
+                throw new Error('Diff object is not empty and should be.');
+            }
+        });
+
+        it('If argument is null, and instanceSetReference has _ids, diff has $set equal to _ids.', () => {
+            const instanceSetReference1 = new InstanceSetReference();
+            
+            instanceSetReference1._ids = [database.ObjectId(), database.ObjectId()];
+            
+            const diff = instanceSetReference1.splitDiff(null);
+
+            if (!arraysEqual(diff.$set, instanceSetReference1._ids)) {
+                throw new Error('Diff is not as expected.');
+            }
+        });
+
+        it('If instanceSetReferences are equal, then diff is empty object.', () => {
+            const instanceSetReference1 = new InstanceSetReference();
+            const instanceSetReference2 = new InstanceSetReference();
+            const _ids = [database.ObjectId(), database.ObjectId()];
+            
+            instanceSetReference1._ids = _ids;
+            instanceSetReference2._ids = _ids;
+            
+            const diff = instanceSetReference1.splitDiff(instanceSetReference2);
+
+            if (Object.keys(diff).length !== 0) {
+                throw new Error('Diff object is not empty and should be.');
+            }
+        });
+
+        it('If instanceSetReference has _ids, but argument is empty isntanceSetReference, diff has $set equal to _ids.', () => {
+            const instanceSetReference1 = new InstanceSetReference();
+            const instanceSetReference2 = new InstanceSetReference();
+            const _ids = [database.ObjectId(), database.ObjectId()];
+            
+            instanceSetReference1._ids = _ids;
+            
+            const diff = instanceSetReference1.splitDiff(instanceSetReference2);
+
+            if (!arraysEqual(diff.$set, instanceSetReference1._ids)) {
+                throw new Error('Diff is not as expected.');
+            }
+        });
+
+        it('If instanceSetReference is empty, and argument has _ids, diff has $unset equal to arguments _ids.', () => {
+            const instanceSetReference1 = new InstanceSetReference();
+            const instanceSetReference2 = new InstanceSetReference();
+            const _ids = [database.ObjectId(), database.ObjectId()];
+            
+            instanceSetReference2._ids = _ids;
+            
+            const diff = instanceSetReference1.splitDiff(instanceSetReference2);
+
+            if (!arraysEqual(diff.$unset, instanceSetReference2._ids)) {
+                throw new Error('Diff is not as expected.');
+            }
+
+        });
+
+        it('If instanceSetReference contains all _ids as argument _ids, plus additional, diff has $addToSet.', () => {
+            const instanceSetReference1 = new InstanceSetReference();
+            const instanceSetReference2 = new InstanceSetReference();
+            const _ids = [database.ObjectId(), database.ObjectId()];
+            const additionalIds = [database.ObjectId(), database.ObjectId()];
+            
+            instanceSetReference1._ids = [..._ids, ...additionalIds];
+            instanceSetReference2._ids = _ids;
+            
+            const diff = instanceSetReference1.splitDiff(instanceSetReference2);
+
+            if (!arraysEqual(diff.$addToSet, additionalIds)) {
+                throw new Error('Diff is not as expected.');
+            }
+        });
+
+        it('If argument _ids contains all instanceSetReference _ids, plus additional, diff has $pull.', () => {
+            const instanceSetReference1 = new InstanceSetReference();
+            const instanceSetReference2 = new InstanceSetReference();
+            const _ids = [database.ObjectId(), database.ObjectId()];
+            const additionalIds = [database.ObjectId(), database.ObjectId()];
+            
+            instanceSetReference2._ids = [..._ids, ...additionalIds];
+            instanceSetReference1._ids = _ids;
+            
+            const diff = instanceSetReference1.splitDiff(instanceSetReference2);
+
+            if (!arraysEqual(diff.$pull, additionalIds)) {
+                throw new Error('Diff is not as expected.');
+            }
+        });
+    
+        it('If argument _ids and instanceSetReference _ids are not supersets one way or another, diff has $addToSet and $pull.', () => {
+            const instanceSetReference1 = new InstanceSetReference();
+            const instanceSetReference2 = new InstanceSetReference();
+            const overlappingIds = [database.ObjectId(), database.ObjectId()];
+            const _ids1 = [database.ObjectId(), database.ObjectId()];
+            const _ids2 = [database.ObjectId(), database.ObjectId()];
+            
+            instanceSetReference1._ids = [..._ids1, ...overlappingIds];
+            instanceSetReference2._ids = [..._ids2, ...overlappingIds];
+            
+            const diff = instanceSetReference1.splitDiff(instanceSetReference2);
+
+            if (!diff.$addToSet || !arraysEqual(diff.$addToSet, _ids1)) {
+                throw new Error('Diff is not as expected.');
+            }
+
+            if (!diff.$pull || !arraysEqual(diff.$pull, _ids2)) {
+                throw new Error('Diff is not as expected.');
+            }
+        });
+        
+        describe('Diff When Ids Are Different Objects', () => {
+
+            it.skip('If instanceSetReference contains all _ids as argument _ids, plus additional, diff has $addToSet.', () => {
+                const instanceSetReference1 = new InstanceSetReference();
+                const instanceSetReference2 = new InstanceSetReference();
+                const ids = [database.ObjectId().toHexString(), database.ObjectId().toHexString()];
+                const additionalIds = [database.ObjectId(), database.ObjectId()];
+                
+                instanceSetReference1._ids = [...(ids.map(id => database.ObjectId(id))), ...additionalIds];
+                instanceSetReference2._ids = ids.map(id => database.ObjectId(id));
+                
+                const diff = instanceSetReference1.splitDiff(instanceSetReference2);
+
+                console.log(JSON.stringify(diff, null, 2));
+
+                if (!diff.$addToSet || !arraysEqual(diff.$addToSet, additionalIds)) {
+                    throw new Error('Diff is not as expected.');
+                }
+            });
+    
+            it.skip('If argument _ids contains all instanceSetReference _ids, plus additional, diff has $pull.', () => {
+                const instanceSetReference1 = new InstanceSetReference();
+                const instanceSetReference2 = new InstanceSetReference();
+                const ids = [database.ObjectId().toHexString(), database.ObjectId().toHexString()];
+                const additionalIds = [database.ObjectId(), database.ObjectId()];
+                
+                instanceSetReference1._ids = ids.map(id => database.ObjectId(id));
+                instanceSetReference2._ids = [...(ids.map(id => database.ObjectId(id))), ...additionalIds];
+                
+                const diff = instanceSetReference1.splitDiff(instanceSetReference2);
+
+                console.log(JSON.stringify(diff, null, 2));
+    
+                if (!diff.$pull || !arraysEqual(diff.$pull, additionalIds)) {
+                    throw new Error('Diff is not as expected.');
+                }
+            });
+    
+            it.skip('If argument _ids and instanceSetReference _ids are not supersets one way or another, diff has $addToSet and $pull.', () => {
+                const instanceSetReference1 = new InstanceSetReference();
+                const instanceSetReference2 = new InstanceSetReference();
+                const overlappingIds = [database.ObjectId().toHexString(), database.ObjectId().toHexString()];
+                const _ids1 = [database.ObjectId(), database.ObjectId()];
+                const _ids2 = [database.ObjectId(), database.ObjectId()];
+                
+                instanceSetReference1._ids = [..._ids1, ...overlappingIds.map(id => database.ObjectId(id))];
+                instanceSetReference2._ids = [..._ids2, ...overlappingIds.map(id => database.ObjectId(id))];
+                
+                const diff = instanceSetReference1.splitDiff(instanceSetReference2);
+    
+                if (!diff.$addToSet || !arraysEqual(diff.$addToSet, _ids1)) {
+                    throw new Error('Diff is not as expected.');
+                }
+    
+                if (!diff.$pull || !arraysEqual(diff.$pull, _ids2)) {
+                    throw new Error('Diff is not as expected.');
+                }
+            });
+
+        });
 
     });
 
