@@ -3920,7 +3920,11 @@ describe('Class Model Tests', () => {
 
             });
 
+            describe('findPage() with Read Control Filter', () => {
 
+
+
+            });
 
         });
 
@@ -5074,6 +5078,40 @@ describe('Class Model Tests', () => {
                         if (!expectedInstances.equals(instancesFound)) 
                             throw new Error('find did not filter instances correctly.')
     
+                    });
+    
+                });
+    
+                describe('Test findPage() with read filtering', () => {
+    
+                    it('Call findPage() on read controlled super class with a passing and not passing instance of each sub class.', async () => {
+                        const instanceNames = [
+                            'instanceOfReadControlledSuperClassPasses',
+                            'instanceOfReadControlledSuperClassFailsRelationship',
+                            'instanceOfReadControlledSubClassOfReadControlledSuperClassPasses',
+                            'instanceOfReadControlledSubClassOfReadControlledSuperClassFailsRelationship',
+                            'instanceOfReadControlledSubClassOfReadControlledSuperClassFailsBoolean',
+                            'instanceOfReadControlledDiscriminatedSuperClassPasses',
+                            'instanceOfReadControlledDiscriminatedSuperClassFailsRelationship',
+                            'instanceOfReadControlledDiscriminatedSuperClassFailsString',
+                            'instanceOfReadControlledDiscriminatedSuperClassFailsBoolean',
+                            'instanceOfReadControlledSubClassOfReadControlledDiscriminatedSuperClassPasses',
+                            'instanceOfReadControlledSubClassOfReadControlledDiscriminatedSuperClassFailsRelationship',
+                            'instanceOfReadControlledSubClassOfReadControlledDiscriminatedSuperClassFailsBoolean',
+                            'ReadControlledSubClassOfReadControlledDiscriminatedSuperClass',
+                            'ReadControlledSubClassOfReadControlledDiscriminatedSuperClass'
+                        ];
+                        const expectedInstances = new InstanceSet(ReadControlledSuperClass, [
+                            instanceOfReadControlledSuperClassPasses,
+                            instanceOfReadControlledSubClassOfReadControlledSuperClassPasses,
+                            instanceOfReadControlledDiscriminatedSuperClassPasses,
+                            instanceOfReadControlledSubClassOfReadControlledDiscriminatedSuperClassPasses
+                        ]);
+    
+                        const instancesFound = (await ReadControlledSuperClass.findPage({name: {$in: instanceNames}}, 0, 100,)).instances;
+    
+                        if (!expectedInstances.equals(instancesFound)) 
+                            throw new Error('find did not filter instances correctly.');    
                     });
     
                 });
@@ -6850,6 +6888,64 @@ describe('Class Model Tests', () => {
     
                 });
     
+                describe('Test findPage() with sensitive filtering', () => {
+    
+                    it('Call findPage() on sensitive controlled super class with a passing and not passing instance of each sub class.', async () => {
+                        const instanceNames = [
+                            'instanceOfSensitiveControlledSuperClassPasses',
+                            'instanceOfSensitiveControlledSuperClassFailsRelationship',
+                            'instanceOfSensitiveControlledSubClassOfSensitiveControlledSuperClassPasses',
+                            'instanceOfSensitiveControlledSubClassOfSensitiveControlledSuperClassFailsRelationship',
+                            'instanceOfSensitiveControlledSubClassOfSensitiveControlledSuperClassFailsBoolean',
+                            'instanceOfSensitiveControlledDiscriminatedSuperClassPasses',
+                            'instanceOfSensitiveControlledDiscriminatedSuperClassFailsRelationship',
+                            'instanceOfSensitiveControlledDiscriminatedSuperClassFailsString',
+                            'instanceOfSensitiveControlledDiscriminatedSuperClassFailsBoolean',
+                            'instanceOfSensitiveControlledSubClassOfSensitiveControlledDiscriminatedSuperClassPasses',
+                            'instanceOfSensitiveControlledSubClassOfSensitiveControlledDiscriminatedSuperClassFailsRelationship',
+                            'instanceOfSensitiveControlledSubClassOfSensitiveControlledDiscriminatedSuperClassFailsBoolean',
+                            'SensitiveControlledSubClassOfSensitiveControlledDiscriminatedSuperClass',
+                            'SensitiveControlledSubClassOfSensitiveControlledDiscriminatedSuperClass'
+                        ];
+    
+                        const instancesFound = (await SensitiveControlledSuperClass.findPage({name: {$in: instanceNames}}, 0, 100)).instances;
+                        
+                        if (instancesFound.getInstanceWithId(instanceOfSensitiveControlledSuperClassPasses._id).SSN !== '123456789') {
+                            throw new Error('An instance was stripped when it should not have been.');
+                        }
+                        
+                        if (instancesFound.getInstanceWithId(instanceOfSensitiveControlledSubClassOfSensitiveControlledSuperClassPasses._id).SSN !== '123456789') {
+                            throw new Error('An instance was stripped when it should not have been.');
+                        }
+                        
+                        if (instancesFound.getInstanceWithId(instanceOfSensitiveControlledDiscriminatedSuperClassPasses._id).SSN !== '123456789') {
+                            throw new Error('An instance was stripped when it should not have been.');
+                        }
+                        
+                        if (instancesFound.getInstanceWithId(instanceOfSensitiveControlledSubClassOfSensitiveControlledDiscriminatedSuperClassPasses._id).SSN !== '123456789') {
+                            throw new Error('An instance was stripped when it should not have been.');
+                        }
+                        
+                        if (instancesFound.getInstanceWithId(instanceOfSensitiveControlledSubClassOfSensitiveControlledDiscriminatedSuperClassPasses._id).DOB === null) {
+                            throw new Error('An instance was stripped when it should not have been.');
+                        }
+                        
+                        if (instancesFound.getInstanceWithId(instanceOfSensitiveControlledSuperClassFailsRelationship._id).SSN !== null) {
+                            throw new Error('An instance was not stripped when it should have been.');
+                        }
+                        
+                        if (instancesFound.getInstanceWithId(instanceOfSensitiveControlledDiscriminatedSuperClassFailsRelationship._id).SSN !== null) {
+                            throw new Error('An instance was not stripped when it should have been.');
+                        }
+                        
+                        if (instancesFound.getInstanceWithId(instanceOfSensitiveControlledDiscriminatedSuperClassFailsString._id).SSN !== null) {
+                            throw new Error('An instance was not stripped when it should have been.');
+                        }
+    
+                    });
+    
+                });
+    
             });
     
         });
@@ -7072,4 +7168,5 @@ describe('Class Model Tests', () => {
     })
 
 });
+
 

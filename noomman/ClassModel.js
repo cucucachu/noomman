@@ -1006,8 +1006,7 @@ class ClassModel {
     async find(queryFilter, readControlMethodParameters, sensitiveControlMethodParameters) {
         const unfiltered = await this.pureFind(queryFilter);
         const filtered = await this.readControlFilter(unfiltered, readControlMethodParameters);
-        const sensitiveInstances = await this.sensitiveControlFilter(filtered, sensitiveControlMethodParameters);
-        sensitiveInstances.stripSensitiveAttributes();
+        await filtered.sensitiveControlCheckAndStrip(sensitiveControlMethodParameters);
 
         return filtered;
     }
@@ -1184,7 +1183,7 @@ class ClassModel {
         return this.pureFindOne({_id: id});
     }
 
-    async findPage(queryFilter={}, page=0, pageSize=100, orderBy={_id: 1}, readControlMethodParameters) {
+    async findPage(queryFilter={}, page=0, pageSize=100, orderBy={_id: 1}, readControlMethodParameters, sensitiveControlMethodParameters) {
         if (this.abstract && !this.isSuperClass())
             throw new NoommanErrors.NoommanClassModelError('Error in ' + this.className + '.findPage(). This class is abstract and non-discriminated, but it has no sub-classes.');
 
@@ -1255,6 +1254,7 @@ class ClassModel {
         }
 
         const filteredInstances = await instances.readControlFilter(readControlMethodParameters);
+        await filteredInstances.sensitiveControlCheckAndStrip(sensitiveControlMethodParameters);
 
         const hiddenInstances = instances.size - filteredInstances.size;
 

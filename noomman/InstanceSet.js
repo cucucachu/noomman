@@ -694,6 +694,19 @@ class InstanceSet extends SuperSet {
     }
 
     /*
+     * sensitiveControlCheckAndStrip(sensitiveControlMethodParameters)
+     * Runs applicable sensitiveControl methods for each Instance in the given InstanceSet, and and strips the sensitive 
+     *    attributes from those for which sensitiveControl method fails.
+     * Parameters
+     * - sensitiveControlMethodParameters - Object - An object containing any parameters that the sensitiveControl method(s)
+     *    may need.
+     */
+    async sensitiveControlCheckAndStrip(sensitiveControlMethodParameters) {
+        const instancesToStrip = await this.classModel.sensitiveControlFilter(this, sensitiveControlMethodParameters);
+        instancesToStrip.stripSensitiveAttributes();
+    }
+
+    /*
      * delete(deleteControlMethodParameters) 
      * Deletes all Instances in this InstanceSet from the database.
      * Parameters
