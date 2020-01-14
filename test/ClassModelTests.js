@@ -3599,6 +3599,325 @@ describe('Class Model Tests', () => {
 
                 });
 
+                describe('Finding Instances from Sub Class', () => {
+
+                    it('Finding all instances with page size equal to total number of instances.', async () => {
+                        const filter = {};
+                        const page = 0;
+                        const pageSize = 150;
+                        const orderBy = {
+                            number: 1,
+                        };
+    
+                        const result = await UniqueNumberSubClass.findPage(filter, page, pageSize, orderBy);
+                        const instances = result.instances;
+    
+                        if (
+                            instances.size !== 150 ||
+                            result.page !== page ||
+                            result.pageSize !== pageSize || 
+                            result.hiddenInstances !== 0 ||
+                            result.totalNumberOfInstances !== 150
+                        ) {
+                            throw new Error('Result is incorrect.');
+                        }
+    
+                        let index = 300;
+                        for (const instance of instances) {
+                            if (instance.number !== index) {
+                                throw new Error('Instances are out of order');
+                            }
+                            index++;
+                        }
+                    });
+
+                    it('Instances have proper Class Model set.', async () => {
+                        const filter = {};
+                        const page = 0;
+                        const pageSize = 150;
+                        const orderBy = {
+                            number: 1,
+                        };
+    
+                        const result = await UniqueNumberSubClass.findPage(filter, page, pageSize, orderBy);
+                        const instances = result.instances;
+    
+                        let index = 0;
+                        for (const instance of instances) {
+                            if (index < 100 && instance.classModel !== UniqueNumberSubClass) {
+                                throw new Error('Sub Class instances have incorrect class model.');
+                            }
+                            else if (index > 100 && instance.classModel !== UniqueNumberDiscriminatedSubSubClass){
+                                throw new Error('Sub Sub Class instances have incorrect class model.');
+                            }
+                            index++;
+                        }
+                    });
+
+                    it('Finding first page of instances.', async () => {
+                        const filter = {};
+                        const page = 0;
+                        const pageSize = 50;
+                        const orderBy = {
+                            number: 1,
+                        };
+    
+                        const result = await UniqueNumberSubClass.findPage(filter, page, pageSize, orderBy);
+                        const instances = result.instances;
+    
+                        if (
+                            instances.size !== 50 ||
+                            result.page !== page ||
+                            result.pageSize !== pageSize || 
+                            result.hiddenInstances !== 0 ||
+                            result.totalNumberOfInstances !== 150
+                        ) {
+                            throw new Error('Result is incorrect.');
+                        }
+    
+                        let index = 300;
+                        for (const instance of instances) {
+                            if (instance.number !== index) {
+                                throw new Error('Instances are out of order');
+                            }
+                            index++;
+                        }
+                    });
+
+                    it('Finding page of instances that crosses two cursors.', async () => {
+                        const filter = {};
+                        const page = 1;
+                        const pageSize = 75;
+                        const orderBy = {
+                            number: 1,
+                        };
+    
+                        const result = await UniqueNumberSubClass.findPage(filter, page, pageSize, orderBy);
+                        const instances = result.instances;
+    
+                        if (
+                            instances.size !== 75 ||
+                            result.page !== page ||
+                            result.pageSize !== pageSize || 
+                            result.hiddenInstances !== 0 ||
+                            result.totalNumberOfInstances !== 150
+                        ) {
+                            throw new Error('Result is incorrect.');
+                        }
+    
+                        let index = 375;
+                        for (const instance of instances) {
+                            if (instance.number !== index) {
+                                throw new Error('Instances are out of order');
+                            }
+                            index++;
+                        }
+                    });
+
+                    it('Finding page of instances that goes past end of instances.', async () => {
+                        const filter = {};
+                        const page = 1;
+                        const pageSize = 80;
+                        const orderBy = {
+                            number: 1,
+                        };
+    
+                        const result = await UniqueNumberSubClass.findPage(filter, page, pageSize, orderBy);
+                        const instances = result.instances;
+    
+                        if (
+                            instances.size !== 70 ||
+                            result.page !== page ||
+                            result.pageSize !== pageSize || 
+                            result.hiddenInstances !== 0 ||
+                            result.totalNumberOfInstances !== 150
+                        ) {
+                            throw new Error('Result is incorrect.');
+                        }
+    
+                        let index = 380;
+                        for (const instance of instances) {
+                            if (instance.number !== index) {
+                                throw new Error('Instances are out of order');
+                            }
+                            index++;
+                        }
+                    });
+
+                    it('Finding page of instances that has all instances and goes past end of instances.', async () => {
+                        const filter = {};
+                        const page = 0;
+                        const pageSize = 200;
+                        const orderBy = {
+                            number: 1,
+                        };
+                    
+                        const result = await UniqueNumberSubClass.findPage(filter, page, pageSize, orderBy);
+                        const instances = result.instances;
+    
+                        if (
+                            instances.size !== 150 ||
+                            result.page !== page ||
+                            result.pageSize !== pageSize || 
+                            result.hiddenInstances !== 0 ||
+                            result.totalNumberOfInstances !== 150
+                        ) {
+                            throw new Error('Result is incorrect.');
+                        }
+    
+                        let index = 300;
+                        for (const instance of instances) {
+                            if (instance.number !== index) {
+                                throw new Error('Instances are out of order');
+                            }
+                            index++;
+                        }
+                    });
+
+                });
+
+                describe('Finding Instances from Discriminated Sub Sub Class', () => {
+
+                    it('Finding all instances with page size equal to total number of instances.', async () => {
+                        const filter = {};
+                        const page = 0;
+                        const pageSize = 50;
+                        const orderBy = {
+                            number: 1,
+                        };
+    
+                        const result = await UniqueNumberDiscriminatedSubSubClass.findPage(filter, page, pageSize, orderBy);
+                        const instances = result.instances;
+    
+                        if (
+                            instances.size !== 50 ||
+                            result.page !== page ||
+                            result.pageSize !== pageSize || 
+                            result.hiddenInstances !== 0 ||
+                            result.totalNumberOfInstances !== 50
+                        ) {
+                            throw new Error('Result is incorrect.');
+                        }
+    
+                        let index = 400;
+                        for (const instance of instances) {
+                            if (instance.number !== index) {
+                                throw new Error('Instances are out of order');
+                            }
+                            index++;
+                        }
+                    });
+
+                    it('Instances have proper Class Model set.', async () => {
+                        const filter = {};
+                        const page = 0;
+                        const pageSize = 50;
+                        const orderBy = {
+                            number: 1,
+                        };
+    
+                        const result = await UniqueNumberDiscriminatedSubSubClass.findPage(filter, page, pageSize, orderBy);
+                        const instances = result.instances;
+    
+                        for (const instance of instances) {
+                            if (instance.classModel !== UniqueNumberDiscriminatedSubSubClass){
+                                throw new Error('Sub Sub Class instances have incorrect class model.');
+                            }
+                        }
+                    });
+
+                    it('Finding first page of instances.', async () => {
+                        const filter = {};
+                        const page = 0;
+                        const pageSize = 20;
+                        const orderBy = {
+                            number: 1,
+                        };
+    
+                        const result = await UniqueNumberDiscriminatedSubSubClass.findPage(filter, page, pageSize, orderBy);
+                        const instances = result.instances;
+    
+                        if (
+                            instances.size !== 20 ||
+                            result.page !== page ||
+                            result.pageSize !== pageSize || 
+                            result.hiddenInstances !== 0 ||
+                            result.totalNumberOfInstances !== 50
+                        ) {
+                            throw new Error('Result is incorrect.');
+                        }
+    
+                        let index = 400;
+                        for (const instance of instances) {
+                            if (instance.number !== index) {
+                                throw new Error('Instances are out of order');
+                            }
+                            index++;
+                        }
+                    });
+
+                    it('Finding page of instances that goes past end of instances.', async () => {
+                        const filter = {};
+                        const page = 1;
+                        const pageSize = 30;
+                        const orderBy = {
+                            number: 1,
+                        };
+    
+                        const result = await UniqueNumberDiscriminatedSubSubClass.findPage(filter, page, pageSize, orderBy);
+                        const instances = result.instances;
+    
+                        if (
+                            instances.size !== 20 ||
+                            result.page !== page ||
+                            result.pageSize !== pageSize || 
+                            result.hiddenInstances !== 0 ||
+                            result.totalNumberOfInstances !== 50
+                        ) {
+                            throw new Error('Result is incorrect.');
+                        }
+    
+                        let index = 430;
+                        for (const instance of instances) {
+                            if (instance.number !== index) {
+                                throw new Error('Instances are out of order');
+                            }
+                            index++;
+                        }
+                    });
+
+                    it('Finding page of instances that has all instances and goes past end of instances.', async () => {
+                        const filter = {};
+                        const page = 0;
+                        const pageSize = 60;
+                        const orderBy = {
+                            number: 1,
+                        };
+                    
+                        const result = await UniqueNumberDiscriminatedSubSubClass.findPage(filter, page, pageSize, orderBy);
+                        const instances = result.instances;
+    
+                        if (
+                            instances.size !== 50 ||
+                            result.page !== page ||
+                            result.pageSize !== pageSize || 
+                            result.hiddenInstances !== 0 ||
+                            result.totalNumberOfInstances !== 50
+                        ) {
+                            throw new Error('Result is incorrect.');
+                        }
+    
+                        let index = 400;
+                        for (const instance of instances) {
+                            if (instance.number !== index) {
+                                throw new Error('Instances are out of order');
+                            }
+                            index++;
+                        }
+                    });
+
+                });
+
             });
 
 
