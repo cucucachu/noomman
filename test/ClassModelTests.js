@@ -14,6 +14,9 @@ const testForErrorAsync = TestingFunctions.testForErrorAsync;
     var CompareClass1 = TestClassModels.CompareClass1;
     var CompareClass2 = TestClassModels.CompareClass2;
 
+    // Simple Classes
+    var UniqueNumberClass = TestClassModels.UniqueNumberClass;
+
     // Validation Classes
     var AllFieldsRequiredClass = TestClassModels.AllFieldsRequiredClass;
     var AllFieldsMutexClass = TestClassModels.AllFieldsMutexClass;
@@ -3089,6 +3092,302 @@ describe('Class Model Tests', () => {
                 });
 
             });
+
+        });
+
+        describe('ClassModel.findPage()', () => {
+
+            before(async () => {
+                const numberOfInstancesToCreate = 300;
+
+                if ((await UniqueNumberClass.find()).size !== numberOfInstancesToCreate) {
+                    await UniqueNumberClass.clear();
+    
+                    const uniqueNumbers = new InstanceSet(UniqueNumberClass);
+    
+                    for (let i = 0; i < numberOfInstancesToCreate; i++) {
+                        const instance = new Instance(UniqueNumberClass);
+                        instance.number = i;
+                        uniqueNumbers.add(instance);
+                    }
+    
+                    await uniqueNumbers.save();
+                }
+            });
+
+            describe('findPage With No SubClasses or Read Control', () => {
+
+                it('Can find all instances if page size is exactly the number of instances.', async () => {
+                    const filter = {};
+                    const page = 0;
+                    const pageSize = 300;
+                    const orderBy = undefined;
+
+                    const result = await UniqueNumberClass.findPage(filter, page, pageSize, orderBy);
+                    const instances = result.instances;
+
+                    if (
+                        instances.size !== 300 ||
+                        result.page !== page ||
+                        result.pageSize !== pageSize || 
+                        result.hiddenInstances !== 0 ||
+                        result.totalNumberOfInstances !== 300
+                    ) {
+                        throw new Error('Result is incorrect.');
+                    }
+                });
+
+                it('Can order instances using the orderBy parameter.', async () => {
+                    const filter = {};
+                    const page = 0;
+                    const pageSize = 300;
+                    const orderBy = {
+                        number: -1,
+                    };
+
+                    const result = await UniqueNumberClass.findPage(filter, page, pageSize, orderBy);
+                    const instances = result.instances;
+
+                    if (
+                        instances.size !== 300 ||
+                        result.page !== page ||
+                        result.pageSize !== pageSize || 
+                        result.hiddenInstances !== 0 ||
+                        result.totalNumberOfInstances !== 300
+                    ) {
+                        throw new Error('Result is incorrect.');
+                    }
+
+                    let index = 299;
+                    for (const instance of instances) {
+                        if (instance.number !== index) {
+                            throw new Error('Instances are out of order');
+                        }
+                        index--;
+                    }
+
+                });
+
+                it('Can filter instances using the queryFilter parameter.', async () => {
+                    const filter = {
+                        number: {
+                            $gte: 150,
+                        },
+                    };
+                    const page = 0;
+                    const pageSize = 150;
+                    const orderBy = undefined;
+
+                    const result = await UniqueNumberClass.findPage(filter, page, pageSize, orderBy);
+                    const instances = result.instances;
+                    if (
+                        instances.size !== 150 ||
+                        result.page !== page ||
+                        result.pageSize !== pageSize || 
+                        result.hiddenInstances !== 0 ||
+                        result.totalNumberOfInstances !== 150
+                    ) {
+                        throw new Error('Result is incorrect.');
+                    }
+                });
+
+                it('Can find the first page of instances.', async () => {
+                    const filter = {};
+                    const page = 0;
+                    const pageSize = 20;
+                    const orderBy = {
+                        number: 1,
+                    };
+
+                    const result = await UniqueNumberClass.findPage(filter, page, pageSize, orderBy);
+                    const instances = result.instances;
+
+                    if (
+                        instances.size !== 20 ||
+                        result.page !== page ||
+                        result.pageSize !== pageSize || 
+                        result.hiddenInstances !== 0 ||
+                        result.totalNumberOfInstances !== 300
+                    ) {
+                        throw new Error('Result is incorrect.');
+                    }
+
+                    let index = 0;
+                    for (const instance of instances) {
+                        if (instance.number !== index) {
+                            throw new Error('Instances are out of order');
+                        }
+                        index++;
+                    }
+                });
+
+                it('Can find a middle page of instances.', async () => {
+                    const filter = {};
+                    const page = 3;
+                    const pageSize = 20;
+                    const orderBy = {
+                        number: 1,
+                    };
+
+                    const result = await UniqueNumberClass.findPage(filter, page, pageSize, orderBy);
+                    const instances = result.instances;
+
+                    if (
+                        instances.size !== 20 ||
+                        result.page !== page ||
+                        result.pageSize !== pageSize || 
+                        result.hiddenInstances !== 0 ||
+                        result.totalNumberOfInstances !== 300
+                    ) {
+                        throw new Error('Result is incorrect.');
+                    }
+
+                    let index = 60;
+                    for (const instance of instances) {
+                        if (instance.number !== index) {
+                            throw new Error('Instances are out of order');
+                        }
+                        index++;
+                    }
+                });
+
+                it('Can find the last page of instances, exact fit.', async () => {
+                    const filter = {};
+                    const page = 14;
+                    const pageSize = 20;
+                    const orderBy = {
+                        number: 1,
+                    };
+
+                    const result = await UniqueNumberClass.findPage(filter, page, pageSize, orderBy);
+                    const instances = result.instances;
+
+                    if (
+                        instances.size !== 20 ||
+                        result.page !== page ||
+                        result.pageSize !== pageSize || 
+                        result.hiddenInstances !== 0 ||
+                        result.totalNumberOfInstances !== 300
+                    ) {
+                        throw new Error('Result is incorrect.');
+                    }
+
+                    let index = 280;
+                    for (const instance of instances) {
+                        if (instance.number !== index) {
+                            throw new Error('Instances are out of order');
+                        }
+                        index++;
+                    }
+                });
+
+                it('Can find the last page of instances, requesting more instances than exist.', async () => {
+                    const filter = {};
+                    const page = 7;
+                    const pageSize = 40;
+                    const orderBy = {
+                        number: 1,
+                    };
+
+                    const result = await UniqueNumberClass.findPage(filter, page, pageSize, orderBy);
+                    const instances = result.instances;
+
+                    if (
+                        instances.size !== 20 ||
+                        result.page !== page ||
+                        result.pageSize !== pageSize || 
+                        result.hiddenInstances !== 0 ||
+                        result.totalNumberOfInstances !== 300
+                    ) {
+                        throw new Error('Result is incorrect.');
+                    }
+
+                    let index = 280;
+                    for (const instance of instances) {
+                        if (instance.number !== index) {
+                            throw new Error('Instances are out of order');
+                        }
+                        index++;
+                    }
+                });
+
+                it('Can get very last instance with page size 1.', async () => {
+                    const filter = {};
+                    const page = 299;
+                    const pageSize = 1;
+                    const orderBy = {
+                        number: 1,
+                    };
+
+                    const result = await UniqueNumberClass.findPage(filter, page, pageSize, orderBy);
+                    const instances = result.instances;
+
+                    if (
+                        instances.size !== 1 ||
+                        result.page !== page ||
+                        result.pageSize !== pageSize || 
+                        result.hiddenInstances !== 0 ||
+                        result.totalNumberOfInstances !== 300
+                    ) {
+                        throw new Error('Result is incorrect.');
+                    }
+
+                    let index = 299;
+                    for (const instance of instances) {
+                        if (instance.number !== index) {
+                            throw new Error('Instances are out of order');
+                        }
+                        index++;
+                    }
+                });
+
+                it('No instances returned if requesting one past the last instance.', async () => {
+                    const filter = {};
+                    const page = 300;
+                    const pageSize = 1;
+                    const orderBy = {
+                        number: 1,
+                    };
+
+                    const result = await UniqueNumberClass.findPage(filter, page, pageSize, orderBy);
+                    const instances = result.instances;
+
+                    if (
+                        instances.size !== 0 ||
+                        result.page !== page ||
+                        result.pageSize !== pageSize || 
+                        result.hiddenInstances !== 0 ||
+                        result.totalNumberOfInstances !== 300
+                    ) {
+                        throw new Error('Result is incorrect.');
+                    }
+                });
+
+                it('No instances returned if page * pageSize is greater than the total number of instances.', async () => {
+                    const filter = {};
+                    const page = 151;
+                    const pageSize = 2;
+                    const orderBy = {
+                        number: 1,
+                    };
+
+                    const result = await UniqueNumberClass.findPage(filter, page, pageSize, orderBy);
+                    const instances = result.instances;
+
+                    if (
+                        instances.size !== 0 ||
+                        result.page !== page ||
+                        result.pageSize !== pageSize || 
+                        result.hiddenInstances !== 0 ||
+                        result.totalNumberOfInstances !== 300
+                    ) {
+                        throw new Error('Result is incorrect.');
+                    }                    
+                });
+
+            });
+
+
 
         });
 

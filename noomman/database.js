@@ -225,6 +225,10 @@ async function findById(collection, id) {
 	return findOne(collection, query);
 }
 
+async function findCursor(collection, query) {
+	return db.collection(collection).find(query);
+}
+
 /*
  * deleteOne(collection, document)
  * Deletes the document with the ObjectId of the given document from the given collection.
@@ -304,4 +308,5 @@ module.exports = {
 	find,
 	findOne,
 	findById,
+	findCursor,
 }

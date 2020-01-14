@@ -168,6 +168,17 @@ const ClassModel = require('../../noomman/ClassModel');
                 }
             ],
         });
+
+        var UniqueNumberClass = new ClassModel({
+            className: 'UniqueNumberClass',
+            attributes: [
+                {
+                    name: 'number',
+                    type: Number,
+                    unique: true,
+                }
+            ],
+        });
     }
     
     // Validation Classes
@@ -1599,6 +1610,7 @@ module.exports = {
     TestClassWithAllSimpleFields,
     AllAttributesAndRelationshipsClass,
     AbstractClass,
+    UniqueNumberClass,
     AllFieldsRequiredClass,
     AllFieldsMutexClass,
     AllFieldsInRequiredGroupClass,

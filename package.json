@@ -4,7 +4,7 @@
   "main": "noomman.js",
   "private": false,
   "scripts": {
-    "test": "mocha"
+    "test": "mocha --timeout 5000"
   },
   "dependencies": {
     "moment": "^2.24.0",

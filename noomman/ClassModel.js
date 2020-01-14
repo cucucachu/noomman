@@ -1184,6 +1184,123 @@ class ClassModel {
         return this.pureFindOne({_id: id});
     }
 
+    async findPage(queryFilter, page=0, pageSize=100, orderBy={_id: 1}, readControlMethodParameters) {
+        // If this class is a non-discriminated abstract class and it doesn't have any sub classes, throw an error.
+        if (this.abstract && !this.isSuperClass())
+            throw new NoommanErrors.NoommanClassModelError('Error in ' + this.className + '.findPage(). This class is abstract and non-discriminated, but it has no sub-classes.');
+
+        if (page < 0 || pageSize <= 0) {
+            throw new Error(this.className + '.findPage() called with negative page or pageSize value.');
+        }
+
+        queryFilter = queryFilter ? queryFilter : {};
+        let documents = [];
+        const cursors = await this.findPageRecursive(queryFilter, page, pageSize, orderBy);
+       
+        let index = 0;
+        const startIndex = page * pageSize;
+        const endIndex = ((page + 1) * pageSize) - 1;
+        let documentsRemaining = pageSize;
+        let totalNumberOfInstances = 0;
+
+        for (const cursor of cursors) {
+            totalNumberOfInstances += await cursor.cursor.count();
+        }
+
+        if (startIndex > totalNumberOfInstances) {
+            return {
+                instances: new InstanceSet(this),
+                page,
+                pageSize,
+                hiddenInstances: 0, 
+                totalNumberOfInstances,
+            }
+        }
+
+        for (const cursor of cursors) {
+            const cursorCount = await cursor.cursor.count();
+            const cursorStart = index;
+            const cursorEnd = index + cursorCount - 1;
+
+            if (endIndex < cursorStart || startIndex > cursorEnd) {
+                continue;
+            }
+            else {
+                const skipValue = startIndex > cursorStart ? startIndex - cursorStart : 0;
+                let limitValue = documentsRemaining;
+                const documentsFromThisCursor = await cursor.cursor.skip(skipValue).limit(limitValue).toArray();
+
+                for (const document of documentsFromThisCursor) {
+                    documents.push({
+                        document,
+                        className: document.__t ? document.__t : cursor.className,
+                    });
+                }
+            }
+
+            documentsRemaining = pageSize - documents.length;
+            index += cursorCount;
+
+            if (documentsRemaining === 0 || index >= totalNumberOfInstances) {
+                break;
+            }
+        }
+
+        // convert documents to instances
+        const instances = new InstanceSet(this);
+
+        for (const document of documents) {
+            const documentClassModel = AllClassModels[document.className];
+            instances.add(new Instance(documentClassModel, document.document));
+        }
+
+        const filteredInstances = await instances.readControlFilter(readControlMethodParameters);
+
+        const hiddenInstances = instances.size - filteredInstances.size;
+
+        return {
+            instances: filteredInstances,
+            page,
+            pageSize,
+            hiddenInstances, 
+            totalNumberOfInstances,
+        }
+    }
+
+    async findPageRecursive(queryFilter, page, pageSize, orderBy) {
+        let cursors = [];
+
+        const subClassesWithDifferentCollections = this.subClasses ? this.subClasses.filter(subClass => !subClass.useSuperClassCollection) : [];
+
+        if (this.useSuperClassCollection) {
+            queryFilter.__t = this.className;
+        }
+
+        if (this.collection) {
+            const cursorForThisCollection = await database.findCursor(this.collection, queryFilter); 
+            if(orderBy !== null) {
+                cursorForThisCollection.sort(orderBy);
+            }
+
+            cursors.push( {
+                className: this.className,
+                cursor: cursorForThisCollection,
+            });
+        }
+        
+        const promises = [];
+  
+        for (const subClass of subClassesWithDifferentCollections) {
+            delete queryFilter.__t;
+            promises.push(subClass.findPage(queryFilter, page, pageSize, orderBy));
+        }
+
+        const subClassCursors = await Promise.all(promises);
+        cursors = cursors.concat(subClassCursors);
+
+        return cursors;
+    }
+
     /*
      * updateRelatedInstancesForInstance(instance) 
      * Analyzes the changes to two-way relationships for the given Instance to determine which related instances also
