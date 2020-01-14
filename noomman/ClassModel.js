@@ -1025,7 +1025,7 @@ class ClassModel {
      * Throws
      * - NoommanClassModelError - If this ClassModel is abstract and has no sub-ClassModels.
      */
-    async pureFind(queryFilter) {
+    async pureFind(queryFilter={}) {
         const foundInstances = new InstanceSet(this);
 
         const subClassesWithDifferentCollections = this.subClasses ? this.subClasses.filter(subClass => !subClass.useSuperClassCollection) : [];
@@ -1184,8 +1184,7 @@ class ClassModel {
         return this.pureFindOne({_id: id});
     }
 
-    async findPage(queryFilter, page=0, pageSize=100, orderBy={_id: 1}, readControlMethodParameters) {
-        // If this class is a non-discriminated abstract class and it doesn't have any sub classes, throw an error.
+    async findPage(queryFilter={}, page=0, pageSize=100, orderBy={_id: 1}, readControlMethodParameters) {
         if (this.abstract && !this.isSuperClass())
             throw new NoommanErrors.NoommanClassModelError('Error in ' + this.className + '.findPage(). This class is abstract and non-discriminated, but it has no sub-classes.');
 
@@ -1223,6 +1222,7 @@ class ClassModel {
             const cursorEnd = index + cursorCount - 1;
 
             if (endIndex < cursorStart || startIndex > cursorEnd) {
+                index += cursorCount;
                 continue;
             }
             else {
@@ -1268,7 +1268,7 @@ class ClassModel {
     }
 
     async findPageRecursive(queryFilter, page, pageSize, orderBy) {
-        let cursors = [];
+        let cursorsWithClassName = [];
 
         const subClassesWithDifferentCollections = this.subClasses ? this.subClasses.filter(subClass => !subClass.useSuperClassCollection) : [];
 
@@ -1282,7 +1282,7 @@ class ClassModel {
                 cursorForThisCollection.sort(orderBy);
             }
 
-            cursors.push( {
+            cursorsWithClassName.push( {
                 className: this.className,
                 cursor: cursorForThisCollection,
             });
@@ -1292,13 +1292,17 @@ class ClassModel {
   
         for (const subClass of subClassesWithDifferentCollections) {
             delete queryFilter.__t;
-            promises.push(subClass.findPage(queryFilter, page, pageSize, orderBy));
+            promises.push(subClass.findPageRecursive(queryFilter, page, pageSize, orderBy));
         }
 
-        const subClassCursors = await Promise.all(promises);
-        cursors = cursors.concat(subClassCursors);
+        if (promises.length) {
+            const subClassCursors = await Promise.all(promises);
+            for (const subClassCursor of subClassCursors) {
+                cursorsWithClassName = cursorsWithClassName.concat(subClassCursor);
+            }
+        }
 
-        return cursors;
+        return cursorsWithClassName;
     }
 
     /*

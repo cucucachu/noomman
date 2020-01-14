@@ -179,6 +179,17 @@ const ClassModel = require('../../noomman/ClassModel');
                 }
             ],
         });
+
+        var UniqueNumberSubClass = new ClassModel({
+            className: 'UniqueNumberSubClass',
+            superClasses: [UniqueNumberClass],
+        });
+
+        var UniqueNumberDiscriminatedSubSubClass = new ClassModel({
+            className: 'UniqueNumberDiscriminatedSubSubClass',
+            useSuperClassCollection: true,
+            superClasses: [UniqueNumberSubClass],
+        });
     }
     
     // Validation Classes
@@ -1611,6 +1622,8 @@ module.exports = {
     AllAttributesAndRelationshipsClass,
     AbstractClass,
     UniqueNumberClass,
+    UniqueNumberSubClass,
+    UniqueNumberDiscriminatedSubSubClass,
     AllFieldsRequiredClass,
     AllFieldsMutexClass,
     AllFieldsInRequiredGroupClass,
