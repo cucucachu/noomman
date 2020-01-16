@@ -312,7 +312,7 @@ class Instance extends Diffable {
         // If nonsingular, use find()
         else {
             if (relationshipCurrentValue == null || (Array.isArray(relationshipCurrentValue) && relationshipCurrentValue.length == 0)) {
-                walkResult = this.classModel.emptyInstanceSet();
+                walkResult = relatedClass.emptyInstanceSet();
             }
             else {
                 if (!usePreviousState) {
