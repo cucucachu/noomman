@@ -1,4 +1,6 @@
 const ClassModel = require('../../noomman/ClassModel');
+const NoommanErrors = require('../../noomman/NoommanErrors');
+const NoommanValidationError = NoommanErrors.NoommanValidationError;
 
 // Create Class Models that will be used across tests.
 {
@@ -1433,11 +1435,11 @@ const ClassModel = require('../../noomman/ClassModel');
             validations: [
                 function() {
                     if (this.number <= 0)
-                        throw new Error('Number must be greater than 0.');
+                        throw new NoommanValidationError('Number must be greater than 0.', ['number']);
                 },
                 function() {
                     if (this.name === '')
-                        throw new Error('Name cannot be empty.');
+                        throw new NoommanValidationError('Name cannot be empty.', ['name']);
                 },
             ],
         });
@@ -1448,7 +1450,7 @@ const ClassModel = require('../../noomman/ClassModel');
             validations: [
                 function() {
                     if (this.number > 10) {
-                        throw new Error('Number must be less than or equal to 10.');
+                        throw new NoommanValidationError('Number must be less than or equal to 10.', ['number']);
                     }
                 }
             ]
@@ -1467,7 +1469,7 @@ const ClassModel = require('../../noomman/ClassModel');
             validations: [
                 function() {
                     if (!this.boolean) {
-                        throw new Error('Boolean must be true.');
+                        throw new NoommanValidationError('Boolean must be true.', ['boolean']);
                     }
                 }
             ]
@@ -1487,7 +1489,7 @@ const ClassModel = require('../../noomman/ClassModel');
             validations: [
                 function() {
                     if (!this.boolean2) {
-                        throw new Error('Boolean2 must be true.');
+                        throw new NoommanValidationError('Boolean2 must be true.', ['boolean2']);
                     }
                 }
             ],
@@ -1506,7 +1508,7 @@ const ClassModel = require('../../noomman/ClassModel');
                 async function() {
                     const related = await this.walk('relatedInstance');
                     if (related === null || !related.valid)
-                        throw new Error('Related instance is not valid.');
+                        throw new NoommanValidationError('Related instance is not valid.', ['relatedInstance']);
                 },
             ],
         });

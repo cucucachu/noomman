@@ -29,6 +29,10 @@ class NoommanError extends Error {
  * Extends NoommanError
  * An Error which is thrown when an Instance does not conform to the 
  *    requirements defined by the schema of its ClassModel.
+ * Parameters:
+ * - message - String - The error message for this error.
+ * - properties - Array[string] - An array containing the attribute or relationship names that 
+ *    need to be changed in order not to throw this error.
  */
 class NoommanValidationError extends NoommanError {
 
@@ -38,8 +42,9 @@ class NoommanValidationError extends NoommanError {
      * Returns
      * - NoommanValidationError - The NoommanValidationError created.
      */
-    constructor(message) {
+    constructor(message, properties=[]) {
         super(message);
+        this.properties = properties;
     }
 }
 

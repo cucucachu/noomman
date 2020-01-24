@@ -139,21 +139,21 @@ class Attribute {
             
         if (this.list) {
             if (!Array.isArray(value)) {
-                throw new NoommanErrors.NoommanValidationError('Illegal attempt to set a List Attribute to something other than an Array.');
+                throw new NoommanErrors.NoommanValidationError('Illegal attempt to set a List Attribute to something other than an Array.', [this.name]);
             }
             for (const item of value) {
                 if (!this.validType(item)) {
-                    throw new NoommanErrors.NoommanValidationError('Illegal attempt to set a ' + this.type.name + ' List Attribute to an array containing non-' + this.type.name + ' element(s).');
+                    throw new NoommanErrors.NoommanValidationError('Illegal attempt to set a ' + this.type.name + ' List Attribute to an array containing non-' + this.type.name + ' element(s).', [this.name]);
                 }
             }
             return true;
         }
         else {
             if (Array.isArray(value)) {
-                throw new NoommanErrors.NoommanValidationError('Illegal attempt to set an Attribute to an Array.');
+                throw new NoommanErrors.NoommanValidationError('Illegal attempt to set an Attribute to an Array.', [this.name]);
             }
             if (!this.validType(value)) {
-                throw new NoommanErrors.NoommanValidationError('Illegal attempt to set a ' + this.type.name + ' Attribute to something other than a ' + this.type.name + '.');
+                throw new NoommanErrors.NoommanValidationError('Illegal attempt to set a ' + this.type.name + ' Attribute to something other than a ' + this.type.name + '.', [this.name]);
             }
         }
     }

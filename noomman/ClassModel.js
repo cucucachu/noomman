@@ -904,6 +904,24 @@ class ClassModel {
     }
 
     /*
+     * allSubClasses()
+     * Finds all the ClassModels which are a child ClassModel to this ClassModel, 
+     *    all the way down the inheritance tree.
+     * Returns
+     * - Array<ClassModel> - An array containing all the ClassModels that are a sub ClassModel
+     *    of this ClassModel.
+     */
+    allSubClasses() {
+        const subClasses = new SuperSet(this.subClasses);
+
+        for (const subClass of this.subClasses) {
+            subClasses.addFromIterable(subClass.allSubClasses())
+        }
+
+        return [...subClasses];
+    }
+
+    /*
      * emptyInstanceSet()
      * Creates a new empty InstanceSet of this classModel.
      * Returns

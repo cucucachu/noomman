@@ -21,6 +21,34 @@ function testForError(functionName, expectedErrorMessage, functionToCall) {
         throw new Error(functionName + ' did not throw an error when it should have.');
 }
 
+function testForValidationError(functionName, expectedErrorMessage, properties, functionToCall) {
+    let errorThrown = false;
+
+    try {
+        functionToCall();
+    }
+    catch (error) {
+        if (error.message != expectedErrorMessage) {
+            throw new Error(
+                functionName + ' threw an error, but not the expected one.\n' + 
+                'expected: ' + expectedErrorMessage + '\n' + 
+                'actual:   ' + error.message
+            )
+        }
+        if (!arraysEqual(error.properties, properties)) {
+            throw new Error(
+                functionName + ' threw an error, not with the expected properties.\n' + 
+                'expected: ' + properties + '\n' + 
+                'actual:   ' + error.properties
+            )
+        }
+        errorThrown = true;
+    }
+
+    if (!errorThrown)
+        throw new Error(functionName + ' did not throw an error when it should have.');
+}
+
 function testForErrorRegex(functionName, expectedErrorMessage, expectedErrorRegex, functionToCall) {
     let errorThrown = false;
 
@@ -54,6 +82,34 @@ async function testForErrorAsync(functionName, expectedErrorMessage, functionToC
                 functionName + ' threw an error, but not the expected one.\n' + 
                 'expected: ' + expectedErrorMessage + '\n' + 
                 'actual:   ' + error.message
+            )
+        }
+        errorThrown = true;
+    }
+
+    if (!errorThrown)
+        throw new Error(functionName + ' did not throw an error when it should have.');
+}
+
+async function testForValidationErrorAsync(functionName, expectedErrorMessage, properties, functionToCall) {
+    let errorThrown = false;
+
+    try {
+        await functionToCall();
+    }
+    catch (error) {
+        if (error.message != expectedErrorMessage) {
+            throw new Error(
+                functionName + ' threw an error, but not the expected one.\n' + 
+                'expected: ' + expectedErrorMessage + '\n' + 
+                'actual:   ' + error.message
+            )
+        }
+        if (!arraysEqual(error.properties, properties)) {
+            throw new Error(
+                functionName + ' threw an error, but not with the expected properties.\n' + 
+                'expected: ' + properties + '\n' + 
+                'actual:   ' + error.properties
             )
         }
         errorThrown = true;
@@ -151,8 +207,10 @@ function objectsEqual(object1, object2) {
 
 module.exports = {
     testForError,
+    testForValidationError,
     testForErrorRegex,
     testForErrorAsync,
+    testForValidationErrorAsync,
     testForErrorAsyncRegex,
     arraysEqual,
     objectsEqual,

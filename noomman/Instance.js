@@ -417,7 +417,7 @@ class Instance extends Diffable {
             await this.customValidations();
         }
         catch (error) {
-            throw new Error(this.id + ': ' + error.message);
+            throw new NoommanErrors.NoommanValidationError(this.id + ': ' + error.message, error.properties);
         }
     }
 
@@ -442,14 +442,16 @@ class Instance extends Diffable {
             }
         }
 
+        const invalidProperties = [];
         if (violations.length) {
             message = 'Mutex violation(s):';
             for (const property of properties) {
                 if (violations.includes(property.mutex) && this.propertyIsSet(property.name)) {
+                    invalidProperties.push(property.name);
                     message += ' Property "' + property.name + '" with mutex "' + property.mutex + '".';
                 }
             }
-            throw new NoommanErrors.NoommanValidationError(message);
+            throw new NoommanErrors.NoommanValidationError(message, invalidProperties);
         }
     }
 
@@ -463,6 +465,7 @@ class Instance extends Diffable {
         const documentProperties = this.classModel.attributes.concat(this.classModel.relationships);
         let message = 'Missing required property(s): ';
         let valid = true;
+        const invalidProperties = [];
 
         for (const documentProperty of documentProperties) {
             if (!documentProperty.required)
@@ -470,13 +473,14 @@ class Instance extends Diffable {
             if (!this.propertyIsSet(documentProperty.name)) {
                 if (!valid)
                     message += ', ';
+                invalidProperties.push(documentProperty.name);
                 valid = false;
                 message += '"' + documentProperty.name + '"';
             }
         }
 
         if (!valid)
-            throw new NoommanErrors.NoommanValidationError(message);
+            throw new NoommanErrors.NoommanValidationError(message, invalidProperties);
     }
 
     /* 
@@ -502,14 +506,20 @@ class Instance extends Diffable {
             }
         }
 
+        const invalidProperties = [];
         if (requiredGroups.length) {
             message = 'Required Group violations found for requirement group(s):';
             requiredGroups.forEach(function(requiredGroup) {
                 message += ' "' + requiredGroup + '"';
+                for (const property of properties) {
+                    if (property.requiredGroup === requiredGroup) {
+                        invalidProperties.push(property.name);
+                    }
+                }
             });
             message += '.';
 
-            throw new NoommanErrors.NoommanValidationError(message);
+            throw new NoommanErrors.NoommanValidationError(message, invalidProperties);
         }
     }
 
@@ -558,7 +568,7 @@ class Instance extends Diffable {
             await this.validate();
         }
         catch (error) {
-            throw new NoommanErrors.NoommanValidationError('Caught validation error when attempting to save Instance: ' + error.message);
+            throw new NoommanErrors.NoommanValidationError('Caught validation error when attempting to save Instance: ' + error.message, error.properties);
         }
 
         if (this.currentState.equals(this.previousState)) {

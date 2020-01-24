@@ -516,7 +516,7 @@ class InstanceSet extends SuperSet {
             await this.validate();
         }
         catch (error) {
-            throw new NoommanErrors.NoommanValidationError('Caught validation error when attempting to save InstanceSet: ' + error.message);
+            throw new NoommanErrors.NoommanValidationError('Caught validation error when attempting to save InstanceSet: ' + error.message, error.properties);
         }
         
         await this.classModel.updateControlCheck(instancesToUpdate, updateControlMethodParameters);

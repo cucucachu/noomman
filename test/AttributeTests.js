@@ -2,6 +2,7 @@ const Attribute = require('../noomman/Attribute');
 
 const TestingFunctions = require('./helpers/TestingFunctions');
 const testForError = TestingFunctions.testForError;
+const testForValidationError = TestingFunctions.testForValidationError;
 
 describe('Attribute Tests', () => {
 
@@ -540,8 +541,9 @@ describe('Attribute Tests', () => {
                         type: Boolean,
                     });
                     const expectedErrorMessage = 'Illegal attempt to set a Boolean Attribute to something other than a Boolean.';
+                    const properties = ['attribute'];
 
-                    testForError('attribute.validate()', expectedErrorMessage, () => {
+                    testForValidationError('attribute.validate()', expectedErrorMessage, properties, () => {
                         attribute.validate('false');
                     });
                 });
@@ -573,8 +575,9 @@ describe('Attribute Tests', () => {
                         type: Number,
                     });
                     const expectedErrorMessage = 'Illegal attempt to set a Number Attribute to something other than a Number.';
+                    const properties = ['attribute'];
 
-                    testForError('attribute.validate()', expectedErrorMessage, () => {
+                    testForValidationError('attribute.validate()', expectedErrorMessage, properties, () => {
                         attribute.validate(true);
                     });
                 });
@@ -607,8 +610,9 @@ describe('Attribute Tests', () => {
                         type: String,
                     });
                     const expectedErrorMessage = 'Illegal attempt to set a String Attribute to something other than a String.';
+                    const properties = ['attribute'];
 
-                    testForError('attribute.validate()', expectedErrorMessage, () => {
+                    testForValidationError('attribute.validate()', expectedErrorMessage, properties, () => {
                         attribute.validate(true);
                     });
                 });
@@ -641,8 +645,9 @@ describe('Attribute Tests', () => {
                         type: Date,
                     });
                     const expectedErrorMessage = 'Illegal attempt to set a Date Attribute to something other than a Date.';
+                    const properties = ['attribute'];
 
-                    testForError('attribute.validate()', expectedErrorMessage, () => {
+                    testForValidationError('attribute.validate()', expectedErrorMessage, properties, () => {
                         attribute.validate(true);
                     });
                 });
@@ -688,8 +693,9 @@ describe('Attribute Tests', () => {
                         list: true,
                     });
                     const expectedErrorMessage = 'Illegal attempt to set a Boolean List Attribute to an array containing non-Boolean element(s).';
+                    const properties = ['attribute'];
 
-                    testForError('attribute.validate()', expectedErrorMessage, () => {
+                    testForValidationError('attribute.validate()', expectedErrorMessage, properties, () => {
                         attribute.validate(value);
                     });
                 });
@@ -739,8 +745,9 @@ describe('Attribute Tests', () => {
                         list: true,
                     });
                     const expectedErrorMessage = 'Illegal attempt to set a List Attribute to something other than an Array.';
+                    const properties = ['attribute'];
 
-                    testForError('attribute.validate()', expectedErrorMessage, () => {
+                    testForValidationError('attribute.validate()', expectedErrorMessage, properties, () => {
                         attribute.validate(value);
                     });
                 });
@@ -753,8 +760,9 @@ describe('Attribute Tests', () => {
                         list: true,
                     });
                     const expectedErrorMessage = 'Illegal attempt to set a Number List Attribute to an array containing non-Number element(s).';
+                    const properties = ['attribute'];
 
-                    testForError('attribute.validate()', expectedErrorMessage, () => {
+                    testForValidationError('attribute.validate()', expectedErrorMessage, properties, () => {
                         attribute.validate(value);
                     });
                 });
@@ -804,8 +812,9 @@ describe('Attribute Tests', () => {
                         list: true,
                     });
                     const expectedErrorMessage = 'Illegal attempt to set a List Attribute to something other than an Array.';
+                    const properties = ['attribute'];
 
-                    testForError('attribute.validate()', expectedErrorMessage, () => {
+                    testForValidationError('attribute.validate()', expectedErrorMessage, properties, () => {
                         attribute.validate(value);
                     });
                 });
@@ -818,8 +827,9 @@ describe('Attribute Tests', () => {
                         list: true,
                     });
                     const expectedErrorMessage = 'Illegal attempt to set a String List Attribute to an array containing non-String element(s).';
+                    const properties = ['attribute'];
 
-                    testForError('attribute.validate()', expectedErrorMessage, () => {
+                    testForValidationError('attribute.validate()', expectedErrorMessage, properties, () => {
                         attribute.validate(value);
                     });
                 });
@@ -869,8 +879,9 @@ describe('Attribute Tests', () => {
                         list: true,
                     });
                     const expectedErrorMessage = 'Illegal attempt to set a List Attribute to something other than an Array.';
+                    const properties = ['attribute'];
 
-                    testForError('attribute.validate()', expectedErrorMessage, () => {
+                    testForValidationError('attribute.validate()', expectedErrorMessage, properties, () => {
                         attribute.validate(value);
                     });
                 });
@@ -883,8 +894,9 @@ describe('Attribute Tests', () => {
                         list: true,
                     });
                     const expectedErrorMessage = 'Illegal attempt to set a Date List Attribute to an array containing non-Date element(s).';
+                    const properties = ['attribute'];
 
-                    testForError('attribute.validate()', expectedErrorMessage, () => {
+                    testForValidationError('attribute.validate()', expectedErrorMessage, properties, () => {
                         attribute.validate(value);
                     });
                 });

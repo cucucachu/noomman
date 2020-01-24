@@ -5,6 +5,7 @@ const TestClassModels = require('./helpers/TestClassModels');
 const TestingFunctions = require('./helpers/TestingFunctions');
 const testForError = TestingFunctions.testForError;
 const testForErrorAsync = TestingFunctions.testForErrorAsync;
+const testForValidationErrorAsync = TestingFunctions.testForValidationErrorAsync;
 const testForErrorAsyncRegex = TestingFunctions.testForErrorAsyncRegex;
 const DatabaseConnection = require('./helpers/DatabaseConnection');
 
@@ -1351,6 +1352,7 @@ describe('InstanceSet Tests', () => {
                 it('All fields are required. All but string are set. Error thrown.', async () => {
                     const instance = new Instance(AllFieldsRequiredClass);
                     const expectedErrorMessage = instance.id + ': Missing required property(s): "string"';
+                    const properties = ['string'];
                     instance.assign({
                         strings: ['String'],
                         date: new Date(),
@@ -1363,7 +1365,7 @@ describe('InstanceSet Tests', () => {
                     });
                     const instanceSet = new InstanceSet(AllFieldsRequiredClass, [instance]);
     
-                    await testForErrorAsync('instanceSet.validate()', expectedErrorMessage, async () => {
+                    await testForValidationErrorAsync('instanceSet.validate()', expectedErrorMessage, properties, async () => {
                         return instanceSet.validate();
                     });    
                 });
@@ -1394,8 +1396,9 @@ describe('InstanceSet Tests', () => {
                     });
                     const instanceSet = new InstanceSet(AllFieldsRequiredClass, [instance1, instance2]);
                     const expectedErrorMessage = instance1.id + ': Missing required property(s): "string"';
+                    const properties = ['string'];
     
-                    await testForErrorAsync('instanceSet.validate()', expectedErrorMessage, async () => {
+                    await testForValidationErrorAsync('instanceSet.validate()', expectedErrorMessage, properties, async () => {
                         return instanceSet.validate();
                     });    
                 });
@@ -1408,10 +1411,13 @@ describe('InstanceSet Tests', () => {
                     const instance = new Instance(AllFieldsInRequiredGroupClass);
                     const expectedErrorMessage = instance.id + ': Required Group violations found for requirement group(s): "a".';
                     const instanceSet = new InstanceSet(AllFieldsInRequiredGroupClass, [instance]);
-        
-                    await testForErrorAsync('InstanceSet.validate()', expectedErrorMessage, async () => {
+                    const properties = [
+                        'string', 'strings', 'date', 'boolean', 'booleans', 'number', 'numbers', 'class1', 'class2s'
+                    ];
+    
+                    await testForValidationErrorAsync('instanceSet.validate()', expectedErrorMessage, properties, async () => {
                         return instanceSet.validate();
-                    });
+                    });    
                 });
                     
                 it('Multiple fields (one of each type) share a required group boolean is set to false. Error thrown.', async () => {
@@ -1420,10 +1426,13 @@ describe('InstanceSet Tests', () => {
                     const instanceSet = new InstanceSet(AllFieldsInRequiredGroupClass, [instance]);
     
                     instanceSet.boolean = false;
-        
-                    await testForErrorAsync('InstanceSet.validate()', expectedErrorMessage, async () => {
+                    const properties = [
+                        'string', 'strings', 'date', 'boolean', 'booleans', 'number', 'numbers', 'class1', 'class2s'
+                    ];
+    
+                    await testForValidationErrorAsync('instanceSet.validate()', expectedErrorMessage, properties, async () => {
                         return instanceSet.validate();
-                    });
+                    });   
                 });
                     
                 it('Multiple fields (one of each type) share a required group string is set to "". No Error thrown.', async () => {
@@ -1463,9 +1472,9 @@ describe('InstanceSet Tests', () => {
                         date: new Date(),
                     });
                     const instanceSet = new InstanceSet(MutexClassA, [instance]);
+                    const properties = ['boolean', 'date'];
     
-
-                    await testForErrorAsync('InstanceSet.validate()', expectedErrorMessage, async () => {
+                    await testForValidationErrorAsync('instanceSet.validate()', expectedErrorMessage, properties, async () => {
                         return instanceSet.validate();
                     });
                 });
@@ -1485,8 +1494,9 @@ describe('InstanceSet Tests', () => {
                     instance.class1 = new Instance(CompareClass1);
                     instance.class2 = new Instance(CompareClass2);
                     const instanceSet = new InstanceSet(MutexClassB, [instance]);
-
-                    await testForErrorAsync('InstanceSet.validate()', expectedErrorMessage, async () => {
+                    const properties = ['class1', 'class2'];
+    
+                    await testForValidationErrorAsync('instanceSet.validate()', expectedErrorMessage, properties, async () => {
                         return instanceSet.validate();
                     });
                 });
@@ -1506,8 +1516,9 @@ describe('InstanceSet Tests', () => {
                     instance.class1s = new InstanceSet(CompareClass1, [new Instance(CompareClass1), new Instance(CompareClass1)]);
                     instance.class2s = new InstanceSet(CompareClass2, [new Instance(CompareClass2), new Instance(CompareClass2)]);
                     const instanceSet = new InstanceSet(MutexClassC, [instance]);
-
-                    await testForErrorAsync('InstanceSet.validate()', expectedErrorMessage, async () => {
+                    const properties = ['class1s', 'class2s'];
+    
+                    await testForValidationErrorAsync('instanceSet.validate()', expectedErrorMessage, properties, async () => {
                         return instanceSet.validate();
                     });
                 });
@@ -1557,8 +1568,9 @@ describe('InstanceSet Tests', () => {
                                 name: 'instance',
                                 number: 0,
                             });
-    
-                            await testForErrorAsync('InstanceSet.validate()', expectedErrorMessage, async () => {
+                            const properties = ['number'];
+            
+                            await testForValidationErrorAsync('instanceSet.validate()', expectedErrorMessage, properties, async () => {
                                 return instanceSet.validate();
                             });
                         });
@@ -1571,8 +1583,9 @@ describe('InstanceSet Tests', () => {
                                 name: '',
                                 number: 1,
                             });
-    
-                            await testForErrorAsync('InstanceSet.validate()', expectedErrorMessage, async () => {
+                            const properties = ['name'];
+            
+                            await testForValidationErrorAsync('instanceSet.validate()', expectedErrorMessage, properties, async () => {
                                 return instanceSet.validate();
                             });
                         });
@@ -1600,8 +1613,9 @@ describe('InstanceSet Tests', () => {
                                 name: 'instance',
                                 number: 100,
                             });
-    
-                            await testForErrorAsync('InstanceSet.validate()', expectedErrorMessage, async () => {
+                            const properties = ['number'];
+            
+                            await testForValidationErrorAsync('instanceSet.validate()', expectedErrorMessage, properties, async () => {
                                 return instanceSet.validate();
                             });
                         });
@@ -1625,8 +1639,9 @@ describe('InstanceSet Tests', () => {
                                 name: 'instance',
                                 number: 100,
                             });
-    
-                            await testForErrorAsync('InstanceSet.validate()', expectedErrorMessage, async () => {
+                            const properties = ['number'];
+            
+                            await testForValidationErrorAsync('instanceSet.validate()', expectedErrorMessage, properties, async () => {
                                 return instanceSet.validate();
                             });
                         });
@@ -1639,8 +1654,9 @@ describe('InstanceSet Tests', () => {
                                 name: 'instance',
                                 number: 0,
                             });
-    
-                            await testForErrorAsync('InstanceSet.validate()', expectedErrorMessage, async () => {
+                            const properties = ['number'];
+            
+                            await testForValidationErrorAsync('instanceSet.validate()', expectedErrorMessage, properties, async () => {
                                 return instanceSet.validate();
                             });
                         });
@@ -1653,8 +1669,9 @@ describe('InstanceSet Tests', () => {
                                 name: '',
                                 number: 1,
                             });
-    
-                            await testForErrorAsync('InstanceSet.validate()', expectedErrorMessage, async () => {
+                            const properties = ['name'];
+            
+                            await testForValidationErrorAsync('instanceSet.validate()', expectedErrorMessage, properties, async () => {
                                 return instanceSet.validate();
                             });
                         });
@@ -1684,8 +1701,9 @@ describe('InstanceSet Tests', () => {
                                 number: 5,
                                 boolean: false,
                             });
-    
-                            await testForErrorAsync('InstanceSet.validate()', expectedErrorMessage, async () => {
+                            const properties = ['boolean'];
+            
+                            await testForValidationErrorAsync('instanceSet.validate()', expectedErrorMessage, properties, async () => {
                                 return instanceSet.validate();
                             });
                         });
@@ -1711,8 +1729,9 @@ describe('InstanceSet Tests', () => {
                                 number: 5,
                                 boolean: false,
                             });
-    
-                            await testForErrorAsync('InstanceSet.validate()', expectedErrorMessage, async () => {
+                            const properties = ['boolean'];
+            
+                            await testForValidationErrorAsync('instanceSet.validate()', expectedErrorMessage, properties, async () => {
                                 return instanceSet.validate();
                             });
                         });
@@ -1726,8 +1745,9 @@ describe('InstanceSet Tests', () => {
                                 number: 0,
                                 boolean: true,
                             });
-    
-                            await testForErrorAsync('InstanceSet.validate()', expectedErrorMessage, async () => {
+                            const properties = ['number'];
+            
+                            await testForValidationErrorAsync('instanceSet.validate()', expectedErrorMessage, properties, async () => {
                                 return instanceSet.validate();
                             });
                         });
@@ -1741,8 +1761,9 @@ describe('InstanceSet Tests', () => {
                                 number: 1,
                                 boolean: true,
                             });
-    
-                            await testForErrorAsync('InstanceSet.validate()', expectedErrorMessage, async () => {
+                            const properties = ['name'];
+            
+                            await testForValidationErrorAsync('instanceSet.validate()', expectedErrorMessage, properties, async () => {
                                 return instanceSet.validate();
                             });
                         });
@@ -1774,8 +1795,9 @@ describe('InstanceSet Tests', () => {
                                 boolean: true,
                                 boolean2: false,
                             });
-    
-                            await testForErrorAsync('InstanceSet.validate()', expectedErrorMessage, async () => {
+                            const properties = ['boolean2'];
+            
+                            await testForValidationErrorAsync('instanceSet.validate()', expectedErrorMessage, properties, async () => {
                                 return instanceSet.validate();
                             });
                         });
@@ -1803,8 +1825,9 @@ describe('InstanceSet Tests', () => {
                                 boolean: true,
                                 boolean2: false,
                             });
-    
-                            await testForErrorAsync('InstanceSet.validate()', expectedErrorMessage, async () => {
+                            const properties = ['boolean2'];
+            
+                            await testForValidationErrorAsync('instanceSet.validate()', expectedErrorMessage, properties, async () => {
                                 return instanceSet.validate();
                             });
                         });
@@ -1819,8 +1842,9 @@ describe('InstanceSet Tests', () => {
                                 boolean: false,
                                 boolean2: true,
                             });
-    
-                            await testForErrorAsync('Instance.validate()', expectedErrorMessage, async () => {
+                            const properties = ['boolean'];
+            
+                            await testForValidationErrorAsync('instanceSet.validate()', expectedErrorMessage, properties, async () => {
                                 return instanceSet.validate();
                             });
                         });
@@ -1835,8 +1859,9 @@ describe('InstanceSet Tests', () => {
                                 boolean: true,
                                 boolean2: true,
                             });
-    
-                            await testForErrorAsync('Instance.validate()', expectedErrorMessage, async () => {
+                            const properties = ['number'];
+            
+                            await testForValidationErrorAsync('instanceSet.validate()', expectedErrorMessage, properties, async () => {
                                 return instanceSet.validate();
                             });
                         });
@@ -1851,8 +1876,9 @@ describe('InstanceSet Tests', () => {
                                 boolean: true,
                                 boolean2: true,
                             });
-    
-                            await testForErrorAsync('Instance.validate()', expectedErrorMessage, async () => {
+                            const properties = ['name'];
+            
+                            await testForValidationErrorAsync('instanceSet.validate()', expectedErrorMessage, properties, async () => {
                                 return instanceSet.validate();
                             });
                         });
@@ -1973,8 +1999,9 @@ describe('InstanceSet Tests', () => {
                 });
                 const expectedErrorMessage = 'Caught validation error when attempting to save InstanceSet: ' + instanceB.id + ': Missing required property(s): "string"';
                 const instanceSet = new InstanceSet(AllFieldsRequiredClass, [instanceA, instanceB]);
+                const properties = ['string'];
 
-                await testForErrorAsync('instanceSet.save()', expectedErrorMessage, async() => {
+                await testForValidationErrorAsync('instanceSet.save()', expectedErrorMessage, properties, async () => {
                     return instanceSet.save();
                 });
 

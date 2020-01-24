@@ -7,6 +7,7 @@ const TestingFunctions = require('./helpers/TestingFunctions');
 const DatabaseConnection = require('./helpers/DatabaseConnection');
 const testForError = TestingFunctions.testForError;
 const testForErrorAsync = TestingFunctions.testForErrorAsync;
+const arraysEqual = TestingFunctions.arraysEqual;
 
 // Load all TestClassModels +
 {
@@ -7089,6 +7090,24 @@ describe('Class Model Tests', () => {
 
             if (!superClasses.includes('NoommanClassModel')) {
                 throw new Error('Class Model did not inherit from NoommanClassModel.');
+            }
+        });
+
+    });
+
+    describe('ClassModel.allSubClasses()', () => {
+
+        it('Returns all subclasses all the way down the inheritance tree.', () => {
+            if (!arraysEqual(SuperClass.allSubClasses().map(c => c.className), [
+                'SubClassOfSuperClass',
+                'AbstractSubClassOfSuperClass',
+                'SubClassOfMultipleSuperClasses',
+                'DiscriminatedSubClassOfSuperClass',
+                'SubClassOfSubClassOfSuperClass',
+                'SubClassOfAbstractSubClassOfSuperClass',
+                'SubClassOfDiscriminatedSubClassOfSuperClass',
+            ])) {
+                throw new Error('Subclasses are not as expected.');
             }
         });
 
