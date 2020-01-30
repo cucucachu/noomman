@@ -417,7 +417,13 @@ class Instance extends Diffable {
             await this.customValidations();
         }
         catch (error) {
-            throw new NoommanErrors.NoommanValidationError(this.id + ': ' + error.message, error.properties);
+            if(this.saved()){
+                throw new NoommanErrors.NoommanValidationError(this.classModel.className + ' ' + this.id + ': ' + error.message, error.properties);
+            }
+            else {
+                throw new NoommanErrors.NoommanValidationError('New Instance of ' + this.classModel.className + ': ' + error.message, error.properties)
+            }
+            
         }
     }
 

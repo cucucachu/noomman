@@ -2272,9 +2272,9 @@ describe('Instance Tests', () => {
                 await instance.validate();
             });
 
-            it('All fields are required. All but string are set. Error thrown.', async () => {
+            it.only('All fields are required. All but string are set. Error thrown.', async () => {
                 const instance = new Instance(AllFieldsRequiredClass);
-                const expectedErrorMessage = instance.id + ': Missing required property(s): "string"';
+                const expectedErrorMessage = 'New Instance of ' + instance.classModel.className + ': Missing required property(s): "string"';
                 properties = ['string'];
                 instance.assign({
                     strings: ['String'],
