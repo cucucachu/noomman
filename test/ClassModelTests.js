@@ -2733,6 +2733,13 @@ describe('Class Model Tests', () => {
         });
 
         describe('ClassModel.findById()', () => {
+
+            it('Error thrown if findById called with invalid id string.', async () => {
+                const expectedErrorMessage = 'CompareClass1.findById() called with invalid Id string: garbage.'
+                await testForErrorAsync('ClassModel.findById', expectedErrorMessage, async () => {
+                    return CompareClass1.findById('garbage');
+                });
+            });
     
             describe('Calling findById on the Class of the instance you want to find. (Direct)', () => {
 
@@ -2741,6 +2748,19 @@ describe('Class Model Tests', () => {
                     const instanceToFind = instanceOfAllFieldsMutexClass;
 
                     const instanceFound = await classToCallFindOneOn.findById(instanceToFind._id);
+
+                    if (!instanceFound)
+                        throw new Error('findById() did not return an instance.');
+                    
+                    if (!instanceToFind.equals(instanceFound))
+                        throw new Error('findById() returned the wrong instance.');
+                });
+
+                it('Calling findById with a string id.', async () => {
+                    const classToCallFindOneOn = AllFieldsMutexClass;
+                    const instanceToFind = instanceOfAllFieldsMutexClass;
+
+                    const instanceFound = await classToCallFindOneOn.findById(instanceToFind.id);
 
                     if (!instanceFound)
                         throw new Error('findById() did not return an instance.');

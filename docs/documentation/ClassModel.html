@@ -347,7 +347,7 @@
             </div>
             
             <div class="docs-section" id="findById">
-                <h5>findById(queryFilter, readControlMethodParameters, sensitiveControlMethodParameters)</h5>
+                <h5>findById(id, readControlMethodParameters, sensitiveControlMethodParameters)</h5>
                 <div>
                     <strong>Description</strong>
                     <p>
@@ -368,8 +368,8 @@
                         <tbody>
                             <tr>
                                 <td>id</td>
-                                <td>ObjectId</td>
-                                <td>A mongo ObjectId of the Instance you which to find.</td>
+                                <td>ObjectId | String</td>
+                                <td>A mongo ObjectId (or hex string representation thereof) of the Instance you which to find.</td>
                             </tr>
                             <tr>
                                 <td>readControlMethodParameters</td>
@@ -395,6 +395,21 @@
                         which has the given id and passes the readControl methods if applicable. Returns null if no Instance with the given id is 
                         found, or if matching instance does not pass readControl method (if applicable).
                     </p>
+                    <strong>Throws</strong>
+                    <table>
+                        <thead>
+                            <th>Error Type</th>
+                            <th>Cause</th>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>NoommanArgumentError</td>
+                                <td>
+                                    If the given id is a string and is not a valid hex string for an ObjectId.
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
                 </div>
             </div>
             

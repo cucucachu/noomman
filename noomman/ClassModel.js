@@ -1216,7 +1216,7 @@ class ClassModel {
     }
 
     /* 
-     * findById(queryFilter, readControlMethodParameters, sensitiveControlMethodParameters)
+     * findById(id, readControlMethodParameters, sensitiveControlMethodParameters)
      * Finds a single instance of this ClassModel with the given id. 
      *    If called on a superclass, will recursively check this ClassModel's collection, and then it's sub-ClassModels collections.
      *    This method respects readControl and sensitiveControl methods. If this ClassModel is read controlled, the Instance found
@@ -1224,7 +1224,7 @@ class ClassModel {
      *    is sensitive controlled, an instance which does not pass the sensitiveControl method(s) for this ClassModel will be 
      *    stripped of any sensitive attributes.
      * Parameters
-     * - id - ObjectId - A mongo ObjectId of the Instance you which to find.
+     * - id - ObjectId | String - A mongo ObjectId (or hex string representation thereof) of the Instance you which to find.
      * - readControlMethodParameters - Object - An object containing parameters that will be passed to the readControl method(s)
      *    for this ClassModel.
      * - sensitiveControlMethodParameters - Object - An object containing parameters that will be passed to the sensitiveControl
@@ -1233,8 +1233,19 @@ class ClassModel {
      * - Promise<Instance> - The first Instance of this ClassModel or its children
      *    which has the given id and passes the readControl methods if applicable. Returns null if no Instance with the given id is 
      *    found, or if matching instance does not pass readControl method (if applicable).
+     * Throws
+     * - NoommanArgumentError - If given id is a string which is not a valid mongodb id hex string.
      */
     async findById(id, readControlMethodParameters, sensitiveControlMethodParameters) {
+        if (typeof(id) === 'string') {
+            try {
+                id = database.ObjectId(id);
+            }
+            catch(error) {
+                throw new NoommanErrors.NoommanArgumentError(this.className + '.findById() called with invalid Id string: ' + id + '.');
+            }
+        }
+
         return this.findOne({_id: id}, readControlMethodParameters, sensitiveControlMethodParameters);
     }
 
