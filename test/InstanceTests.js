@@ -2185,6 +2185,88 @@ describe('Instance Tests', () => {
 
             });
 
+            describe('Getting Relationship Ids', () => {
+
+                describe('Relationship is Not Populated', () => {
+    
+                    it('Null returned if singular relationship is empty.', () => {
+                        const instance1 = new Instance(TwoWayRelationshipClass1);
+    
+                        if (instance1.oneToOne_id !== null) {
+                            throw new Error('Id is incorrect.');
+                        }
+                    });
+    
+                    it('Empty array returned if non-singular relationship is emtpy.', () => {
+                        const instance1 = new Instance(TwoWayRelationshipClass1);
+    
+                        if (!Array.isArray(instance1.oneToMany_ids) || instance1.oneToMany_ids.length !== 0) {
+                            throw new Error('Ids are incorrect.');
+                        }
+                    });
+
+                });
+
+                describe('Relationship is Populated By Setting Relationship.', () => {
+
+                    it('Can get a the id in a singular relationship.', () => {
+                        const instance1 = new Instance(TwoWayRelationshipClass1);
+                        const instance2 = new Instance(TwoWayRelationshipClass2);
+    
+                        instance1.oneToOne = instance2;
+    
+                        if (!instance1.oneToOne_id.equals(instance2._id)) {
+                            throw new Error('Id is incorrect.');
+                        }
+                    });
+    
+                    it('Can get the ids in a non-singular relationship.', () => {
+                        const instance1 = new Instance(TwoWayRelationshipClass1);
+                        const instance2 = new Instance(TwoWayRelationshipClass2);
+                        const instance3 = new Instance(TwoWayRelationshipClass2);
+    
+                        instance1.oneToMany = new InstanceSet(TwoWayRelationshipClass2, [instance2, instance3]);
+    
+                        if (!instance1.oneToMany_ids.includes(instance2._id) || !instance1.oneToMany_ids.includes(instance3._id)) {
+                            throw new Error('Ids are incorrect.');
+                        }
+                    });
+
+                });
+
+                describe('Relationship is Populated From Document.', () => {
+
+                    it('Can get a the id in a singular relationship.', () => {
+                        const relatedId =  database.ObjectId();
+                        const document = {
+                            _id: database.ObjectId(),
+                            oneToOne: relatedId,
+                        }
+                        const instance = new Instance(TwoWayRelationshipClass1, document);
+    
+                        if (!instance.oneToOne_id.equals(relatedId)) {
+                            throw new Error('Id is incorrect.');
+                        }
+                    });
+    
+                    it('Can get the ids in a non-singular relationship.', () => {
+                        const relatedIds = [database.ObjectId(), database.ObjectId()];
+                        const document = {
+                            _id: database.ObjectId,
+                            oneToMany: relatedIds,
+                        };
+
+                        const instance = new Instance(TwoWayRelationshipClass1, document);
+    
+                        if (!instance.oneToMany_ids.includes(relatedIds[0]) || !instance.oneToMany_ids.includes(relatedIds[1])) {
+                            throw new Error('Ids are incorrect.');
+                        }
+                    });
+
+                });
+
+            });
+
         });
 
         describe('Has Trap', () => {

@@ -109,6 +109,34 @@ class Instance extends Diffable {
                 if (classModel.relationships.map(relationship => '_' + relationship.name).includes(key))
                     return trapTarget.currentState[key.slice(1)];
 
+                if (key !== '_id' && typeof(key) === 'string' && key.includes('_id')) {
+                    const relationship = classModel.getRelationship(key.substr(0, key.length - 3));
+                    if (relationship && relationship.singular) {
+                        trapTarget.currentState.sync();
+                        const relationshipValue = trapTarget.currentState[relationship.name];
+                        if (relationshipValue instanceof Instance) {
+                            return relationshipValue._id;
+                        }
+                        else {
+                            return relationshipValue;
+                        }
+                    }
+                }
+
+                if (typeof(key) === 'string' && key.includes('_ids')) {
+                    const relationship = classModel.getRelationship(key.substr(0, key.length - 4));
+                    if (relationship && !relationship.singular) {
+                        trapTarget.currentState.sync();
+                        const relationshipValue = trapTarget.currentState[relationship.name];
+                        if (Array.isArray(relationshipValue)) {
+                            return relationshipValue;
+                        }
+                        else {
+                            return relationshipValue.getObjectIds();
+                        }
+                    }
+                }
+
                 if (attributeNames.includes(key))
                     return trapTarget.currentState[key];
 
