@@ -4456,6 +4456,31 @@ describe('InstanceSet Tests', () => {
     
         });
 
+        describe('InstanceSet.toString()', () => {
+
+            it('InstanceSet.toString() returns expected string.', () => {
+                const instance1 = new Instance(CompareClass1);
+                const instance2 = new Instance(CompareClass1);
+                const instanceSet = new InstanceSet(CompareClass1, [instance1, instance2]);
+
+                const string = instanceSet.toString();
+                const obj = JSON.parse(string);
+
+                if (obj.className !== 'CompareClass1') {
+                    throw new Error('String is missing className');
+                }
+
+                if (obj.size !== 2) {
+                    throw new Error('String is missing size');
+                }
+
+                if (!Array.isArray(obj.instances) || obj.instances.length !== 2) {
+                    throw new Error('String is missing instances.');
+                }
+            });
+
+        });
+
     });
 
 });

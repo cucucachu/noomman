@@ -209,8 +209,21 @@ class Instance extends Diffable {
      * - String - A string representation of this instance.
      */
     toString() {
-        return this.currentState.toString();
+        return JSON.stringify(Object.assign({className: this.classModel.className}, this.toDocument()), null, 2);
     }
+
+    /*
+     * inspect()
+     * Overrides default util.inspect() behavior for more helpful output when using
+     *    console.log(instance); Custom inspection functions are deprecated, so this method
+     *    is commented out and should not be used, but is left here in case a developer really 
+     *    wants it for debugging purposes.
+     * Returns
+     * - String - A string representation of this instance.
+    inspect() {
+        return this.toString();
+    }
+     */
 
     /* 
      * saved()

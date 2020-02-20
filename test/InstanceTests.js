@@ -6021,4 +6021,17 @@ describe('Instance Tests', () => {
 
     });
 
+    describe('instance.toString()', () => {
+
+        it('toString called by console.log()', () => {
+            const instance = new Instance(CompareClass1);
+            const string = instance.toString();
+            const obj = JSON.parse(string);
+
+            if (obj.className !== 'CompareClass1' || obj._id !== instance.id)
+                throw new Error('toString() did not return the expected string. ' + string)
+        });
+
+    });
+
 });

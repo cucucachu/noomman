@@ -845,6 +845,35 @@ class InstanceSet extends SuperSet {
         return classModel.isInstanceSetOfThisClass(this);
     }
 
+    /*
+     * toString()
+     * Implements the standard toString() behaviour.
+     * Returns
+     * - String - A string representation of this InstanceSet.
+     */
+    toString() {
+        const string = {};
+        string.className = this.classModel.className;
+        string.size = this.size;
+        string.instances = this.map(i => {
+            return Object.assign({className: i.classModel.className}, i.toDocument());
+        });
+        return JSON.stringify(string, null, 2);
+    }
+
+    /*
+     * inspect()
+     * Overrides default util.inspect() behavior for more helpful output when using
+     *    console.log(instanceSet); Custom inspection functions are deprecated, so this method
+     *    is commented out and should not be used, but is left here in case a developer really 
+     *    wants it for debugging purposes.
+     * Returns
+     * - String - A string representation of this InstanceSet.
+    inspect() {
+        return this.toString();
+    }
+    */
+
 }
 
 module.exports = InstanceSet;
