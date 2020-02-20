@@ -3,18 +3,13 @@ const moment = require('moment');
 const database = require('../noomman/database');
 const Instance = require('../noomman/Instance');
 const InstanceSet = require('../noomman/InstanceSet');
-const InstanceState = require('../noomman/InstanceState');
-const SuperSet = require('../noomman/SuperSet');
 const TestClassModels = require('./helpers/TestClassModels');
 const DatabaseConnection = require('./helpers/DatabaseConnection');
 const TestingFunctions = require('./helpers/TestingFunctions');
 const testForError = TestingFunctions.testForError;
 const testForValidationErrorAsync = TestingFunctions.testForValidationErrorAsync;
-const testForErrorRegex = TestingFunctions.testForErrorRegex;
 const testForErrorAsync = TestingFunctions.testForErrorAsync;
-const testForErrorAsyncRegex = TestingFunctions.testForErrorAsyncRegex;
 const arraysEqual = TestingFunctions.arraysEqual;
-const objectsEqual = TestingFunctions.objectsEqual;
 
 // Load all TestClassModels 
 {
@@ -2038,6 +2033,25 @@ describe('Instance Tests', () => {
                                 throw new Error('instance.' + relationshipName + ' did not return empty array.');
                         });
     
+                    });
+
+                });
+
+                describe('Getting Relationships with "->" syntax', () => {
+
+                    it.skip('Can walk singlular relationship with -> syntax', () => {
+                    });
+
+                    it.skip('Can walk non-singlular relationship with -> syntax', () => {
+                    });
+
+                    it.skip('Can walk two singular relationships with -> syntax', () => {
+                    });
+
+                    it.skip('Can walk two non-singular relationships with -> syntax', () => {
+                    });
+
+                    it.skip('Can walk three relationships with -> syntax', () => {
                     });
 
                 });
@@ -5376,6 +5390,49 @@ describe('Instance Tests', () => {
 
 
         })
+
+    });
+
+    describe('instance.walkPath()', () => {
+
+        describe('Instance.parsePath()', () => {
+    
+            it.skip('Can parse path from string.', () => {
+    
+            });
+    
+        });
+
+        describe('instance.validatePath()', () => {
+
+            it.skip('If path contains only valid relationships, no error thrown.', () => {
+            });
+
+            it.skip('If path is not an array, error thrown.', () => {
+            });
+
+            it.skip('If path is an array containing non-string elements, error thrown.', () => {
+            });
+
+            it.skip('If path contains any invalid relationship names, error thrown.', () => {
+            });
+
+        });
+
+        it.skip('Can walk singlular relationship.', async () => {
+        });
+
+        it.skip('Can walk non-singlular relationship.', async () => {
+        });
+
+        it.skip('Can walk two singular relationships.', async () => {
+        });
+
+        it.skip('Can walk two non-singular relationships.', async () => {
+        });
+
+        it.skip('Can walk three relationships.', async () => {
+        });
 
     });
 

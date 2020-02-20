@@ -100,6 +100,11 @@ class Instance extends Diffable {
             get(trapTarget, key, receiver) {
                 if (classModel.relationships.map(relationship => relationship.name).includes(key))
                     return receiver.walk(key);
+                
+                if (key.length >= 2 && key.substr(0, 2) === '->') {
+                    const path = Instance.parsePath(key);
+                    return receiver.walkPath(path);
+                }
 
                 if (classModel.relationships.map(relationship => '_' + relationship.name).includes(key))
                     return trapTarget.currentState[key.slice(1)];
@@ -337,6 +342,89 @@ class Instance extends Diffable {
         }
 
         return walkResult;
+    }
+
+    static parsePath(path) {
+        const pathArray = [];
+        const char = '->';
+        
+        while(path.includes(char)) {
+            path = path.substr(2);
+            const index = path.indexOf(char) === -1 ? undefined : path.indexOf(char);
+            pathArray.push(path.substr(0, index));
+            path = path.substr(index);
+        }
+
+        console.log(pathArray);
+        return pathArray;
+    }
+
+    validatePath(path) {
+        const errorMessage = 'Instance ' + this.id + ' of ClassModel ' 
+            + this.classModel.className + 'called with invalid argument: ' + path
+
+        if (!Array.isArray(path)) {
+            throw new NoommanArgumentError(errorMessage);
+        }
+
+        for (const item of path) {
+            if (typeof(item) !== string) {
+                throw new NoommanArgumentError(errorMessage);
+            }
+        }
+
+        let classModel = this.classModel;
+        for (const index in path) {
+            const relationship = classModel.getRelationship(path[index]);
+            if (relationship === null) {
+                throw new NoommanArgumentError(errorMessage);
+            }
+            classModel = classModel.getRelatedClassModel(path[index]);
+        }
+    }
+
+    async walkPath(path) {
+        this.validatePath(path);
+
+        let currentInstanceSet = this.classModel.emptyInstanceSet();
+        currentInstanceSet.add(this);
+
+        let finalClassModel = this.classModel;
+        for (const index in path) {
+            const relationship = finalClassModel.getRelationship(path[index]);
+            finalClassModel = finalClassModel.getRelatedClassModel(path[index]);
+        }
+
+        const emptyResultSet = finalClassModel.emptyInstanceSet();
+
+        let classModel = this.classModel;
+
+        for (const relationshipName of path) {
+            const relationship = classModel.getRelationship(path[index]);
+
+            const walkResult = currentInstanceSet.walk(relationshipName);
+
+            if (relationship.singular) {
+                if (walkResult === null) {
+                    return emptyResultSet;
+                }
+                else {
+                    const walkResultAsInstanceSet = walkResult.classModel.emptyInstanceSet;
+                    walkResultAsInstanceSet.add(walkResult);
+                    currentInstanceSet = walkResultAsInstanceSet;
+                }
+            }
+            else {
+                if (walkResult.isEmpty()) {
+                    return emptyResultSet;
+                }
+                else {
+                    currentInstanceSet = walkResult;
+                }
+            }
+        }
+
+        return currentInstanceSet;
     }
 
     /*
