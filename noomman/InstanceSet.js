@@ -262,6 +262,23 @@ class InstanceSet extends SuperSet {
         return instances;
     }
 
+    /*
+     * instanceAt(index)
+     * Converts this InstanceSet into an array and retrieves the instance at given index.
+     * Parameters
+     * - index - Number - The index of the instance to retrieve.
+     * Returns
+     * - Instance - The Instance at the given index when this InstanceSet is converted into an array.
+     * Throws
+     * - NoommanArgumentError - If the given index is not a number.
+     */
+    instanceAt(index) {
+        if (typeof(index) !== 'number')
+            throw new NoommanErrors.NoommanArgumentError('InstanceSet.instanceAt() called with invalid argument: ' + index + '.');
+
+        return [...this][index];
+    }
+
     // Set Math
 
     /*

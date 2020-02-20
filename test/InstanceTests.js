@@ -2039,19 +2039,146 @@ describe('Instance Tests', () => {
 
                 describe('Getting Relationships with "->" syntax', () => {
 
-                    it.skip('Can walk singlular relationship with -> syntax', () => {
+                    it('Can walk singlular relationship with "->" syntax.', async () => {
+                        const instance1 = new Instance(TwoWayRelationshipClass1);
+                        const instance2 = new Instance(TwoWayRelationshipClass2);
+            
+                        instance1.oneToOne = instance2;
+            
+                        const walkResult = await instance1['->oneToOne'];
+            
+                        if (walkResult.isEmpty()) {
+                            throw new Error('instance.walkPath did not return any instances.');
+                        }
+            
+                        if (!walkResult.instanceAt(0).equals(instance2)) {
+                            throw new Error('instance.walkPath did not return the expected instance(s).');
+                        }
                     });
-
-                    it.skip('Can walk non-singlular relationship with -> syntax', () => {
+            
+                    it('Can walk non-singlular relationship with "->" syntax.', async () => {
+                        const instance1 = new Instance(TwoWayRelationshipClass1);
+                        const instance2 = new Instance(TwoWayRelationshipClass2);
+            
+                        instance1.oneToMany = new InstanceSet(TwoWayRelationshipClass2, [instance2]);            
+            
+                        const walkResult = await instance1['->oneToMany'];
+            
+                        if (walkResult.isEmpty()) {
+                            throw new Error('instance.walkPath did not return any instances.');
+                        }
+            
+                        if (!walkResult.instanceAt(0).equals(instance2)) {
+                            throw new Error('instance.walkPath did not return the expected instance(s).');
+                        }
                     });
-
-                    it.skip('Can walk two singular relationships with -> syntax', () => {
+            
+                    it('Can walk two singular relationships with "->" syntax.', async () => {
+                        const instance1 = new Instance(TwoWayRelationshipClass1);
+                        const instance2 = new Instance(TwoWayRelationshipClass2);
+                        const instance3 = new Instance(TwoWayRelationshipClass1);
+            
+                        instance1.oneToOne = instance2;
+                        instance2.manyToOne = instance3;
+            
+                        const walkResult = await instance1['->oneToOne->manyToOne'];
+            
+                        if (walkResult.isEmpty()) {
+                            throw new Error('instance.walkPath did not return any instances.');
+                        }
+            
+                        if (!walkResult.instanceAt(0).equals(instance3)) {
+                            throw new Error('instance.walkPath did not return the expected instance(s).');
+                        }
                     });
-
-                    it.skip('Can walk two non-singular relationships with -> syntax', () => {
+    
+                    it('Can walk two non-singular relationships with "->" syntax.', async () => {
+                        let instance1 = new Instance(TwoWayRelationshipClass1);
+                        let instance2a = new Instance(TwoWayRelationshipClass2);
+                        let instance2b = new Instance(TwoWayRelationshipClass2);
+                        let instance3a = new Instance(TwoWayRelationshipClass1);
+                        let instance3b = new Instance(TwoWayRelationshipClass1);
+                        let instance3c = new Instance(TwoWayRelationshipClass1);
+                        let instance3d = new Instance(TwoWayRelationshipClass1);
+            
+                        instance1.oneToMany = new InstanceSet(TwoWayRelationshipClass2, [instance2a, instance2b]);
+                        instance2a.oneToMany = new InstanceSet(TwoWayRelationshipClass1, [instance3a, instance3b]);
+                        instance2b.oneToMany = new InstanceSet(TwoWayRelationshipClass1, [instance3c, instance3d]);
+        
+                        await instance1.save();
+                        await instance2a.save();
+                        await instance2b.save();
+                        await instance3a.save();
+                        await instance3b.save();
+                        await instance3c.save();
+                        await instance3d.save();
+        
+                        instance1 = await TwoWayRelationshipClass1.findById(instance1._id);
+            
+                        const walkResult = await instance1['->oneToMany->oneToMany'];
+            
+                        if (walkResult.isEmpty()) {
+                            throw new Error('instance.walkPath did not return any instances.');
+                        }
+            
+                        if (walkResult.size !== 4) {
+                            throw new Error('instance.walkPath did not return the expected number of instances.');
+                        }
+            
+                        if (!walkResult.hasInstance(instance3a) || !walkResult.hasInstance(instance3b)
+                            || !walkResult.hasInstance(instance3c) || !walkResult.hasInstance(instance3d)
+                        ) {
+                            throw new Error('instance.walkPath did not return the expected instance(s).');
+                        }
                     });
-
-                    it.skip('Can walk three relationships with -> syntax', () => {
+            
+                    it('Can walk three relationships with "->" syntax.', async () => {
+                        let instance1 = new Instance(TwoWayRelationshipClass1);
+                        let instance2a = new Instance(TwoWayRelationshipClass2);
+                        let instance2b = new Instance(TwoWayRelationshipClass2);
+                        let instance3a = new Instance(TwoWayRelationshipClass1);
+                        let instance3b = new Instance(TwoWayRelationshipClass1);
+                        let instance3c = new Instance(TwoWayRelationshipClass1);
+                        let instance3d = new Instance(TwoWayRelationshipClass1);
+                        let instance4a = new Instance(TwoWayRelationshipClass2);
+                        let instance4b = new Instance(TwoWayRelationshipClass2);
+                        let instance4c = new Instance(TwoWayRelationshipClass2);
+                        let instance4d = new Instance(TwoWayRelationshipClass2);
+            
+                        instance1.oneToMany = new InstanceSet(TwoWayRelationshipClass2, [instance2a, instance2b]);
+                        instance2a.oneToMany = new InstanceSet(TwoWayRelationshipClass1, [instance3a, instance3b]);
+                        instance2b.oneToMany = new InstanceSet(TwoWayRelationshipClass1, [instance3c, instance3d]);
+                        instance3a.oneToOne = instance4a;
+                        instance3b.oneToOne = instance4b;
+                        instance3c.oneToOne = instance4c;
+                        instance3d.oneToOne = instance4d;
+        
+                        await instance1.save();
+                        await instance2a.save();
+                        await instance2b.save();
+                        await instance3a.save();
+                        await instance3b.save();
+                        await instance3c.save();
+                        await instance3d.save();
+        
+                        instance1 = await TwoWayRelationshipClass1.findById(instance1._id);
+            
+            
+                        const walkResult = await instance1['->oneToMany->oneToMany->oneToOne'];
+            
+                        if (walkResult.isEmpty()) {
+                            throw new Error('instance.walkPath did not return any instances.');
+                        }
+            
+                        if (walkResult.size !== 4) {
+                            throw new Error('instance.walkPath did not return the expected number of instances.');
+                        }
+            
+                        if (!walkResult.hasInstance(instance4a) || !walkResult.hasInstance(instance4b)
+                            || !walkResult.hasInstance(instance4c) || !walkResult.hasInstance(instance4d)
+                        ) {
+                            throw new Error('instance.walkPath did not return the expected instance(s).');
+                        }
                     });
 
                 });
@@ -5397,41 +5524,354 @@ describe('Instance Tests', () => {
 
         describe('Instance.parsePath()', () => {
     
-            it.skip('Can parse path from string.', () => {
+            it('Can parse path from string - single relationship.', () => {
+                const parsed = Instance.parsePath('->relationship');
+
+                if (parsed.length !== 1 || parsed[0] !== 'relationship')
+                    throw new Error('Path was parsed incorrectly: ' + parsed);
+            });
     
+            it('Can parse path from string - five relationships.', () => {
+                const parsed = Instance.parsePath('->relationship->a->b_b->c->lastRelationship');
+
+                if (parsed.length !== 5 || 
+                    parsed[0] !== 'relationship' ||
+                    parsed[1] !== 'a' ||
+                    parsed[2] !== 'b_b' ||
+                    parsed[3] !== 'c' ||
+                    parsed[4] !== 'lastRelationship'
+                )
+                    throw new Error('Path was parsed incorrectly: ' + parsed);
             });
     
         });
 
         describe('instance.validatePath()', () => {
 
-            it.skip('If path contains only valid relationships, no error thrown.', () => {
+            it('If path contains only valid relationships, no error thrown.', () => {
+                const instance = new Instance(TwoWayRelationshipClass1);
+                const path = ['oneToOne', 'oneToMany', 'manyToOne', 'manyToMany'];
+                instance.validatePath(path);
             });
 
-            it.skip('If path is not an array, error thrown.', () => {
+            it('If path is not an array, error thrown.', () => {
+                const instance = new Instance(TwoWayRelationshipClass1);
+                const path = 'oneToOne';
+                const expectedErrorMessage = 'Instance ' + instance.id + ' of ClassModel ' 
+                    + instance.classModel.className + ' called with invalid argument: ' + path
+                
+                testForError('instance.validatePath()', expectedErrorMessage, () => {
+                    instance.validatePath(path)
+                });
             });
 
-            it.skip('If path is an array containing non-string elements, error thrown.', () => {
+            it('If path is an array containing non-string elements, error thrown.', () => {
+                const instance = new Instance(TwoWayRelationshipClass1);
+                const path = ['oneToOne', 'oneToMany', 'manyToOne', 1];
+                const expectedErrorMessage = 'Instance ' + instance.id + ' of ClassModel ' 
+                    + instance.classModel.className + ' called with invalid argument: ' + path
+                
+                testForError('instance.validatePath()', expectedErrorMessage, () => {
+                    instance.validatePath(path)
+                });
             });
 
-            it.skip('If path contains any invalid relationship names, error thrown.', () => {
+            it('If path contains any invalid relationship names, error thrown.', () => {
+                const instance = new Instance(TwoWayRelationshipClass1);
+                const path = ['oneToOne', 'oneToMany', 'manyToOne', 'manyTo1'];
+                const expectedErrorMessage = 'Instance ' + instance.id + ' of ClassModel ' 
+                    + instance.classModel.className + ' called with invalid argument: ' + path
+                
+                testForError('instance.validatePath()', expectedErrorMessage, () => {
+                    instance.validatePath(path)
+                });
             });
 
         });
 
-        it.skip('Can walk singlular relationship.', async () => {
+        describe('Walking Relationships with Unsaved Instances', () => {
+
+            it('Can walk singlular relationship.', async () => {
+                const instance1 = new Instance(TwoWayRelationshipClass1);
+                const instance2 = new Instance(TwoWayRelationshipClass2);
+    
+                instance1.oneToOne = instance2;
+    
+                const walkResult = await instance1.walkPath(['oneToOne']);
+    
+                if (walkResult.isEmpty()) {
+                    throw new Error('instance.walkPath did not return any instances.');
+                }
+    
+                if (!walkResult.instanceAt(0).equals(instance2)) {
+                    throw new Error('instance.walkPath did not return the expected instance(s).');
+                }
+            });
+    
+            it('Can walk non-singlular relationship.', async () => {
+                const instance1 = new Instance(TwoWayRelationshipClass1);
+                const instance2 = new Instance(TwoWayRelationshipClass2);
+    
+                instance1.oneToMany = new InstanceSet(TwoWayRelationshipClass2, [instance2]);
+    
+                const walkResult = await instance1.walkPath(['oneToMany']);
+    
+                if (walkResult.isEmpty()) {
+                    throw new Error('instance.walkPath did not return any instances.');
+                }
+    
+                if (!walkResult.instanceAt(0).equals(instance2)) {
+                    throw new Error('instance.walkPath did not return the expected instance(s).');
+                }
+            });
+    
+            it('Can walk two singular relationships.', async () => {
+                const instance1 = new Instance(TwoWayRelationshipClass1);
+                const instance2 = new Instance(TwoWayRelationshipClass2);
+                const instance3 = new Instance(TwoWayRelationshipClass1);
+    
+                instance1.oneToOne = instance2;
+                instance2.manyToOne = instance3;
+    
+                const walkResult = await instance1.walkPath(['oneToOne', 'manyToOne']);
+    
+                if (walkResult.isEmpty()) {
+                    throw new Error('instance.walkPath did not return any instances.');
+                }
+    
+                if (!walkResult.instanceAt(0).equals(instance3)) {
+                    throw new Error('instance.walkPath did not return the expected instance(s).');
+                }
+            });
+    
+            it('Can walk two non-singular relationships.', async () => {
+                const instance1 = new Instance(TwoWayRelationshipClass1);
+                const instance2a = new Instance(TwoWayRelationshipClass2);
+                const instance2b = new Instance(TwoWayRelationshipClass2);
+                const instance3a = new Instance(TwoWayRelationshipClass1);
+                const instance3b = new Instance(TwoWayRelationshipClass1);
+                const instance3c = new Instance(TwoWayRelationshipClass1);
+                const instance3d = new Instance(TwoWayRelationshipClass1);
+    
+                instance1.oneToMany = new InstanceSet(TwoWayRelationshipClass2, [instance2a, instance2b]);
+                instance2a.oneToMany = new InstanceSet(TwoWayRelationshipClass1, [instance3a, instance3b]);
+                instance2b.oneToMany = new InstanceSet(TwoWayRelationshipClass1, [instance3c, instance3d]);
+    
+                const walkResult = await instance1.walkPath(['oneToMany', 'oneToMany']);
+    
+                if (walkResult.isEmpty()) {
+                    throw new Error('instance.walkPath did not return any instances.');
+                }
+    
+                if (walkResult.size !== 4) {
+                    throw new Error('instance.walkPath did not return the expected number of instances.');
+                }
+    
+                if (!walkResult.hasInstance(instance3a) || !walkResult.hasInstance(instance3b)
+                    || !walkResult.hasInstance(instance3c) || !walkResult.hasInstance(instance3d)
+                ) {
+                    throw new Error('instance.walkPath did not return the expected instance(s).');
+                }
+            });
+    
+            it('Can walk three relationships.', async () => {
+                const instance1 = new Instance(TwoWayRelationshipClass1);
+                const instance2a = new Instance(TwoWayRelationshipClass2);
+                const instance2b = new Instance(TwoWayRelationshipClass2);
+                const instance3a = new Instance(TwoWayRelationshipClass1);
+                const instance3b = new Instance(TwoWayRelationshipClass1);
+                const instance3c = new Instance(TwoWayRelationshipClass1);
+                const instance3d = new Instance(TwoWayRelationshipClass1);
+                const instance4a = new Instance(TwoWayRelationshipClass2);
+                const instance4b = new Instance(TwoWayRelationshipClass2);
+                const instance4c = new Instance(TwoWayRelationshipClass2);
+                const instance4d = new Instance(TwoWayRelationshipClass2);
+    
+                instance1.oneToMany = new InstanceSet(TwoWayRelationshipClass2, [instance2a, instance2b]);
+                instance2a.oneToMany = new InstanceSet(TwoWayRelationshipClass1, [instance3a, instance3b]);
+                instance2b.oneToMany = new InstanceSet(TwoWayRelationshipClass1, [instance3c, instance3d]);
+                instance3a.oneToOne = instance4a;
+                instance3b.oneToOne = instance4b;
+                instance3c.oneToOne = instance4c;
+                instance3d.oneToOne = instance4d;
+    
+                const walkResult = await instance1.walkPath(['oneToMany', 'oneToMany', 'oneToOne']);
+    
+                if (walkResult.isEmpty()) {
+                    throw new Error('instance.walkPath did not return any instances.');
+                }
+    
+                if (walkResult.size !== 4) {
+                    throw new Error('instance.walkPath did not return the expected number of instances.');
+                }
+    
+                if (!walkResult.hasInstance(instance4a) || !walkResult.hasInstance(instance4b)
+                    || !walkResult.hasInstance(instance4c) || !walkResult.hasInstance(instance4d)
+                ) {
+                    throw new Error('instance.walkPath did not return the expected instance(s).');
+                }
+            });
+
         });
 
-        it.skip('Can walk non-singlular relationship.', async () => {
-        });
+        describe('Walking Relationships with Saved Instances', () => {
 
-        it.skip('Can walk two singular relationships.', async () => {
-        });
+            it('Can walk singlular relationship.', async () => {
+                let instance1 = new Instance(TwoWayRelationshipClass1);
+                let instance2 = new Instance(TwoWayRelationshipClass2);
+    
+                instance1.oneToOne = instance2;
 
-        it.skip('Can walk two non-singular relationships.', async () => {
-        });
+                await instance1.save();
 
-        it.skip('Can walk three relationships.', async () => {
+                instance1 = await TwoWayRelationshipClass1.findById(instance1._id);
+    
+                const walkResult = await instance1.walkPath(['oneToOne']);
+    
+                if (walkResult.isEmpty()) {
+                    throw new Error('instance.walkPath did not return any instances.');
+                }
+    
+                if (!walkResult.instanceAt(0).equals(instance2)) {
+                    throw new Error('instance.walkPath did not return the expected instance(s).');
+                }
+            });
+    
+            it('Can walk non-singlular relationship.', async () => {
+                let instance1 = new Instance(TwoWayRelationshipClass1);
+                let instance2 = new Instance(TwoWayRelationshipClass2);
+    
+                instance1.oneToMany = new InstanceSet(TwoWayRelationshipClass2, [instance2]);
+    
+                await instance1.save();
+
+                instance1 = await TwoWayRelationshipClass1.findById(instance1._id);
+
+                const walkResult = await instance1.walkPath(['oneToMany']);
+    
+                if (walkResult.isEmpty()) {
+                    throw new Error('instance.walkPath did not return any instances.');
+                }
+    
+                if (!walkResult.instanceAt(0).equals(instance2)) {
+                    throw new Error('instance.walkPath did not return the expected instance(s).');
+                }
+            });
+    
+            it('Can walk two singular relationships.', async () => {
+                let instance1 = new Instance(TwoWayRelationshipClass1);
+                let instance2 = new Instance(TwoWayRelationshipClass2);
+                let instance3 = new Instance(TwoWayRelationshipClass1);
+    
+                instance1.oneToOne = instance2;
+                instance2.manyToOne = instance3;
+
+                await instance1.save();
+                await instance2.save();
+                await instance3.save();
+                
+
+                instance1 = await TwoWayRelationshipClass1.findById(instance1._id);
+    
+                const walkResult = await instance1.walkPath(['oneToOne', 'manyToOne']);
+    
+                if (walkResult.isEmpty()) {
+                    throw new Error('instance.walkPath did not return any instances.');
+                }
+    
+                if (!walkResult.instanceAt(0).equals(instance3)) {
+                    throw new Error('instance.walkPath did not return the expected instance(s).');
+                }
+            });
+    
+            it('Can walk two non-singular relationships.', async () => {
+                let instance1 = new Instance(TwoWayRelationshipClass1);
+                let instance2a = new Instance(TwoWayRelationshipClass2);
+                let instance2b = new Instance(TwoWayRelationshipClass2);
+                let instance3a = new Instance(TwoWayRelationshipClass1);
+                let instance3b = new Instance(TwoWayRelationshipClass1);
+                let instance3c = new Instance(TwoWayRelationshipClass1);
+                let instance3d = new Instance(TwoWayRelationshipClass1);
+    
+                instance1.oneToMany = new InstanceSet(TwoWayRelationshipClass2, [instance2a, instance2b]);
+                instance2a.oneToMany = new InstanceSet(TwoWayRelationshipClass1, [instance3a, instance3b]);
+                instance2b.oneToMany = new InstanceSet(TwoWayRelationshipClass1, [instance3c, instance3d]);
+
+                await instance1.save();
+                await instance2a.save();
+                await instance2b.save();
+                await instance3a.save();
+                await instance3b.save();
+                await instance3c.save();
+                await instance3d.save();
+
+                instance1 = await TwoWayRelationshipClass1.findById(instance1._id);
+    
+                const walkResult = await instance1.walkPath(['oneToMany', 'oneToMany']);
+    
+                if (walkResult.isEmpty()) {
+                    throw new Error('instance.walkPath did not return any instances.');
+                }
+    
+                if (walkResult.size !== 4) {
+                    throw new Error('instance.walkPath did not return the expected number of instances.');
+                }
+    
+                if (!walkResult.hasInstance(instance3a) || !walkResult.hasInstance(instance3b)
+                    || !walkResult.hasInstance(instance3c) || !walkResult.hasInstance(instance3d)
+                ) {
+                    throw new Error('instance.walkPath did not return the expected instance(s).');
+                }
+            });
+    
+            it('Can walk three relationships.', async () => {
+                let instance1 = new Instance(TwoWayRelationshipClass1);
+                let instance2a = new Instance(TwoWayRelationshipClass2);
+                let instance2b = new Instance(TwoWayRelationshipClass2);
+                let instance3a = new Instance(TwoWayRelationshipClass1);
+                let instance3b = new Instance(TwoWayRelationshipClass1);
+                let instance3c = new Instance(TwoWayRelationshipClass1);
+                let instance3d = new Instance(TwoWayRelationshipClass1);
+                let instance4a = new Instance(TwoWayRelationshipClass2);
+                let instance4b = new Instance(TwoWayRelationshipClass2);
+                let instance4c = new Instance(TwoWayRelationshipClass2);
+                let instance4d = new Instance(TwoWayRelationshipClass2);
+    
+                instance1.oneToMany = new InstanceSet(TwoWayRelationshipClass2, [instance2a, instance2b]);
+                instance2a.oneToMany = new InstanceSet(TwoWayRelationshipClass1, [instance3a, instance3b]);
+                instance2b.oneToMany = new InstanceSet(TwoWayRelationshipClass1, [instance3c, instance3d]);
+                instance3a.oneToOne = instance4a;
+                instance3b.oneToOne = instance4b;
+                instance3c.oneToOne = instance4c;
+                instance3d.oneToOne = instance4d;
+
+                await instance1.save();
+                await instance2a.save();
+                await instance2b.save();
+                await instance3a.save();
+                await instance3b.save();
+                await instance3c.save();
+                await instance3d.save();
+
+                instance1 = await TwoWayRelationshipClass1.findById(instance1._id);
+    
+                const walkResult = await instance1.walkPath(['oneToMany', 'oneToMany', 'oneToOne']);
+    
+                if (walkResult.isEmpty()) {
+                    throw new Error('instance.walkPath did not return any instances.');
+                }
+    
+                if (walkResult.size !== 4) {
+                    throw new Error('instance.walkPath did not return the expected number of instances.');
+                }
+    
+                if (!walkResult.hasInstance(instance4a) || !walkResult.hasInstance(instance4b)
+                    || !walkResult.hasInstance(instance4c) || !walkResult.hasInstance(instance4d)
+                ) {
+                    throw new Error('instance.walkPath did not return the expected instance(s).');
+                }
+            });
+            
         });
 
     });

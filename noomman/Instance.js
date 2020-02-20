@@ -344,6 +344,15 @@ class Instance extends Diffable {
         return walkResult;
     }
 
+    /*
+     * parsePath(path)
+     * Parses a string path for the Instance get trap, when property starts with "->". 
+     * Parameters
+     * - path - String - a relationship walking path string, with each relationship to walk preceded 
+     *    by the substring "->".
+     * Returns
+     * - Array<String> - An array of strings that were separated by the "->" string in the given path string.
+     */
     static parsePath(path) {
         const pathArray = [];
         const char = '->';
@@ -355,21 +364,32 @@ class Instance extends Diffable {
             path = path.substr(index);
         }
 
-        console.log(pathArray);
         return pathArray;
     }
 
+    /*
+     * validatePath(path)
+     * Validates that the given path array contains valid relationship names for the relavant ClassModels.
+     * Parameters
+     * - path - Array<String> - An array of strings that represent a sequence or relationships to walk from 
+     *    this Instance.
+     * Throws
+     * - NoommanArgumentError - If given path is not an Array.
+     * - NoommanArgumentError - If given path is an Array containing any item that is not a string.
+     * - NoommanArgumentError - If given path Array contains any string is not a valid relationship name for
+     *    the relavant ClassModel.
+     */
     validatePath(path) {
         const errorMessage = 'Instance ' + this.id + ' of ClassModel ' 
-            + this.classModel.className + 'called with invalid argument: ' + path
+            + this.classModel.className + ' called with invalid argument: ' + path
 
         if (!Array.isArray(path)) {
-            throw new NoommanArgumentError(errorMessage);
+            throw new NoommanErrors.NoommanArgumentError(errorMessage);
         }
 
         for (const item of path) {
-            if (typeof(item) !== string) {
-                throw new NoommanArgumentError(errorMessage);
+            if (typeof(item) !== 'string') {
+                throw new NoommanErrors.NoommanArgumentError(errorMessage);
             }
         }
 
@@ -377,12 +397,25 @@ class Instance extends Diffable {
         for (const index in path) {
             const relationship = classModel.getRelationship(path[index]);
             if (relationship === null) {
-                throw new NoommanArgumentError(errorMessage);
+                throw new NoommanErrors.NoommanArgumentError(errorMessage);
             }
             classModel = classModel.getRelatedClassModel(path[index]);
         }
     }
 
+    /*
+     * walkPath(path)
+     * Walks the relationships in the given path from this Instance, and returns a single InstanceSet containing all the Instances
+     *    at the end of the path. 
+     * - path - Array<String> - An array of strings that represent a sequence or relationships to walk from 
+     *    this Instance.
+     * Returns
+     * - InstanceSet - An InstanceSet containing the Instances that result from walking the given path. InstanceSet will always be 
+     *    for the ClassModel at the end of the relationship path. If relationships are empty somewhere in the middle of the path, 
+     *    or there are no Instances at the end of the path, the returned InstanceSet will be empty.
+     * Throws
+     * - NoommanArgumentError - If validatePath() throws a NoommanArgumentError.
+     */
     async walkPath(path) {
         this.validatePath(path);
 
@@ -397,30 +430,15 @@ class Instance extends Diffable {
 
         const emptyResultSet = finalClassModel.emptyInstanceSet();
 
-        let classModel = this.classModel;
 
         for (const relationshipName of path) {
-            const relationship = classModel.getRelationship(path[index]);
-
-            const walkResult = currentInstanceSet.walk(relationshipName);
-
-            if (relationship.singular) {
-                if (walkResult === null) {
-                    return emptyResultSet;
-                }
-                else {
-                    const walkResultAsInstanceSet = walkResult.classModel.emptyInstanceSet;
-                    walkResultAsInstanceSet.add(walkResult);
-                    currentInstanceSet = walkResultAsInstanceSet;
-                }
+            const walkResult = await currentInstanceSet.walk(relationshipName);
+            
+            if (walkResult.isEmpty()) {
+                return emptyResultSet;
             }
             else {
-                if (walkResult.isEmpty()) {
-                    return emptyResultSet;
-                }
-                else {
-                    currentInstanceSet = walkResult;
-                }
+                currentInstanceSet = walkResult;
             }
         }
 

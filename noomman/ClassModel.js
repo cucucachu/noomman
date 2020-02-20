@@ -597,6 +597,16 @@ class ClassModel {
         return instanceSet.classModel.allSuperClasses().map(c => c.className).includes(this.className);
     }
 
+    /* 
+     * getRelationship(relationshipName)
+     * Retreives the relationship with the given relationshipName on this ClassModel.
+     * Parameters
+     * - relationshipName - String - A string matching the name property of one of the relationships of 
+     *    this ClassModel.
+     * Returns
+     * - Relationship - The relationship matching the given relationshipName on this ClassModel. If no 
+     *    relationship exists on this ClassModel with the given name, null is returned.
+     */
     getRelationship(relationshipName) {
         const relationships = this.relationships.filter(r => r.name === relationshipName);
         return relationships.length ? relationships[0] : null;
