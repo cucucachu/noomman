@@ -67,6 +67,7 @@
             <li><a href="#stripSensitiveAttributes">stripSensitiveAttributes()</a></li>
             <li><a href="#validate">validate()</a></li>
             <li><a href="#walk">walk()</a></li>
+            <li><a href="#walkPath">walkPath()</a></li>
         </ul>
     </div>
 
@@ -584,6 +585,59 @@
                             <tr>
                                 <td>NoommanArgumentError</td>
                                 <td>If relationshipName does not match any relationship for the ClassModel of this Instance.</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            
+            <div class="docs-section" id="walkPath">
+                <h5>walkPath(path)</h5>
+                <div>
+                    <strong>Description</strong>
+                    <p>
+                        Walks a path of multiple relationship from this Instance, returning an InstanceSet containing all Instances
+                        at the end of the path.
+                    </p>
+                    <strong>Parameters</strong>
+                    <table>
+                        <thead>
+                            <th>Name</th>
+                            <th>Type</th>
+                            <th>Description</th>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>path</td>
+                                <td>Array&lt;String&gt;</td>
+                                <td>An Array containing the names of the relationships to walk.</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                    <strong>Returns</strong>
+                    <p>
+                        Promise&lt;InstanceSet&gt; - The InstanceSet of Instances related to this Instance through the given relationships.
+                        If there are no Instances at the end of the path, or path cannot be walked all the way to the end, the InstanceSet
+                        will be empty.
+                    </p>
+                    <strong>Throws</strong>
+                    <table>
+                        <thead>
+                            <th>Error Type</th>
+                            <th>Cause</th>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>NoommanArgumentError</td>
+                                <td>If path is not an Array.</td>
+                            </tr>
+                            <tr>
+                                <td>NoommanArgumentError</td>
+                                <td>If path contains any items that are not a string.</td>
+                            </tr>
+                            <tr>
+                                <td>NoommanArgumentError</td>
+                                <td>If path contains any items that are not a valid relationship for the relavant ClassModel.</td>
                             </tr>
                         </tbody>
                     </table>
