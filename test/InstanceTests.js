@@ -5546,49 +5546,6 @@ describe('Instance Tests', () => {
     
         });
 
-        describe('instance.validatePath()', () => {
-
-            it('If path contains only valid relationships, no error thrown.', () => {
-                const instance = new Instance(TwoWayRelationshipClass1);
-                const path = ['oneToOne', 'oneToMany', 'manyToOne', 'manyToMany'];
-                instance.validatePath(path);
-            });
-
-            it('If path is not an array, error thrown.', () => {
-                const instance = new Instance(TwoWayRelationshipClass1);
-                const path = 'oneToOne';
-                const expectedErrorMessage = 'Instance ' + instance.id + ' of ClassModel ' 
-                    + instance.classModel.className + ' called with invalid argument: ' + path
-                
-                testForError('instance.validatePath()', expectedErrorMessage, () => {
-                    instance.validatePath(path)
-                });
-            });
-
-            it('If path is an array containing non-string elements, error thrown.', () => {
-                const instance = new Instance(TwoWayRelationshipClass1);
-                const path = ['oneToOne', 'oneToMany', 'manyToOne', 1];
-                const expectedErrorMessage = 'Instance ' + instance.id + ' of ClassModel ' 
-                    + instance.classModel.className + ' called with invalid argument: ' + path
-                
-                testForError('instance.validatePath()', expectedErrorMessage, () => {
-                    instance.validatePath(path)
-                });
-            });
-
-            it('If path contains any invalid relationship names, error thrown.', () => {
-                const instance = new Instance(TwoWayRelationshipClass1);
-                const path = ['oneToOne', 'oneToMany', 'manyToOne', 'manyTo1'];
-                const expectedErrorMessage = 'Instance ' + instance.id + ' of ClassModel ' 
-                    + instance.classModel.className + ' called with invalid argument: ' + path
-                
-                testForError('instance.validatePath()', expectedErrorMessage, () => {
-                    instance.validatePath(path)
-                });
-            });
-
-        });
-
         describe('Walking Relationships with Unsaved Instances', () => {
 
             it('Can walk singlular relationship.', async () => {

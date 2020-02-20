@@ -696,6 +696,49 @@ class InstanceSet extends SuperSet {
     }
 
     /*
+     * walkPath(path)
+     * Walks the relationships in the given path for all Instances in this InstanceSet, and returns a single InstanceSet +
+     *    containing all the Instances at the end of the path. 
+     * - path - Array<String> - An array of strings that represent a sequence or relationships to walk from 
+     *    this InstanceSet.
+     * Returns
+     * - InstanceSet - An InstanceSet containing the Instances that result from walking the given path. InstanceSet will always be 
+     *    for the ClassModel at the end of the relationship path. If relationships are empty somewhere in the middle of the path, 
+     *    or there are no Instances at the end of the path, the returned InstanceSet will be empty.
+     * Throws
+     * - NoommanArgumentError - If ClassModel.validatePath() throws a NoommanArgumentError.
+     */
+    async walkPath(path) {
+        this.classModel.validatePath(path);
+
+        let currentInstanceSet = this;
+
+        let finalClassModel = this.classModel;
+        for (const index in path) {
+            finalClassModel = finalClassModel.getRelatedClassModel(path[index]);
+        }
+
+        const emptyResultSet = finalClassModel.emptyInstanceSet();
+
+        if (this.isEmpty()) {
+            return emptyResultSet;
+        }
+
+        for (const relationshipName of path) {
+            const walkResult = await currentInstanceSet.walk(relationshipName);
+            
+            if (walkResult.isEmpty()) {
+                return emptyResultSet;
+            }
+            else {
+                currentInstanceSet = walkResult;
+            }
+        }
+
+        return currentInstanceSet;
+    }
+
+    /*
      * readControlFilter(readControlMethodParameters)
      * Runs applicable readControl methods for each Instance in this InstanceSet, and filters out any
      *    Instances for which any readControl method returns false. Returns a new InstanceSet, does not 

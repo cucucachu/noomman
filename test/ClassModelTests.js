@@ -7184,7 +7184,45 @@ describe('Class Model Tests', () => {
             }
         });
 
-    })
+    });
+
+    describe('ClassModel.validatePath()', () => {
+
+        it('If path contains only valid relationships, no error thrown.', () => {
+            const path = ['oneToOne', 'oneToMany', 'manyToOne', 'manyToMany'];
+            TwoWayRelationshipClass1.validatePath(path);
+        });
+
+        it('If path is not an array, error thrown.', () => {
+            const path = 'oneToOne';
+            const expectedErrorMessage = 'Error walking path from TwoWayRelationshipClass1. Invalid path given: ' + path + '.';
+            
+            testForError('instance.validatePath()', expectedErrorMessage, () => {
+                TwoWayRelationshipClass1.validatePath(path)
+            });
+        });
+
+        it('If path is an array containing non-string elements, error thrown.', () => {
+            const instance = new Instance(TwoWayRelationshipClass1);
+            const path = ['oneToOne', 'oneToMany', 'manyToOne', 1];
+            const expectedErrorMessage = 'Error walking path from TwoWayRelationshipClass1. Invalid path given: ' + path + '.';
+            
+            testForError('instance.validatePath()', expectedErrorMessage, () => {
+                TwoWayRelationshipClass1.validatePath(path)
+            });
+        });
+
+        it('If path contains any invalid relationship names, error thrown.', () => {
+            const instance = new Instance(TwoWayRelationshipClass1);
+            const path = ['oneToOne', 'oneToMany', 'manyToOne', 'manyTo1'];
+            const expectedErrorMessage = 'Error walking path from TwoWayRelationshipClass1. Invalid path given: ' + path + '.';
+            
+            testForError('instance.validatePath()', expectedErrorMessage, () => {
+                TwoWayRelationshipClass1.validatePath(path)
+            });
+        });
+
+    });
 
 });
 

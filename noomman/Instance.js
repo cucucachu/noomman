@@ -368,42 +368,6 @@ class Instance extends Diffable {
     }
 
     /*
-     * validatePath(path)
-     * Validates that the given path array contains valid relationship names for the relavant ClassModels.
-     * Parameters
-     * - path - Array<String> - An array of strings that represent a sequence or relationships to walk from 
-     *    this Instance.
-     * Throws
-     * - NoommanArgumentError - If given path is not an Array.
-     * - NoommanArgumentError - If given path is an Array containing any item that is not a string.
-     * - NoommanArgumentError - If given path Array contains any string is not a valid relationship name for
-     *    the relavant ClassModel.
-     */
-    validatePath(path) {
-        const errorMessage = 'Instance ' + this.id + ' of ClassModel ' 
-            + this.classModel.className + ' called with invalid argument: ' + path
-
-        if (!Array.isArray(path)) {
-            throw new NoommanErrors.NoommanArgumentError(errorMessage);
-        }
-
-        for (const item of path) {
-            if (typeof(item) !== 'string') {
-                throw new NoommanErrors.NoommanArgumentError(errorMessage);
-            }
-        }
-
-        let classModel = this.classModel;
-        for (const index in path) {
-            const relationship = classModel.getRelationship(path[index]);
-            if (relationship === null) {
-                throw new NoommanErrors.NoommanArgumentError(errorMessage);
-            }
-            classModel = classModel.getRelatedClassModel(path[index]);
-        }
-    }
-
-    /*
      * walkPath(path)
      * Walks the relationships in the given path from this Instance, and returns a single InstanceSet containing all the Instances
      *    at the end of the path. 
@@ -414,35 +378,13 @@ class Instance extends Diffable {
      *    for the ClassModel at the end of the relationship path. If relationships are empty somewhere in the middle of the path, 
      *    or there are no Instances at the end of the path, the returned InstanceSet will be empty.
      * Throws
-     * - NoommanArgumentError - If validatePath() throws a NoommanArgumentError.
+     * - NoommanArgumentError - If ClassModel.validatePath() throws a NoommanArgumentError.
      */
     async walkPath(path) {
-        this.validatePath(path);
+        const instanceSet = this.classModel.emptyInstanceSet();
+        instanceSet.add(this);
 
-        let currentInstanceSet = this.classModel.emptyInstanceSet();
-        currentInstanceSet.add(this);
-
-        let finalClassModel = this.classModel;
-        for (const index in path) {
-            const relationship = finalClassModel.getRelationship(path[index]);
-            finalClassModel = finalClassModel.getRelatedClassModel(path[index]);
-        }
-
-        const emptyResultSet = finalClassModel.emptyInstanceSet();
-
-
-        for (const relationshipName of path) {
-            const walkResult = await currentInstanceSet.walk(relationshipName);
-            
-            if (walkResult.isEmpty()) {
-                return emptyResultSet;
-            }
-            else {
-                currentInstanceSet = walkResult;
-            }
-        }
-
-        return currentInstanceSet;
+        return instanceSet.walkPath(path);        
     }
 
     /*

@@ -795,6 +795,42 @@ class ClassModel {
     }
 
     /*
+     * validatePath(path)
+     * Validates that the given path array contains valid relationship names for the relavant ClassModels.
+     * Parameters
+     * - path - Array<String> - An array of strings that represent a sequence or relationships to walk from 
+     *    this ClassModel.
+     * Throws
+     * - NoommanArgumentError - If given path is not an Array.
+     * - NoommanArgumentError - If given path is an Array containing any item that is not a string.
+     * - NoommanArgumentError - If given path Array contains any string is not a valid relationship name for
+     *    the relavant ClassModel.
+     */
+    validatePath(path) {
+        const errorMessage = 'Error walking path from '
+            + this.className + '. Invalid path given: ' + path + '.';
+
+        if (!Array.isArray(path)) {
+            throw new NoommanErrors.NoommanArgumentError(errorMessage);
+        }
+
+        for (const item of path) {
+            if (typeof(item) !== 'string') {
+                throw new NoommanErrors.NoommanArgumentError(errorMessage);
+            }
+        }
+
+        let classModel = this;
+        for (const index in path) {
+            const relationship = classModel.getRelationship(path[index]);
+            if (relationship === null) {
+                throw new NoommanErrors.NoommanArgumentError(errorMessage);
+            }
+            classModel = classModel.getRelatedClassModel(path[index]);
+        }
+    }
+
+    /*
      * discriminated()
      * Determines if this ClassModel is discriminated. This ClassModel is considered discriminated if 
      *    it has a direct sub-ClassModel with its 'useSuperClassCollection' property set to true.
