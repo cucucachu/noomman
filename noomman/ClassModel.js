@@ -500,14 +500,14 @@ class ClassModel {
             }
 
             if (relationship.mirrorRelationship !== undefined) {
-                let mirrorRelationship = toClass.relationships.filter(r => r.name === relationship.mirrorRelationship);
-                if (mirrorRelationship.length === 0) {
+                const mirrorRelationship = toClass.getRelationship(relationship.mirrorRelationship);
+
+                if (mirrorRelationship === null) {
                     throw new NoommanErrors.NoommanClassModelError('Invalid two-way relationship. ' + 
                         this.className + '.' + relationship.name + ' is missing mirror relationship ' + 
                         toClass.className + '.' + relationship.mirrorRelationship + '.'
                     );
                 }
-                mirrorRelationship = mirrorRelationship[0];
 
                 if (mirrorRelationship.toClass !== this.className) {
                     throw new NoommanErrors.NoommanClassModelError('Invalid two-way relationship. ' + 
@@ -621,10 +621,20 @@ class ClassModel {
      *    this ClassModel.
      * Returns
      * - ClassModel - The ClassModel with the className matching the toClass of the relationship with name
-     *    matching the relationshipName parameter, defined for this ClassModel (or a parent). 
+     *    matching the relationshipName parameter, defined for this ClassModel (or a parent). If no 
+     *    ClassModel exists with the name matching the toClass of the relationship, undefined returned.
+     * Throws
+     * - NoommanArgumentError - If given relationshipName does not match a relationship on this ClassModel.
      */
     getRelatedClassModel(relationshipName) {
-        return AllClassModels[this.relationships.filter(relationship => relationship.name === relationshipName)[0].toClass];
+        const relationship = this.getRelationship(relationshipName);
+
+        if (relationship === null) {
+            throw new NoommanErrors.NoommanArgumentError('Attempt to get related ClassModel failed. ' 
+                + this.className + '.' + relationshipName + ' is not a relationship.');
+        }
+
+        return AllClassModels[relationship.toClass];
     }
 
     /* 
@@ -762,9 +772,20 @@ class ClassModel {
      *    to: String - Either '1', or 'many',
      *    from: String - Either null, '1', or 'many',
      * }
+     * Throws
+     * - NoommanArgumentError - If no relationship exists on this ClassModel matching the given relationshipName.
+     * - NoommanClassModelError - If the relationship with given relationshipName has a toClass property which does
+     *    not match a ClassModel.
+     * - NoommanClassModelError - If the relationship with given relationshipName references a mirrorRelationship 
+     *    which does not exist on the related ClassModel.
      */
     cardinalityOfRelationship(relationshipName) {
-        const relationship = this.relationships.filter(r => r.name === relationshipName)[0];
+        const relationship = this.getRelationship(relationshipName);
+
+        if (relationship === null) {
+            throw new NoommanErrors.NoommanArgumentError('ClassModel.cardinalityOfRelationship() called with invalid relationship ' 
+                + this.className + '.' + relationshipName + '.');
+        }
 
         const cardinality = {
             from: null,
@@ -780,8 +801,20 @@ class ClassModel {
         }
             
         if (relationship.mirrorRelationship !== undefined) {
-            const mirrorRelationship = AllClassModels[relationship.toClass].relationships.filter(x => x.name === relationship.mirrorRelationship)[0];
+            const toClass = this.getRelatedClassModel(relationship.name);
 
+            if (toClass === undefined) {
+                throw new NoommanErrors.NoommanClassModelError('ClassModel.cardinalityOfRelationship() called with invalid relationship ' 
+                    + this.className + '.' + relationshipName + '. Relationship\'s toClass is not a known ClassModel.');
+            }
+
+            const mirrorRelationship = toClass.getRelationship(relationship.mirrorRelationship);
+
+            if (mirrorRelationship === null) {
+                throw new NoommanErrors.NoommanClassModelError('ClassModel.cardinalityOfRelationship() called with invalid relationship ' 
+                    + this.className + '.' + relationshipName + '. Relationship\'s mirrorRelationship "' + relationship.mirrorRelationship 
+                    + '" does not exist on the toClass ' + relationship.toClass + '.');
+            }
 
             if (mirrorRelationship.singular) {
                 cardinality.from = '1';
