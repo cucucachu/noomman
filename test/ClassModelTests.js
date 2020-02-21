@@ -305,38 +305,7 @@ describe('Class Model Tests', () => {
                         superClasses: [SubClassOfDiscriminatedSuperClass],
                     });
                 });
-            });  
-    
-            it('Sub class schema cannot contain the same field names as a super class schema.', () => {
-                testForError('ClassModel.contructor()', 'Sub class schema cannot contain the same attribute names as a super class schema.', () => {
-                    new ClassModel({
-                        className: 'SubClassModel',
-                        superClasses: [SuperClass],
-                        attributes: [
-                            {
-                                name: 'boolean',
-                                type: Boolean,
-                            }
-                        ],
-                    });
-                });
-            });  
-    
-            it('Sub class schema cannot contain the same field names as a super class schema.', () => {
-                testForError('ClassModel.contructor()', 'Sub class schema cannot contain the same attribute names as a super class schema.', () => {
-                    new ClassModel({
-                        className: 'SubClassModel',
-                        superClasses: [DiscriminatedSuperClass],
-                        useSuperClassCollection: true,
-                        attributes: [
-                            {
-                                name: 'boolean',
-                                type: Boolean,
-                            }
-                        ],
-                    });
-                });
-            });  
+            });    
     
             it('If a sub class is created, it is pushed to the super class\'s "subClasses" array.', () => {
                 if (SuperClass.subClasses.length == 0)
@@ -476,6 +445,199 @@ describe('Class Model Tests', () => {
             it.skip('An abstract, non-discriminated class should have no collection.', () => {
                 if (AbstractSuperClass.collection);
                     throw new Error('An abstract class should not have a collection.');
+            });
+
+        });
+
+        describe('Duplicate Attribute and RelationshipNames Validations', () => {
+
+            it('Error thrown if schema contains two attributes with the same name.', () => {
+                const expectedErrorMessage = 'Error creating ClassModel DuplicateAttributeNames. Multiple attributes or relationships with the same name "name".';
+
+                testForError('new ClassModel()', expectedErrorMessage, () => {
+                    new ClassModel({
+                        className: 'DuplicateAttributeNames',
+                        attributes: [
+                            {
+                                name: 'name',
+                                type: String,
+                            },
+                            {
+                                name: 'name',
+                                type: Number,
+                            },
+                        ]
+                    })
+                });
+            });
+
+            it('Error thrown if schema contains two relationships with the same name.', () => {
+                const expectedErrorMessage = 'Error creating ClassModel DuplicateRelationshipNames. Multiple attributes or relationships with the same name "relatedInstance".';
+
+                testForError('new ClassModel()', expectedErrorMessage, () => {
+                    new ClassModel({
+                        className: 'DuplicateRelationshipNames',
+                        relationships: [
+                            {
+                                name: 'relatedInstance',
+                                toClass: 'CompareClass1',
+                                singular: true,
+                            },
+                            {
+                                name: 'relatedInstance',
+                                toClass: 'CompareClass1',
+                                singular: true,
+                            },
+                        ]
+                    })
+                });
+            });
+
+            it('Error thrown if schema contains an attribute and a relationship with the same name.', () => {
+                const expectedErrorMessage = 'Error creating ClassModel DuplicateAttributeAndRelationshipNames. Multiple attributes or relationships with the same name "relatedInstance".';
+
+                testForError('new ClassModel()', expectedErrorMessage, () => {
+                    new ClassModel({
+                        className: 'DuplicateAttributeAndRelationshipNames',
+                        attributes: [
+                            {
+                                name: 'relatedInstance',
+                                type: String,
+                            },
+                        ],
+                        relationships: [
+                            {
+                                name: 'relatedInstance',
+                                toClass: 'CompareClass1',
+                                singular: true,
+                            },
+                        ]
+                    })
+                });
+            });
+
+            it('Error thrown if schema contains an attribute with the same name as a super ClassModel attribute.', () => {
+                const expectedErrorMessage = 'Error creating ClassModel HasSameAttributeAsSuperClass. Inherriting from given superClasses causes a duplicate attribute or relationship name "name".';
+
+                testForError('new ClassModel()', expectedErrorMessage, () => {
+                    new ClassModel({
+                        className: 'HasSameAttributeAsSuperClass',
+                        superClasses: [SuperClass],
+                        attributes: [
+                            {
+                                name: 'name',
+                                type: String,
+                            },
+                        ],
+                    });
+                });
+            });
+
+            it('Error thrown if schema contains a relationship with the same name as a super ClassModel attribute.', () => {
+                const expectedErrorMessage = 'Error creating ClassModel HasSameRelationshipAsSuperClassAttribute. Inherriting from given superClasses causes a duplicate attribute or relationship name "name".';
+
+                testForError('new ClassModel()', expectedErrorMessage, () => {
+                    new ClassModel({
+                        className: 'HasSameRelationshipAsSuperClassAttribute',
+                        superClasses: [SuperClass],
+                        relationships: [
+                            {
+                                name: 'name',
+                                toClass: 'SomeClass',
+                                singular: true,
+                            },
+                        ],
+                    })
+                });
+            });
+
+            it('Error thrown if schema contains an attribute with the same name as a super ClassModel relationship.', () => {
+                const expectedErrorMessage = 'Error creating ClassModel HasSameRelationshipAsSuperClassAttribute. Inherriting from given superClasses causes a duplicate attribute or relationship name "class2".';
+
+                testForError('new ClassModel()', expectedErrorMessage, () => {
+                    new ClassModel({
+                        className: 'HasSameRelationshipAsSuperClassAttribute',
+                        superClasses: [CompareClass1],
+                        attributes: [
+                            {
+                                name: 'class2',
+                                type: String,
+                            },
+                        ],
+                    })
+                });
+            });
+
+            it('Error thrown if schema contains a relationship with the same name as a super ClassModel relationship.', () => {
+                const expectedErrorMessage = 'Error creating ClassModel HasSameRelationshipAsSuperClass. Inherriting from given superClasses causes a duplicate attribute or relationship name "class2".';
+
+                testForError('new ClassModel()', expectedErrorMessage, () => {
+                    new ClassModel({
+                        className: 'HasSameRelationshipAsSuperClass',
+                        superClasses: [CompareClass1],
+                        relationships: [
+                            {
+                                name: 'class2',
+                                toClass: 'SomeClass',
+                                singular: true,
+                            },
+                        ],
+                    })
+                });
+            });
+
+            it('Error thrown if inheriting from multiple ClassModels with attributes of the same name.', () => {
+                const expectedErrorMessage = 'Error creating ClassModel InheritsDuplicateAttributes. Inherriting from given superClasses causes a duplicate attribute or relationship name "name".';
+
+                const SameAttributeAsSuperClass = new ClassModel({
+                    className: 'SameAttributeAsSuperClass',
+                    attributes: [
+                        {
+                            name: 'name',
+                            type: String,
+                        },
+                    ],
+                });
+
+                testForError('new ClassModel()', expectedErrorMessage, () => {
+                    new ClassModel({
+                        className: 'InheritsDuplicateAttributes',
+                        superClasses: [SuperClass, SameAttributeAsSuperClass],
+                    })
+                });
+            });
+
+            it('Error thrown if inheriting from multiple ClassModels with relationships of the same name.', () => {
+                const expectedErrorMessage = 'Error creating ClassModel InheritsDuplicateAttributes. Inherriting from given superClasses causes a duplicate attribute or relationship name "oneToOne".';
+
+                testForError('new ClassModel()', expectedErrorMessage, () => {
+                    new ClassModel({
+                        className: 'InheritsDuplicateAttributes',
+                        superClasses: [TwoWayRelationshipClass1, TwoWayRelationshipClass2],
+                    });
+                });
+
+            });
+
+            it('Error thrown if inheriting from multiple ClassModels with an attribute and relationship of the same name.', () => {
+                const expectedErrorMessage = 'Error creating ClassModel InheritsDuplicateAttributes. Inherriting from given superClasses causes a duplicate attribute or relationship name "oneToOne".';
+
+                const OneTwoOneAttribute = new ClassModel({
+                    className: 'OneTwoOneAttribute',
+                    attributes: [
+                        {
+                            name: 'oneToOne',
+                            type: String,
+                        },
+                    ],
+                });
+
+                testForError('new ClassModel()', expectedErrorMessage, () => {
+                    new ClassModel({
+                        className: 'InheritsDuplicateAttributes',
+                        superClasses: [TwoWayRelationshipClass2, OneTwoOneAttribute],
+                    })
+                });
             });
 
         });
@@ -2510,7 +2672,7 @@ describe('Class Model Tests', () => {
             instanceOfDiscriminatedSuperClass.name = 'instanceOfDiscriminatedSuperClass';
             instanceOfSuperClass.name = 'instanceOfSuperClass';
             instanceOfSubClassOfSuperClass.name = 'instanceOfSubClassOfSuperClass';
-            instanceOfSubClassOfAbstractSuperClass.name = 'instanceOfSubClassOfAbstractSuperClass';
+            instanceOfSubClassOfAbstractSuperClass.abstractName = 'instanceOfSubClassOfAbstractSuperClass';
             instanceOfSubClassOfDiscriminatedSuperClass.name = 'instanceOfSubClassOfDiscriminatedSuperClass';
             instanceOfSubClassOfDiscriminatedSubClassOfSuperClass.name = 'instanceOfSubClassOfDiscriminatedSubClassOfSuperClass';
             instanceOfSubClassOfSubClassOfSuperClass.name = 'instanceOfSubClassOfSubClassOfSuperClass';
@@ -2661,7 +2823,7 @@ describe('Class Model Tests', () => {
                     const instanceToFind = instanceOfSubClassOfAbstractSuperClass;
 
                     const filter = {
-                        name: 'instanceOfSubClassOfAbstractSuperClass'
+                        abstractName: 'instanceOfSubClassOfAbstractSuperClass'
                     }
 
                     const instanceFound = await classToCallFindOneOn.findOne(filter);
@@ -3008,7 +3170,7 @@ describe('Class Model Tests', () => {
                         const expectedInstances = new InstanceSet(classToCallFindOn, [instanceToFind]);
     
                         const filter = {
-                            name: 'instanceOfSubClassOfAbstractSuperClass'
+                            abstractName: 'instanceOfSubClassOfAbstractSuperClass'
                         }
     
                         const instancesFound = await classToCallFindOn.find(filter);

@@ -449,7 +449,7 @@ const NoommanValidationError = NoommanErrors.NoommanValidationError;
             abstract: true,
             attributes: [
                 {
-                    name: 'name',
+                    name: 'abstractName',
                     type: String,
                 },
                 {

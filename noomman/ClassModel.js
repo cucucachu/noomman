@@ -191,6 +191,7 @@ class ClassModel {
      * - NoommanConstructorError - If sensitiveAttributesContructorValidations throws a NoommanConstructorError.
      * - NoommanConstructorError - If customMethodsContructorValidations throws a NoommanConstructorError.
      * - NoommanConstructorError - If inheritanceConstructorValidations throws a NoommanConstructorError.
+     * - NoommanConstructorError - If attributeAndRelationshipNameValidations throws a NoommanConstructorError.
      */
     constructorValidations(schema) {
         ClassModel.paramterShapeConstructorValidations(schema);
@@ -202,6 +203,8 @@ class ClassModel {
         ClassModel.customMethodsContructorValidations(schema);
 
         ClassModel.inheritanceConstructorValidations(schema);
+
+        ClassModel.attributeAndRelationshipNameValidations(schema);
     }
 
     /*
@@ -338,6 +341,78 @@ class ClassModel {
     }
 
     /*
+     * attributeAndRelationshipNameValidations(schema)
+     * Will throw an error if ClassModel would be defined with multiple attributes or relationships with 
+     *    the same name, either through inheritance or explicitly in the given schema.
+     * Parameters
+     * - schema - Object - See constructor parameter definition.
+     * Throws
+     * - NoommanConstructorError - If ClassModel inherits from multiple ClassModels with attributes or relationships
+     *    with the same name.
+     * - NoommanConstructorError - If ClassModel inherits an attribute or relationship from a super ClassModel with the
+     *    the same name as an attribute or relationship defined in the schema.
+     * - NoommanConstructorError - If schema contains multiple attributes or relationships with the same name.
+     */
+    static attributeAndRelationshipNameValidations(schema) {
+        let superNames = [];
+        const names = [];
+
+        if (schema.superClasses) {
+            for (const superClass of schema.superClasses) {
+                for (const relationship of superClass.relationships) {
+                    if (superNames.includes(relationship.name)) {
+                        throw new NoommanErrors.NoommanConstructorError('Error creating ClassModel ' + schema.className + '. ' + 
+                            'Inherriting from given superClasses causes a duplicate attribute or relationship name "' 
+                            + relationship.name + '".');
+                    }
+                    superNames.push(relationship.name);
+                }
+                for (const attribute of superClass.attributes) {
+                    if (superNames.includes(attribute.name)) {
+                        throw new NoommanErrors.NoommanConstructorError('Error creating ClassModel ' + schema.className + '. ' + 
+                            'Inherriting from given superClasses causes a duplicate attribute or relationship name "' 
+                            + attribute.name + '".');
+                    }
+                    superNames.push(attribute.name);
+                }
+            }
+        }
+
+        if (schema.relationships) {
+            for (const relationship of schema.relationships) {
+                if (superNames.includes(relationship.name)) {
+                    throw new NoommanErrors.NoommanConstructorError('Error creating ClassModel ' + schema.className + '. ' + 
+                        'Inherriting from given superClasses causes a duplicate attribute or relationship name "' 
+                        + relationship.name + '".');
+                }
+                if (names.includes(relationship.name)) {
+                    throw new NoommanErrors.NoommanConstructorError('Error creating ClassModel ' + schema.className + '. ' + 
+                        'Multiple attributes or relationships with the same name "' 
+                        + relationship.name + '".');
+                }
+                names.push(relationship.name);
+            }
+        }
+
+        if (schema.attributes) {
+            for (const attribute of schema.attributes) {
+                if (superNames.includes(attribute.name)) {
+                    throw new NoommanErrors.NoommanConstructorError('Error creating ClassModel ' + schema.className + '. ' + 
+                        'Inherriting from given superClasses causes a duplicate attribute or relationship name "' 
+                        + attribute.name + '".');
+                }
+                if (names.includes(attribute.name)) {
+                    throw new NoommanErrors.NoommanConstructorError('Error creating ClassModel ' + schema.className + '. ' + 
+                        'Multiple attributes or relationships with the same name "' 
+                        + attribute.name + '".');
+                }
+                names.push(attribute.name);
+            }
+        }
+        
+    }
+
+    /*
      * customMethodsContructorValidations(schema)
      * Will throw an error if staticMethods and nonStaticMethods properties of schema are not Objects 
      *    (if provided) or if any of their properties are not functions.
@@ -411,17 +486,6 @@ class ClassModel {
 
         if (schema.superClasses) {
             for (const superClass of schema.superClasses) {
-
-                for (const attribute of superClass.attributes) {
-                    if (schema.attributes && schema.attributes.map(attribute => attribute.name).includes(attribute.name)) {
-                        throw new NoommanErrors.NoommanConstructorError('Sub class schema cannot contain the same attribute names as a super class schema.');
-                    }
-                }
-                for (const relationship of superClass.relationships) {
-                    if (schema.relationships && schema.relationships.map(relationship => relationship.name).includes(relationship.name)) {
-                        throw new NoommanErrors.NoommanConstructorError('Sub class schema cannot contain the same relationship names as a super class schema.');
-                    }
-                }
 
                 if (superClass.useSuperClassCollection) {
                     throw new NoommanErrors.NoommanConstructorError('You cannot create a sub class of a class which has useSuperClassCollection set to true.');
