@@ -508,24 +508,24 @@ class InstanceSet extends SuperSet {
     }
     
     /*
-     * save(createControlMethodParameters, updateControlMethodParameters)
+     * save(createPrivilegeMethodParameters, updatePrivilegeMethodParameters)
      * Saves the current state of each Instance in this InstanceSet to the database in the proper 
      *    collection according to its ClassModel.
      * Parameters
-     * - createControlMethodParameters - Object - An object containing parameters needed by a createControl method.
-     * - updateControlMethodParameters - Object - An object containing parameters needed by a updateControl method.
+     * - createPrivilegeMethodParameters - Object - An object containing parameters needed by a createPrivilege method.
+     * - updatePrivilegeMethodParameters - Object - An object containing parameters needed by a updatePrivilege method.
      * Returns
      * - Promise<Array<Instance>> - An Array containing each Instance in this InstanceSet, if save is successful.
      * Throws
      * - NoommanValidationError - If validate() throws a NoommanValidationError.
      * - NoommanValidationError - If ClassModel.updateRelatedInstancesForInstanceSet() throws a NoommanValidationError.
-     * - NoommanSaveError - If ClassModel.createControlCheck() throws a NoommanSaveError.
-     * - NoommanSaveError - If ClassModel.updateControlCheck() throws a NoommanSaveError.
+     * - NoommanSaveError - If ClassModel.createPrivilegeCheck() throws a NoommanSaveError.
+     * - NoommanSaveError - If ClassModel.updatePrivilegeCheck() throws a NoommanSaveError.
      * - NoommanSaveError - If any Instance in this InstanceSet has been stripped of sensitive attributes.
      * - NoommanSaveError - If ClassModel.updateRelatedInstancesForInstanceSet() throws a NoommanSaveError.
      * - NoommanSaveError - If Instance.saveWithoutValidation() throws a NoommanSaveError.
      */ 
-    async save(createControlMethodParameters, updateControlMethodParameters) {
+    async save(createPrivilegeMethodParameters, updatePrivilegeMethodParameters) {
         const instancesToUpdate = this.filterToInstanceSet(instance => instance.saved());
         const instancesToCreate = this.difference(instancesToUpdate);
 
@@ -536,8 +536,8 @@ class InstanceSet extends SuperSet {
             throw new NoommanErrors.NoommanValidationError('Caught validation error when attempting to save InstanceSet: ' + error.message, error.properties);
         }
         
-        await this.classModel.updateControlCheck(instancesToUpdate, updateControlMethodParameters);
-        await this.classModel.createControlCheck(instancesToCreate, createControlMethodParameters);
+        await this.classModel.updatePrivilegeCheck(instancesToUpdate, updatePrivilegeMethodParameters);
+        await this.classModel.createPrivilegeCheck(instancesToCreate, createPrivilegeMethodParameters);
 
         for (const instance of this) {
             if (instance.stripped()) {
@@ -552,23 +552,23 @@ class InstanceSet extends SuperSet {
     }
     
     /*
-     * saveWithoutRelatedUpdates(createControlMethodParameters, updateControlMethodParameters)
+     * saveWithoutRelatedUpdates(createPrivilegeMethodParameters, updatePrivilegeMethodParameters)
      * Saves the current state of each Instance in this InstanceSet to the database in the proper 
      *    collection according to its ClassModel. Does not save any related Instances for which 
      *    a two-way relationship has been updated. Internal use only.
      * Parameters
-     * - createControlMethodParameters - Object - An object containing parameters needed by a createControl method.
-     * - updateControlMethodParameters - Object - An object containing parameters needed by a updateControl method.
+     * - createPrivilegeMethodParameters - Object - An object containing parameters needed by a createPrivilege method.
+     * - updatePrivilegeMethodParameters - Object - An object containing parameters needed by a updatePrivilege method.
      * Returns
      * - Promise<Array<Instance>> - An array containing each Instance in this InstanceSet, if save is successful.
      * Throws
      * - NoommanValidationError - If validate() throws a NoommanValidationError.
-     * - NoommanSaveError - If ClassModel.createControlCheck() throws a NoommanSaveError.
-     * - NoommanSaveError - If ClassModel.updateControlCheck() throws a NoommanSaveError.
+     * - NoommanSaveError - If ClassModel.createPrivilegeCheck() throws a NoommanSaveError.
+     * - NoommanSaveError - If ClassModel.updatePrivilegeCheck() throws a NoommanSaveError.
      * - NoommanSaveError - If any Instance in this InstanceSet has been stripped of sensitive attributes.
      * - NoommanSaveError - If Instance.saveWithoutValidation() throws a NoommanSaveError.
      */ 
-    async saveWithoutRelatedUpdates(createControlMethodParameters, updateControlMethodParameters) {
+    async saveWithoutRelatedUpdates(createPrivilegeMethodParameters, updatePrivilegeMethodParameters) {
         const instancesToUpdate = this.filterToInstanceSet(instance => instance.saved());
         const instancesToCreate = this.difference(instancesToUpdate);
 
@@ -579,8 +579,8 @@ class InstanceSet extends SuperSet {
             throw new Error('Caught validation error when attempting to save InstanceSet: ' + error.message);
         }
         
-        await this.classModel.updateControlCheck(instancesToUpdate, updateControlMethodParameters);
-        await this.classModel.createControlCheck(instancesToCreate, createControlMethodParameters);
+        await this.classModel.updatePrivilegeCheck(instancesToUpdate, updatePrivilegeMethodParameters);
+        await this.classModel.createPrivilegeCheck(instancesToCreate, createPrivilegeMethodParameters);
 
         for (const instance of this) {
             if (instance.stripped()) {
@@ -739,46 +739,46 @@ class InstanceSet extends SuperSet {
     }
 
     /*
-     * readControlFilter(readControlMethodParameters)
-     * Runs applicable readControl methods for each Instance in this InstanceSet, and filters out any
-     *    Instances for which any readControl method returns false. Returns a new InstanceSet, does not 
+     * readPrivilegeFilter(readPrivilegeMethodParameters)
+     * Runs applicable readPrivilege methods for each Instance in this InstanceSet, and filters out any
+     *    Instances for which any readPrivilege method returns false. Returns a new InstanceSet, does not 
      *    update this InstanceSet.
      * Parameters
-     * - readControlMethodParameters - Object - An object containing any parameters that the readControl method(s)
+     * - readPrivilegeMethodParameters - Object - An object containing any parameters that the readPrivilege method(s)
      *    may need.
      * Returns
-     * - Promise<InstanceSet> - An InstanceSet containing those Instances for which all readControl methods return true.
+     * - Promise<InstanceSet> - An InstanceSet containing those Instances for which all readPrivilege methods return true.
      */
-    async readControlFilter(readControlMethodParameters) {
-        return this.classModel.readControlFilter(this, readControlMethodParameters);
+    async readPrivilegeFilter(readPrivilegeMethodParameters) {
+        return this.classModel.readPrivilegeFilter(this, readPrivilegeMethodParameters);
     }
 
     /*
-     * sensitiveControlCheckAndStrip(sensitiveControlMethodParameters)
-     * Runs applicable sensitiveControl methods for each Instance in the given InstanceSet, and and strips the sensitive 
-     *    attributes from those for which sensitiveControl method fails.
+     * sensitivePrivilegeCheckAndStrip(sensitivePrivilegeMethodParameters)
+     * Runs applicable sensitivePrivilege methods for each Instance in the given InstanceSet, and and strips the sensitive 
+     *    attributes from those for which sensitivePrivilege method fails.
      * Parameters
-     * - sensitiveControlMethodParameters - Object - An object containing any parameters that the sensitiveControl method(s)
+     * - sensitivePrivilegeMethodParameters - Object - An object containing any parameters that the sensitivePrivilege method(s)
      *    may need.
      */
-    async sensitiveControlCheckAndStrip(sensitiveControlMethodParameters) {
-        const instancesToStrip = await this.classModel.sensitiveControlFilter(this, sensitiveControlMethodParameters);
+    async sensitivePrivilegeCheckAndStrip(sensitivePrivilegeMethodParameters) {
+        const instancesToStrip = await this.classModel.sensitivePrivilegeFilter(this, sensitivePrivilegeMethodParameters);
         instancesToStrip.stripSensitiveAttributes();
     }
 
     /*
-     * delete(deleteControlMethodParameters) 
+     * delete(deletePrivilegeMethodParameters) 
      * Deletes all Instances in this InstanceSet from the database.
      * Parameters
-     * - deleteControlMethodParameters - Object - An object containing any parameters needed by a deleteControl method.
+     * - deletePrivilegeMethodParameters - Object - An object containing any parameters needed by a deletePrivilege method.
      * Returns
      * - Promise<Array<Boolean>> - An array containing True for each deleted Instance
      *    if all Instances in this InstanceSet are deleted properly.
      * Throws
      * - NoommanDeleteError - If any Instance has not yet been saved (i.e. is not in the database).
-     * - NoommanDeleteError - If deleteControlCheck() throws a NoommanDeleteError.
+     * - NoommanDeleteError - If deletePrivilegeCheck() throws a NoommanDeleteError.
      */
-    async delete(deleteControlMethodParameters) {
+    async delete(deletePrivilegeMethodParameters) {
         if (this.size == 0)
             return;
 
@@ -787,12 +787,12 @@ class InstanceSet extends SuperSet {
         if (unsavedInstances.length) 
             throw new NoommanErrors.NoommanDeleteError('Attempt to delete an InstanceSet containing unsaved Instances.');
 
-        await this.classModel.deleteControlCheck(this, deleteControlMethodParameters);
+        await this.classModel.deletePrivilegeCheck(this, deletePrivilegeMethodParameters);
 
         const deletePromises = [];
 
         for (const instance of this) {
-            deletePromises.push(instance.delete(deleteControlMethodParameters));
+            deletePromises.push(instance.delete(deletePrivilegeMethodParameters));
         }
 
         return Promise.all(deletePromises);

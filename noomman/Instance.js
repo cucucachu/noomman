@@ -429,17 +429,17 @@ class Instance extends Diffable {
     }
 
     /*
-     * readControlFilter(readControlMethodParameters)
-     * Runs applicable readControl methods for this Instance. If each readControl method returns true for 
+     * readPrivilegeFilter(readPrivilegeMethodParameters)
+     * Runs applicable readPrivilege methods for this Instance. If each readPrivilege method returns true for 
      *    this Instance, then this Instance is returned, otherwise null is returned.
      * Parameters
-     * - readControlMethodParameters - Object - An object containing any parameters that the readControl method(s)
+     * - readPrivilegeMethodParameters - Object - An object containing any parameters that the readPrivilege method(s)
      *    may need.
      * Returns
-     * - Promise<Instance> - This Instance if all readControl methods return true, otherwise null.
+     * - Promise<Instance> - This Instance if all readPrivilege methods return true, otherwise null.
      */
-    async readControlFilter(readControlMethodParameters) {
-        return this.classModel.readControlFilterInstance(this, readControlMethodParameters);
+    async readPrivilegeFilter(readPrivilegeMethodParameters) {
+        return this.classModel.readPrivilegeFilterInstance(this, readPrivilegeMethodParameters);
     }
 
     // Validation Methods
@@ -631,20 +631,20 @@ class Instance extends Diffable {
     // Update and Delete Methods Methods
 
     /*
-     * save(createControlMethodParameters, updateControlMethodParameters)
+     * save(createPrivilegeMethodParameters, updatePrivilegeMethodParameters)
      * Saves the current state of this Instance to the database in the proper collection according to its ClassModel.
      * Parameters
-     * - createControlMethodParameters - Object - An object containing parameters needed by a createControl method.
-     * - updateControlMethodParameters - Object - An object containing parameters needed by a updateControl method.
+     * - createPrivilegeMethodParameters - Object - An object containing parameters needed by a createPrivilege method.
+     * - updatePrivilegeMethodParameters - Object - An object containing parameters needed by a updatePrivilege method.
      * Returns
      * - Promise<Instance> - This Instance, if save is successful.
      * Throws
      * - NoommanSaveError - If this Instance has already been deleted.
      * - NoommanSaveError - If this Instance has been stripped by stripSensitiveAttributes().
      * - NoommanValidationError - If a call to validate() throws an NoommanValidationError.
-     * - NoommanSaveError - If Instance does not pass createControl or updateControl methods.
+     * - NoommanSaveError - If Instance does not pass createPrivilege or updatePrivilege methods.
      */ 
-    async save(createControlMethodParameters, updateControlMethodParameters) {
+    async save(createPrivilegeMethodParameters, updatePrivilegeMethodParameters) {
         if (this.deleted()) {
             throw new NoommanErrors.NoommanSaveError('instance.save(): You cannot save an instance which has been deleted.');
         }
@@ -665,7 +665,7 @@ class Instance extends Diffable {
         }
 
         if (!this.saved()) {
-            await this.classModel.createControlCheckInstance(this, createControlMethodParameters);
+            await this.classModel.createPrivilegeCheckInstance(this, createPrivilegeMethodParameters);
             
             if (Object.keys(this.relatedDiffs()).length !== 0) {
                 await this.classModel.updateRelatedInstancesForInstance(this);
@@ -674,7 +674,7 @@ class Instance extends Diffable {
             await this.classModel.insertOne(this.toDocument());
         }
         else {
-            await this.classModel.updateControlCheckInstance(this, updateControlMethodParameters);
+            await this.classModel.updatePrivilegeCheckInstance(this, updatePrivilegeMethodParameters);
 
             if (Object.keys(this.relatedDiffs()).length !== 0) {
                 await this.classModel.updateRelatedInstancesForInstance(this);
@@ -696,9 +696,9 @@ class Instance extends Diffable {
     /*
      * saveWithoutValidation()
      * Saves the current state of this Instance to the database in the proper collection according to its ClassModel.
-     *    Does not do any validation or run crudControl functions, recommended not to be used outside internal 
+     *    Does not do any validation or run crudPrivilege functions, recommended not to be used outside internal 
      *    noomman methods. The purpose is for use in saving multiple instances at once, and any calling method is 
-     *    expected to have already run validations and crudControl functions.
+     *    expected to have already run validations and crudPrivilege functions.
      * Returns
      * - Promise<Instance> - This Instance, if save is successful.
      * Throws
@@ -733,21 +733,21 @@ class Instance extends Diffable {
     }
 
     /*
-     * delete(deleteControlMethodParameters) 
+     * delete(deletePrivilegeMethodParameters) 
      * Deletes this Instance from the database.
      * Parameters
-     * - deleteControlMethodParameters - Object - An object containing any parameters needed by a deleteControl method.
+     * - deletePrivilegeMethodParameters - Object - An object containing any parameters needed by a deletePrivilege method.
      * Returns
      * - Promise<Boolean> - True if Instance is deleted properly.
      * Throws
      * - NoommanDeleteError - If this Instance has not yet been saved (i.e. is not in the database).
-     * - NoommanDeleteError - If deleteControl method returns false for this Instance.
+     * - NoommanDeleteError - If deletePrivilege method returns false for this Instance.
      */
-    async delete(deleteControlMethodParameters) {
+    async delete(deletePrivilegeMethodParameters) {
         if (!this.saved())
             throw new NoommanErrors.NoommanDeleteError('instance.delete(): You cannot delete an instance which hasn\'t been saved yet');
 
-        await this.classModel.deleteControlCheckInstance(this, deleteControlMethodParameters)
+        await this.classModel.deletePrivilegeCheckInstance(this, deletePrivilegeMethodParameters)
 
         await this.deleteOwnedInstances();
 
@@ -776,18 +776,18 @@ class Instance extends Diffable {
     }
 
     /*
-     * deleteOwnedInstances(deleteControlMethodParameters)
+     * deleteOwnedInstances(deletePrivilegeMethodParameters)
      * Deletes any Instances related to this Instance through an 'owns' relationship.
      * Parameters
-     * - deleteControlMethodParameters - Object - An object containing any parameters needed by a deleteControl method.
+     * - deletePrivilegeMethodParameters - Object - An object containing any parameters needed by a deletePrivilege method.
      * Returns 
      * - Promise<Array<Boolean>> - An Array of Booleans, each of which will be true if all related instances were deleted
      *    successfully.
      * Throws
      * - NoommanDeleteError - If a related owned Instance has not yet been saved (i.e. is not in the database).
-     * - NoommanDeleteError - If deleteControl method returns false for a related owned Instance.
+     * - NoommanDeleteError - If deletePrivilege method returns false for a related owned Instance.
      */
-    async deleteOwnedInstances(deleteControlMethodParameters) {
+    async deleteOwnedInstances(deletePrivilegeMethodParameters) {
         const ownsRelationships = this.classModel.relationships.filter(r => r.owns === true);
         const deletePromises = [];
 
@@ -800,7 +800,7 @@ class Instance extends Diffable {
             if (!relationship.singular && related.isEmpty()) {
                 continue;
             }
-            deletePromises.push(related.delete(deleteControlMethodParameters));
+            deletePromises.push(related.delete(deletePrivilegeMethodParameters));
         }
 
         if (deletePromises.length === 0) {

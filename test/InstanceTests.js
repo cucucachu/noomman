@@ -58,23 +58,23 @@ const arraysEqual = TestingFunctions.arraysEqual;
     var ClassOwnedByOtherClass = TestClassModels.ClassOwnedByOtherClass;
     var TreeClass = TestClassModels.TreeClass;
 
-    // Update Controlled Classes
-    var UpdateControlledSuperClass = TestClassModels.UpdateControlledSuperClass;
-    var ClassControlsUpdateControlledSuperClass = TestClassModels.ClassControlsUpdateControlledSuperClass;
-    var UpdateControlledClassUpdateControlledByParameters = TestClassModels.UpdateControlledClassUpdateControlledByParameters;
+    // Update Privileged Classes
+    var UpdatePrivilegedSuperClass = TestClassModels.UpdatePrivilegedSuperClass;
+    var ClassPrivilegesUpdatePrivilegedSuperClass = TestClassModels.ClassPrivilegesUpdatePrivilegedSuperClass;
+    var UpdatePrivilegedClassUpdatePrivilegedByParameters = TestClassModels.UpdatePrivilegedClassUpdatePrivilegedByParameters;
 
-    // Create Controlled Classes
-    var CreateControlledSuperClass = TestClassModels.CreateControlledSuperClass;
-    var ClassControlsCreateControlledSuperClass = TestClassModels.ClassControlsCreateControlledSuperClass;
-    var CreateControlledClassCreateControlledByParameters = TestClassModels.CreateControlledClassCreateControlledByParameters;
+    // Create Privileged Classes
+    var CreatePrivilegedSuperClass = TestClassModels.CreatePrivilegedSuperClass;
+    var ClassPrivilegesCreatePrivilegedSuperClass = TestClassModels.ClassPrivilegesCreatePrivilegedSuperClass;
+    var CreatePrivilegedClassCreatePrivilegedByParameters = TestClassModels.CreatePrivilegedClassCreatePrivilegedByParameters;
 
-    // Delete Controlled Classes
-    var DeleteControlledSuperClass = TestClassModels.DeleteControlledSuperClass;
-    var ClassControlsDeleteControlledSuperClass = TestClassModels.ClassControlsDeleteControlledSuperClass;
-    var DeleteControlledClassDeleteControlledByParameters = TestClassModels.DeleteControlledClassDeleteControlledByParameters;
+    // Delete Privileged Classes
+    var DeletePrivilegedSuperClass = TestClassModels.DeletePrivilegedSuperClass;
+    var ClassPrivilegesDeletePrivilegedSuperClass = TestClassModels.ClassPrivilegesDeletePrivilegedSuperClass;
+    var DeletePrivilegedClassDeletePrivilegedByParameters = TestClassModels.DeletePrivilegedClassDeletePrivilegedByParameters;
     
-    // SensitiveControlled Classes
-    var SensitiveControlledSuperClass = TestClassModels.SensitiveControlledSuperClass;
+    // SensitivePrivileged Classes
+    var SensitivePrivilegedSuperClass = TestClassModels.SensitivePrivilegedSuperClass;
 
     // Validation Classes
     var ValidationSuperClass = TestClassModels.ValidationSuperClass;
@@ -3371,53 +3371,53 @@ describe('Instance Tests', () => {
 
     describe('instance.save()', () => {
 
-        // Set up createControlled Instances
+        // Set up createPrivileged Instances
         {
-            // ClassControlsCreateControlledSuperClass Instances
-            var instanceOfClassControlsCreateControlledSuperClassAllowed = new Instance(ClassControlsCreateControlledSuperClass);
-            instanceOfClassControlsCreateControlledSuperClassAllowed.allowed = true;
+            // ClassPrivilegesCreatePrivilegedSuperClass Instances
+            var instanceOfClassPrivilegesCreatePrivilegedSuperClassAllowed = new Instance(ClassPrivilegesCreatePrivilegedSuperClass);
+            instanceOfClassPrivilegesCreatePrivilegedSuperClassAllowed.allowed = true;
             
-            var instanceOfClassControlsCreateControlledSuperClassNotAllowed = new Instance(ClassControlsCreateControlledSuperClass);
-            instanceOfClassControlsCreateControlledSuperClassNotAllowed.allowed = false;
+            var instanceOfClassPrivilegesCreatePrivilegedSuperClassNotAllowed = new Instance(ClassPrivilegesCreatePrivilegedSuperClass);
+            instanceOfClassPrivilegesCreatePrivilegedSuperClassNotAllowed.allowed = false;
 
-            // CreateControlledSuperClass Instances
-            var instanceOfCreateControlledSuperClassPasses = new Instance(CreateControlledSuperClass);
-            instanceOfCreateControlledSuperClassPasses.name = 'instanceOfCreateControlledSuperClassPasses';
-            instanceOfCreateControlledSuperClassPasses.createControlledBy = instanceOfClassControlsCreateControlledSuperClassAllowed;
+            // CreatePrivilegedSuperClass Instances
+            var instanceOfCreatePrivilegedSuperClassPasses = new Instance(CreatePrivilegedSuperClass);
+            instanceOfCreatePrivilegedSuperClassPasses.name = 'instanceOfCreatePrivilegedSuperClassPasses';
+            instanceOfCreatePrivilegedSuperClassPasses.createPrivilegedBy = instanceOfClassPrivilegesCreatePrivilegedSuperClassAllowed;
 
-            var instanceOfCreateControlledSuperClassFailsRelationship = new Instance(CreateControlledSuperClass);
-            instanceOfCreateControlledSuperClassFailsRelationship.name = 'instanceOfCreateControlledSuperClassFailsRelationship';
-            instanceOfCreateControlledSuperClassFailsRelationship.createControlledBy = instanceOfClassControlsCreateControlledSuperClassNotAllowed;
+            var instanceOfCreatePrivilegedSuperClassFailsRelationship = new Instance(CreatePrivilegedSuperClass);
+            instanceOfCreatePrivilegedSuperClassFailsRelationship.name = 'instanceOfCreatePrivilegedSuperClassFailsRelationship';
+            instanceOfCreatePrivilegedSuperClassFailsRelationship.createPrivilegedBy = instanceOfClassPrivilegesCreatePrivilegedSuperClassNotAllowed;
 
             
         }
 
-        // Set up updateControlled Instances
+        // Set up updatePrivileged Instances
         {
-            // ClassControlsUpdateControlledSuperClass Instances
-            var instanceOfClassControlsUpdateControlledSuperClassAllowed = new Instance(ClassControlsUpdateControlledSuperClass);
-            instanceOfClassControlsUpdateControlledSuperClassAllowed.allowed = true;
+            // ClassPrivilegesUpdatePrivilegedSuperClass Instances
+            var instanceOfClassPrivilegesUpdatePrivilegedSuperClassAllowed = new Instance(ClassPrivilegesUpdatePrivilegedSuperClass);
+            instanceOfClassPrivilegesUpdatePrivilegedSuperClassAllowed.allowed = true;
             
-            var instanceOfClassControlsUpdateControlledSuperClassNotAllowed = new Instance(ClassControlsUpdateControlledSuperClass);
-            instanceOfClassControlsUpdateControlledSuperClassNotAllowed.allowed = false;
+            var instanceOfClassPrivilegesUpdatePrivilegedSuperClassNotAllowed = new Instance(ClassPrivilegesUpdatePrivilegedSuperClass);
+            instanceOfClassPrivilegesUpdatePrivilegedSuperClassNotAllowed.allowed = false;
 
-            // UpdateControlledSuperClass Instances
-            var instanceOfUpdateControlledSuperClassPasses = new Instance(UpdateControlledSuperClass);
-            instanceOfUpdateControlledSuperClassPasses.name = 'instanceOfUpdateControlledSuperClassPasses';
-            instanceOfUpdateControlledSuperClassPasses.updateControlledBy = instanceOfClassControlsUpdateControlledSuperClassAllowed;
+            // UpdatePrivilegedSuperClass Instances
+            var instanceOfUpdatePrivilegedSuperClassPasses = new Instance(UpdatePrivilegedSuperClass);
+            instanceOfUpdatePrivilegedSuperClassPasses.name = 'instanceOfUpdatePrivilegedSuperClassPasses';
+            instanceOfUpdatePrivilegedSuperClassPasses.updatePrivilegedBy = instanceOfClassPrivilegesUpdatePrivilegedSuperClassAllowed;
 
-            var instanceOfUpdateControlledSuperClassFailsRelationship = new Instance(UpdateControlledSuperClass);
-            instanceOfUpdateControlledSuperClassFailsRelationship.name = 'instanceOfUpdateControlledSuperClassFailsRelationship';
-            instanceOfUpdateControlledSuperClassFailsRelationship.updateControlledBy = instanceOfClassControlsUpdateControlledSuperClassNotAllowed;
+            var instanceOfUpdatePrivilegedSuperClassFailsRelationship = new Instance(UpdatePrivilegedSuperClass);
+            instanceOfUpdatePrivilegedSuperClassFailsRelationship.name = 'instanceOfUpdatePrivilegedSuperClassFailsRelationship';
+            instanceOfUpdatePrivilegedSuperClassFailsRelationship.updatePrivilegedBy = instanceOfClassPrivilegesUpdatePrivilegedSuperClassNotAllowed;
 
             
         }
 
         before(async () => {
-            await instanceOfClassControlsUpdateControlledSuperClassAllowed.save();
-            await instanceOfClassControlsUpdateControlledSuperClassNotAllowed.save();
-            await instanceOfClassControlsCreateControlledSuperClassAllowed.save();
-            await instanceOfClassControlsCreateControlledSuperClassNotAllowed.save();
+            await instanceOfClassPrivilegesUpdatePrivilegedSuperClassAllowed.save();
+            await instanceOfClassPrivilegesUpdatePrivilegedSuperClassNotAllowed.save();
+            await instanceOfClassPrivilegesCreatePrivilegedSuperClassAllowed.save();
+            await instanceOfClassPrivilegesCreatePrivilegedSuperClassNotAllowed.save();
 
             await TreeClass.clear();
             await TwoWayRelationshipClass1.clear();
@@ -3426,17 +3426,17 @@ describe('Instance Tests', () => {
 
         after(async () => {
             await AllFieldsRequiredClass.clear();
-            await UpdateControlledSuperClass.clear();
-            await UpdateControlledClassUpdateControlledByParameters.clear();
-            await CreateControlledSuperClass.clear();
-            await CreateControlledClassCreateControlledByParameters.clear();
+            await UpdatePrivilegedSuperClass.clear();
+            await UpdatePrivilegedClassUpdatePrivilegedByParameters.clear();
+            await CreatePrivilegedSuperClass.clear();
+            await CreatePrivilegedClassCreatePrivilegedByParameters.clear();
             await ValidationSuperClass.clear();
             await AllAttributesAndRelationshipsClass.clear();
             await CompareClass1.clear();
             await CompareClass2.clear();
             await AuditableSuperClass.clear();
             await database.clearCollection('audit_' + AuditableSuperClass.collection);
-            await SensitiveControlledSuperClass.clear();
+            await SensitivePrivilegedSuperClass.clear();
         });
 
         describe('Saving New Instances', () => {
@@ -3709,15 +3709,15 @@ describe('Instance Tests', () => {
             
         });
 
-        describe('Saving Create Controlled Instances', () => {
+        describe('Saving Create Privileged Instances', () => {
 
-            it('instance.save() called on an instance of an create controlled class. Instance saved.', async () => {
-                const instance = new Instance(CreateControlledSuperClass);
-                instance.name = 'instanceOfCreateControlledSuperClassPasses-saveAll';
-                instance.createControlledBy = instanceOfClassControlsCreateControlledSuperClassAllowed;
+            it('instance.save() called on an instance of an create privileged class. Instance saved.', async () => {
+                const instance = new Instance(CreatePrivilegedSuperClass);
+                instance.name = 'instanceOfCreatePrivilegedSuperClassPasses-saveAll';
+                instance.createPrivilegedBy = instanceOfClassPrivilegesCreatePrivilegedSuperClassAllowed;
                 await instance.save();
     
-                const instanceSaved = await CreateControlledSuperClass.findById(instance._id);
+                const instanceSaved = await CreatePrivilegedSuperClass.findById(instance._id);
                 
                 if (!instanceSaved)
                     throw new Error('Instance was not saved.');
@@ -3725,22 +3725,22 @@ describe('Instance Tests', () => {
                 await instance.delete(instance);
             });
     
-            it('instance.save() fails due to create control check.', async () => {
-                const instance = instanceOfCreateControlledSuperClassFailsRelationship;
+            it('instance.save() fails due to create privilege check.', async () => {
+                const instance = instanceOfCreatePrivilegedSuperClassFailsRelationship;
                 const expectedErrorMessage = 'Illegal attempt to create instances: ' + instance.id;
                 
                 await testForErrorAsync('Instance.save()', expectedErrorMessage, async () => {
                     return instance.save();
                 });
                 
-                const instanceFound = await CreateControlledSuperClass.findById(instance._id);
+                const instanceFound = await CreatePrivilegedSuperClass.findById(instance._id);
     
                 if (instanceFound) 
                     throw new Error('.save() threw an error, but the instance was saved anyway.');
             });
     
-            it('instance.save() called on an instance of an create controlled class with createControlMethodParameters. Instance saved.', async () => {
-                const instance = new Instance(CreateControlledClassCreateControlledByParameters);
+            it('instance.save() called on an instance of an create privileged class with createprivilegeMethodParameters. Instance saved.', async () => {
+                const instance = new Instance(CreatePrivilegedClassCreatePrivilegedByParameters);
                 const parameters = {
                     numberA: 1,
                     numberB: 1,
@@ -3748,7 +3748,7 @@ describe('Instance Tests', () => {
                 };
                 
                 await instance.save(parameters);
-                const instanceSaved = CreateControlledClassCreateControlledByParameters.findById(instance._id);
+                const instanceSaved = CreatePrivilegedClassCreatePrivilegedByParameters.findById(instance._id);
                 
                 if (!instanceSaved)
                     throw new Error('Instance was not saved.');
@@ -3756,8 +3756,8 @@ describe('Instance Tests', () => {
                 await instance.delete();
             });
     
-            it('instance.save() called on an instance of an create controlled class with createControlMethodParameters. Save fails due to create control check.', async () => {
-                const instance = new Instance(CreateControlledClassCreateControlledByParameters);
+            it('instance.save() called on an instance of an create privileged class with createprivilegeMethodParameters. Save fails due to create privilege check.', async () => {
+                const instance = new Instance(CreatePrivilegedClassCreatePrivilegedByParameters);
                 const expectedErrorMessage = 'Illegal attempt to create instances: ' + instance.id;
                 const parameters = {
                     numberA: -2,
@@ -3769,7 +3769,7 @@ describe('Instance Tests', () => {
                     return instance.save(parameters);
                 })
                 
-                const instanceFound = await CreateControlledClassCreateControlledByParameters.findById(instance._id);
+                const instanceFound = await CreatePrivilegedClassCreatePrivilegedByParameters.findById(instance._id);
     
                 if (instanceFound) 
                     throw new Error('.save() threw an error, but the instance was saved anyway.')
@@ -3777,12 +3777,12 @@ describe('Instance Tests', () => {
 
         });
 
-        describe('Saving Update Controlled Instances', () => {
+        describe('Saving Update Privileged Instances', () => {
 
-            it('instance.save() called on an instance of an update controlled class. Instance saved.', async () => {
-                const instance = new Instance(UpdateControlledSuperClass);
-                instance.name = 'instanceOfUpdateControlledSuperClassPasses-saveAll';
-                instance.updateControlledBy = instanceOfClassControlsUpdateControlledSuperClassAllowed;
+            it('instance.save() called on an instance of an update privileged class. Instance saved.', async () => {
+                const instance = new Instance(UpdatePrivilegedSuperClass);
+                instance.name = 'instanceOfUpdatePrivilegedSuperClassPasses-saveAll';
+                instance.updatePrivilegedBy = instanceOfClassPrivilegesUpdatePrivilegedSuperClassAllowed;
     
                 await instance.save();
     
@@ -3790,7 +3790,7 @@ describe('Instance Tests', () => {
     
                 await instance.save();
     
-                const instanceSaved = await UpdateControlledSuperClass.findById(instance._id);
+                const instanceSaved = await UpdatePrivilegedSuperClass.findById(instance._id);
                 
                 if (!instanceSaved.name.includes('1'))
                     throw new Error('Instance was not updated.');
@@ -3798,8 +3798,8 @@ describe('Instance Tests', () => {
                 await instance.delete(instance);
             });
     
-            it('instance.save() fails due to update control check.', async () => {
-                const instance = instanceOfUpdateControlledSuperClassFailsRelationship;
+            it('instance.save() fails due to update privilege check.', async () => {
+                const instance = instanceOfUpdatePrivilegedSuperClassFailsRelationship;
                 const expectedErrorMessage = 'Illegal attempt to update instances: ' + instance.id;
                 
                 await instance.save();
@@ -3810,14 +3810,14 @@ describe('Instance Tests', () => {
                     return instance.save();
                 });
                 
-                const instanceFound = await UpdateControlledSuperClass.findById(instance._id);
+                const instanceFound = await UpdatePrivilegedSuperClass.findById(instance._id);
     
                 if (instanceFound.name.includes('1')) 
                     throw new Error('.save() threw an error, but the instance was updated anyway.');
             });
     
-            it('instance.save() called on an instance of an update controlled class with updateControlMethodParameters. Instance saved.', async () => {
-                const instance = new Instance(UpdateControlledClassUpdateControlledByParameters);
+            it('instance.save() called on an instance of an update privileged class with updateprivilegeMethodParameters. Instance saved.', async () => {
+                const instance = new Instance(UpdatePrivilegedClassUpdatePrivilegedByParameters);
                 const parameters = {
                     numberA: 1,
                     numberB: 1,
@@ -3830,7 +3830,7 @@ describe('Instance Tests', () => {
     
                 await instance.save(null, parameters);
     
-                const instanceSaved = await UpdateControlledClassUpdateControlledByParameters.findById(instance._id);
+                const instanceSaved = await UpdatePrivilegedClassUpdatePrivilegedByParameters.findById(instance._id);
     
                 if (instanceSaved.name !== 'updated')
                     throw new Error('Instance was not updated.');
@@ -3838,8 +3838,8 @@ describe('Instance Tests', () => {
                 await instance.delete();
             });
     
-            it('instance.save() called on an instance of an update controlled class with updateControlMethodParameters. Save fails due to update control check.', async () => {
-                const instance = new Instance(UpdateControlledClassUpdateControlledByParameters);
+            it('instance.save() called on an instance of an update privileged class with updateprivilegeMethodParameters. Save fails due to update privilege check.', async () => {
+                const instance = new Instance(UpdatePrivilegedClassUpdatePrivilegedByParameters);
                 const expectedErrorMessage = 'Illegal attempt to update instances: ' + instance.id;
                 const parameters = {
                     numberA: -2,
@@ -3854,7 +3854,7 @@ describe('Instance Tests', () => {
                     return instance.save(null, parameters);
                 });
                 
-                const instanceFound = await UpdateControlledClassUpdateControlledByParameters.findById(instance._id);
+                const instanceFound = await UpdatePrivilegedClassUpdatePrivilegedByParameters.findById(instance._id);
     
                 if (instanceFound.name) 
                     throw new Error('.save() threw an error, but the instance was saved anyway.')
@@ -4866,11 +4866,11 @@ describe('Instance Tests', () => {
 
         });
 
-        describe('Saving Sensitive Controlled Instances (Stripped Instances)', () => {
+        describe('Saving Sensitive Privileged Instances (Stripped Instances)', () => {
             
             it('An instance which has been stripped of a sensitive attribute cannot be saved.', async () => {
                 const expectedErrorMessage = 'instance.save(): You cannot save an instance which has been stripped of sensitive attribues.';
-                const instance = new Instance(SensitiveControlledSuperClass);
+                const instance = new Instance(SensitivePrivilegedSuperClass);
                 instance.assign({
                     name: 'StrippedInstance',
                     SSN: '123456789',
@@ -4878,7 +4878,7 @@ describe('Instance Tests', () => {
 
                 await instance.save();
 
-                const foundInstance = await SensitiveControlledSuperClass.findById(instance._id);
+                const foundInstance = await SensitivePrivilegedSuperClass.findById(instance._id);
 
                 await testForErrorAsync('instance.save()', expectedErrorMessage, async () => {
                     return foundInstance.save();
@@ -4892,38 +4892,38 @@ describe('Instance Tests', () => {
 
     describe('instance.delete()', () => {
 
-        // Set up deleteControlled Instances
+        // Set up deletePrivileged Instances
         {
-            // ClassControlsDeleteControlledSuperClass Instances
-            var instanceOfClassControlsDeleteControlledSuperClassAllowed = new Instance(ClassControlsDeleteControlledSuperClass);
-            instanceOfClassControlsDeleteControlledSuperClassAllowed.allowed = true;
+            // ClassPrivilegesDeletePrivilegedSuperClass Instances
+            var instanceOfClassPrivilegesDeletePrivilegedSuperClassAllowed = new Instance(ClassPrivilegesDeletePrivilegedSuperClass);
+            instanceOfClassPrivilegesDeletePrivilegedSuperClassAllowed.allowed = true;
             
-            var instanceOfClassControlsDeleteControlledSuperClassNotAllowed = new Instance(ClassControlsDeleteControlledSuperClass);
-            instanceOfClassControlsDeleteControlledSuperClassNotAllowed.allowed = false;
+            var instanceOfClassPrivilegesDeletePrivilegedSuperClassNotAllowed = new Instance(ClassPrivilegesDeletePrivilegedSuperClass);
+            instanceOfClassPrivilegesDeletePrivilegedSuperClassNotAllowed.allowed = false;
 
-            // DeleteControlledSuperClass Instances
-            var instanceOfDeleteControlledSuperClassPasses = new Instance(DeleteControlledSuperClass);
-            instanceOfDeleteControlledSuperClassPasses.name = 'instanceOfDeleteControlledSuperClassPasses';
-            instanceOfDeleteControlledSuperClassPasses.deleteControlledBy = instanceOfClassControlsDeleteControlledSuperClassAllowed;
+            // DeletePrivilegedSuperClass Instances
+            var instanceOfDeletePrivilegedSuperClassPasses = new Instance(DeletePrivilegedSuperClass);
+            instanceOfDeletePrivilegedSuperClassPasses.name = 'instanceOfDeletePrivilegedSuperClassPasses';
+            instanceOfDeletePrivilegedSuperClassPasses.deletePrivilegedBy = instanceOfClassPrivilegesDeletePrivilegedSuperClassAllowed;
 
-            var instanceOfDeleteControlledSuperClassFailsRelationship = new Instance(DeleteControlledSuperClass);
-            instanceOfDeleteControlledSuperClassFailsRelationship.name = 'instanceOfDeleteControlledSuperClassFailsRelationship';
-            instanceOfDeleteControlledSuperClassFailsRelationship.deleteControlledBy = instanceOfClassControlsDeleteControlledSuperClassNotAllowed;
+            var instanceOfDeletePrivilegedSuperClassFailsRelationship = new Instance(DeletePrivilegedSuperClass);
+            instanceOfDeletePrivilegedSuperClassFailsRelationship.name = 'instanceOfDeletePrivilegedSuperClassFailsRelationship';
+            instanceOfDeletePrivilegedSuperClassFailsRelationship.deletePrivilegedBy = instanceOfClassPrivilegesDeletePrivilegedSuperClassNotAllowed;
 
             
         }
 
         before(async () => {
-            await instanceOfClassControlsDeleteControlledSuperClassAllowed.save();
-            await instanceOfClassControlsDeleteControlledSuperClassNotAllowed.save();
+            await instanceOfClassPrivilegesDeletePrivilegedSuperClassAllowed.save();
+            await instanceOfClassPrivilegesDeletePrivilegedSuperClassNotAllowed.save();
             await TwoWayRelationshipClass1.clear();
             await TwoWayRelationshipClass2.clear();
         });
 
         after(async () => {
             await AllFieldsRequiredClass.clear();
-            await DeleteControlledSuperClass.clear();
-            await DeleteControlledClassDeleteControlledByParameters.clear();
+            await DeletePrivilegedSuperClass.clear();
+            await DeletePrivilegedClassDeletePrivilegedByParameters.clear();
             await AuditableSuperClass.clear();
             await ClassOwnsOtherClass.clear();
             await ClassOwnedByOtherClass.clear();
@@ -4976,24 +4976,24 @@ describe('Instance Tests', () => {
             });
         });
 
-        describe('Deleting Delete Controlled Instances', () => {
+        describe('Deleting Delete Privileged Instances', () => {
 
-            it('instance.delete() called on an instance of an delete controlled class. Instance deleted.', async () => {
-                const instance = new Instance(DeleteControlledSuperClass);
-                instance.name = 'instanceOfDeleteControlledSuperClassPasses-delete';
-                instance.deleteControlledBy = instanceOfClassControlsDeleteControlledSuperClassAllowed;
+            it('instance.delete() called on an instance of an delete privileged class. Instance deleted.', async () => {
+                const instance = new Instance(DeletePrivilegedSuperClass);
+                instance.name = 'instanceOfDeletePrivilegedSuperClassPasses-delete';
+                instance.deletePrivilegedBy = instanceOfClassPrivilegesDeletePrivilegedSuperClassAllowed;
     
                 await instance.save();
                 await instance.delete();
     
-                const instanceFound = await DeleteControlledSuperClass.findById(instance._id);
+                const instanceFound = await DeletePrivilegedSuperClass.findById(instance._id);
 
                 if (instanceFound)
                     throw new Error('Instance was not deleted.');
             });
     
-            it('instance.delete() fails due to delete control check.', async () => {
-                const instance = instanceOfDeleteControlledSuperClassFailsRelationship;
+            it('instance.delete() fails due to delete privilege check.', async () => {
+                const instance = instanceOfDeletePrivilegedSuperClassFailsRelationship;
                 const expectedErrorMessage = 'Illegal attempt to delete instances: ' + instance.id;
                 
                 await instance.save();
@@ -5002,14 +5002,14 @@ describe('Instance Tests', () => {
                     return instance.delete();
                 });
                 
-                const instanceFound = await DeleteControlledSuperClass.findById(instance._id);
+                const instanceFound = await DeletePrivilegedSuperClass.findById(instance._id);
 
                 if (!instanceFound) 
                     throw new Error('.delete() threw an error, but the instance was deleted anyway.');
             });
     
-            it('instance.delete() called on an instance of an delete controlled class with deleteControlMethodParameters. Instance deleted.', async () => {
-                const instance = new Instance(DeleteControlledClassDeleteControlledByParameters);
+            it('instance.delete() called on an instance of an delete privileged class with deleteprivilegeMethodParameters. Instance deleted.', async () => {
+                const instance = new Instance(DeletePrivilegedClassDeletePrivilegedByParameters);
                 const parameters = {
                     numberA: 1, 
                     numberB: 1,
@@ -5019,14 +5019,14 @@ describe('Instance Tests', () => {
                 await instance.save();   
                 await instance.delete(parameters);
     
-                const instanceFound = await DeleteControlledClassDeleteControlledByParameters.findById(instance._id);
+                const instanceFound = await DeletePrivilegedClassDeletePrivilegedByParameters.findById(instance._id);
 
                 if (instanceFound !== null)
                     throw new Instance('Instance was not deleted.');
             });
     
-            it('instance.delete() called on an instance of an delete controlled class with deleteControlMethodParameters. Delete fails due to delete control check.', async () => {
-                const instance = new Instance(DeleteControlledClassDeleteControlledByParameters);
+            it('instance.delete() called on an instance of an delete privileged class with deleteprivilegeMethodParameters. Delete fails due to delete privilege check.', async () => {
+                const instance = new Instance(DeletePrivilegedClassDeletePrivilegedByParameters);
                 const expectedErrorMessage = 'Illegal attempt to delete instances: ' + instance.id;
                 const parameters = {
                     numberA: -2, 
@@ -5040,7 +5040,7 @@ describe('Instance Tests', () => {
                     return instance.delete(parameters);
                 });
                 
-                const instanceFound = await DeleteControlledClassDeleteControlledByParameters.findById(instance._id);
+                const instanceFound = await DeletePrivilegedClassDeletePrivilegedByParameters.findById(instance._id);
     
                 if (instanceFound === null) 
                     throw new Error('.delete() threw an error, but the instance was deleted anyway.')

@@ -54,12 +54,12 @@ class ClassModel {
      *             requiredGroup: String,
      *          }
      *       ],
-     *       crudFunctions: {
-     *          createControl: Function,
-     *          readControl: Function,
-     *          updateControl: Function,
-     *          deleteControl: Function,
-     *          sensitiveControl: Function,
+     *       privileges: {
+     *          create: Function,
+     *          read: Function,
+     *          update: Function,
+     *          delete: Function,
+     *          sensitive: Function,
      *       },
      *       validations: [ Function ],
      *       indices: [ fieldOrSpec ], 
@@ -117,27 +117,27 @@ class ClassModel {
             }
         }
 
-        this.createControlMethods = [];
-        this.readControlMethods = [];
-        this.updateControlMethods = [];
-        this.deleteControlMethods = [];
-        this.sensitiveControlMethods = [];
+        this.createPrivilegeMethods = [];
+        this.readPrivilegeMethods = [];
+        this.updatePrivilegeMethods = [];
+        this.deletePrivilegeMethods = [];
+        this.sensitivePrivilegeMethods = [];
 
-        if (schema.crudControls) {
-            if (schema.crudControls.createControl) {
-                this.createControlMethods.push(schema.crudControls.createControl);
+        if (schema.privileges) {
+            if (schema.privileges.create) {
+                this.createPrivilegeMethods.push(schema.privileges.create);
             }
-            if (schema.crudControls.readControl) {
-                this.readControlMethods.push(schema.crudControls.readControl);
+            if (schema.privileges.read) {
+                this.readPrivilegeMethods.push(schema.privileges.read);
             }
-            if (schema.crudControls.updateControl) {
-                this.updateControlMethods.push(schema.crudControls.updateControl);
+            if (schema.privileges.update) {
+                this.updatePrivilegeMethods.push(schema.privileges.update);
             }
-            if (schema.crudControls.deleteControl) {
-                this.deleteControlMethods.push(schema.crudControls.deleteControl);
+            if (schema.privileges.delete) {
+                this.deletePrivilegeMethods.push(schema.privileges.delete);
             }
-            if (schema.crudControls.sensitiveControl) {
-                this.sensitiveControlMethods.push(schema.crudControls.sensitiveControl);
+            if (schema.privileges.sensitive) {
+                this.sensitivePrivilegeMethods.push(schema.privileges.sensitive);
             }
         }
 
@@ -154,11 +154,11 @@ class ClassModel {
                 this.attributes = this.attributes.concat(superClass.attributes);
                 this.relationships = this.relationships.concat(superClass.relationships);
                 this.indices = this.indices.concat(superClass.indices);
-                this.createControlMethods = this.createControlMethods.concat(superClass.createControlMethods);
-                this.readControlMethods = this.readControlMethods.concat(superClass.readControlMethods);
-                this.updateControlMethods = this.updateControlMethods.concat(superClass.updateControlMethods);
-                this.deleteControlMethods = this.deleteControlMethods.concat(superClass.deleteControlMethods);
-                this.sensitiveControlMethods = this.sensitiveControlMethods.concat(superClass.sensitiveControlMethods);
+                this.createPrivilegeMethods = this.createPrivilegeMethods.concat(superClass.createPrivilegeMethods);
+                this.readPrivilegeMethods = this.readPrivilegeMethods.concat(superClass.readPrivilegeMethods);
+                this.updatePrivilegeMethods = this.updatePrivilegeMethods.concat(superClass.updatePrivilegeMethods);
+                this.deletePrivilegeMethods = this.deletePrivilegeMethods.concat(superClass.deletePrivilegeMethods);
+                this.sensitivePrivilegeMethods = this.sensitivePrivilegeMethods.concat(superClass.sensitivePrivilegeMethods);
                 this.validations = this.validations.concat(superClass.validations);
                 this.auditable = superClass.auditable ? true : this.auditable;
                 this.inheritStaticMethods(superClass);
@@ -187,7 +187,7 @@ class ClassModel {
      *    See schema parameter or constructor() method.
      * Throws
      * - NoommanConstructorError - If parameterShapeConstructorValidations throws a NoommanConstructorError.
-     * - NoommanConstructorError - If crudControlsConstructorValidations throws a NoommanConstructorError.
+     * - NoommanConstructorError - If privilegesConstructorValidations throws a NoommanConstructorError.
      * - NoommanConstructorError - If sensitiveAttributesContructorValidations throws a NoommanConstructorError.
      * - NoommanConstructorError - If customMethodsContructorValidations throws a NoommanConstructorError.
      * - NoommanConstructorError - If inheritanceConstructorValidations throws a NoommanConstructorError.
@@ -196,7 +196,7 @@ class ClassModel {
     constructorValidations(schema) {
         ClassModel.paramterShapeConstructorValidations(schema);
 
-        ClassModel.crudControlsConstructorValidations(schema);
+        ClassModel.privilegesConstructorValidations(schema);
 
         ClassModel.sensitiveAttributesContructorValidations(schema);
 
@@ -257,34 +257,34 @@ class ClassModel {
     }
 
     /*
-     * crudControlsConstructorValidations(schema)
-     * If the property crudControls is provided and any of the properties are not a Function, will
+     * privilegesConstructorValidations(schema)
+     * If the property privileges is provided and any of the properties are not a Function, will
      *    throw an Error.
      * Parameters
      * - schema - Object - See constructor parameter definition.
      * Throws
-     * - NoommanConstructorError - If property createControl of property crudControls is not a Function.
-     * - NoommanConstructorError - If property readControl of property crudControls is not a Function.
-     * - NoommanConstructorError - If property updateControl of property crudControls is not a Function.
-     * - NoommanConstructorError - If property deleteControl of property crudControls is not a Function.
-     * - NoommanConstructorError - If property sensitiveControl of property crudControls is not a Function.
+     * - NoommanConstructorError - If property createPrivilege of property privileges is not a Function.
+     * - NoommanConstructorError - If property readPrivilege of property privileges is not a Function.
+     * - NoommanConstructorError - If property updatePrivilege of property privileges is not a Function.
+     * - NoommanConstructorError - If property deletePrivilege of property privileges is not a Function.
+     * - NoommanConstructorError - If property sensitivePrivilege of property privileges is not a Function.
      */
-    static crudControlsConstructorValidations(schema) {
-        if (schema.crudControls) {
-            if (schema.crudControls.readControl && typeof(schema.crudControls.readControl) !== 'function') {
-                throw new NoommanErrors.NoommanConstructorError('If a readControl method is provided, it must be a function.');
+    static privilegesConstructorValidations(schema) {
+        if (schema.privileges) {
+            if (schema.privileges.read && typeof(schema.privileges.read) !== 'function') {
+                throw new NoommanErrors.NoommanConstructorError('If a readPrivilege method is provided, it must be a function.');
             }
-            if (schema.crudControls.createControl && typeof(schema.crudControls.createControl) !== 'function') {
-                throw new NoommanErrors.NoommanConstructorError('If a createControl method is provided, it must be a function.');
+            if (schema.privileges.create && typeof(schema.privileges.create) !== 'function') {
+                throw new NoommanErrors.NoommanConstructorError('If a createPrivilege method is provided, it must be a function.');
             }
-            if (schema.crudControls.updateControl && typeof(schema.crudControls.updateControl) !== 'function') {
-                throw new NoommanErrors.NoommanConstructorError('If a updateControl method is provided, it must be a function.');
+            if (schema.privileges.update && typeof(schema.privileges.update) !== 'function') {
+                throw new NoommanErrors.NoommanConstructorError('If a updatePrivilege method is provided, it must be a function.');
             }
-            if (schema.crudControls.deleteControl && typeof(schema.crudControls.deleteControl) !== 'function') {
-                throw new NoommanErrors.NoommanConstructorError('If a deleteControl method is provided, it must be a function.');
+            if (schema.privileges.delete && typeof(schema.privileges.delete) !== 'function') {
+                throw new NoommanErrors.NoommanConstructorError('If a deletePrivilege method is provided, it must be a function.');
             }
-            if (schema.crudControls.sensitiveControl && typeof(schema.crudControls.sensitiveControl) !== 'function') {
-                throw new NoommanErrors.NoommanConstructorError('If a sensitiveControl method is provided, it must be a function.');
+            if (schema.privileges.sensitive && typeof(schema.privileges.sensitive) !== 'function') {
+                throw new NoommanErrors.NoommanConstructorError('If a sensitivePrivilege method is provided, it must be a function.');
             }
         }
     }
@@ -292,12 +292,12 @@ class ClassModel {
     /*
      * sensitiveAttributesContructorValidations(schema)
      * Will throw an error if an attribute in ClassModel schema or parent ClassModel schema has an attribute
-     *    marked sensitive, and this ClassModel does not ahve a sensitiveControl method, and vice versa.
+     *    marked sensitive, and this ClassModel does not ahve a sensitivePrivilege method, and vice versa.
      * Parameters
      * - schema - Object - See constructor parameter definition.
      * Throws
-     * - NoommanConstructorError - If ClassModel has a sensitive attribute but no sensitiveControl method.
-     * - NoommanConstructorError - If ClassModel has a sensitiveControl method but no sensitive attribute.
+     * - NoommanConstructorError - If ClassModel has a sensitive attribute but no sensitivePrivilege method.
+     * - NoommanConstructorError - If ClassModel has a sensitivePrivilege method but no sensitive attribute.
      */
     static sensitiveAttributesContructorValidations(schema) {
         let allAttributes = [];
@@ -322,19 +322,19 @@ class ClassModel {
             }
 
             if (sensitiveAttributes) {
-                if (!schema.crudControls || !schema.crudControls.sensitiveControl) {
-                    throw new NoommanErrors.NoommanConstructorError('At least one attribute is marked sensitive, but no sensitiveControl method is provided.');
+                if (!schema.privileges || !schema.privileges.sensitive) {
+                    throw new NoommanErrors.NoommanConstructorError('At least one attribute is marked sensitive, but no sensitivePrivilege method is provided.');
                 }
             }
             else {
-                if (schema.crudControls && schema.crudControls.sensitiveControl) {
-                    throw new NoommanErrors.NoommanConstructorError('A sensitiveControl method was provided, but no attributes are marked sensitive.');
+                if (schema.privileges && schema.privileges.sensitive) {
+                    throw new NoommanErrors.NoommanConstructorError('A sensitivePrivilege method was provided, but no attributes are marked sensitive.');
                 }
             }
         }
         else {
-            if (schema.crudControls && schema.crudControls.sensitiveControl) {
-                throw new NoommanErrors.NoommanConstructorError('A sensitiveControl method was provided, but no attributes are marked sensitive.');
+            if (schema.privileges && schema.privileges.sensitive) {
+                throw new NoommanErrors.NoommanConstructorError('A sensitivePrivilege method was provided, but no attributes are marked sensitive.');
             }
         }
 
@@ -1152,27 +1152,27 @@ class ClassModel {
     // Query Methods
 
     /* 
-     * find(queryFilter, readControlMethodParameters, sensitiveControlMethodParameters)
+     * find(queryFilter, readPrivilegeMethodParameter, sensitivePrivilegeMethodParameter)
      * Finds Instances of this ClassModel using the given query filter in the database. 
      *    If called on a super-ClassModel, will recursively check this ClassModel's collection, and then it's sub-ClassModels' collections.
-     *    This method respects readControl and sensitiveControl methods. If this ClassModel is read controlled, Instances found
-     *    during query will be filtered down to those which pass the readControl method(s) for this ClassModel. If this ClassModel
-     *    is sensitive controlled, all Instances which do not pass the sensitiveControl method(s) for this ClassModel will be 
+     *    This method respects readPrivilege and sensitivePrivilege methods. If this ClassModel has read privileges set, Instances found
+     *    during query will be filtered down to those which pass the readPrivilege method(s) for this ClassModel. If this ClassModel
+     *    has sensitive privileges set, all Instances which do not pass the sensitivePrivilege method(s) for this ClassModel will be 
      *    stripped of any sensitive attributes.
      * Parameters
      * - queryFilter - Object - A mongo query object (required).
-     * - readControlMethodParameters - Object - An object containing parameters that will be passed to the readControl method(s)
+     * - readPrivilegeMethodParameter - Object - An object containing parameters that will be passed to the readPrivilege method(s)
      *    for this ClassModel.
-     * - sensitiveControlMethodParameters - Object - An object containing parameters that will be passed to the sensitiveControl
+     * - sensitivePrivilegeMethodParameter - Object - An object containing parameters that will be passed to the sensitivePrivilege
      *    method(s) for this ClassModel.
      * Returns 
      * - Promise<InstanceSet> - An InstanceSet of this ClassModel containing all instances of this ClassModel or its children
-     *    which match the given query and pass the readControl methods if applicable.
+     *    which match the given query and pass the readPrivilege methods if applicable.
      */
-    async find(queryFilter, readControlMethodParameters, sensitiveControlMethodParameters) {
+    async find(queryFilter, readPrivilegeMethodParameter, sensitivePrivilegeMethodParameter) {
         const unfiltered = await this.pureFind(queryFilter);
-        const filtered = await this.readControlFilter(unfiltered, readControlMethodParameters);
-        await filtered.sensitiveControlCheckAndStrip(sensitiveControlMethodParameters);
+        const filtered = await this.readPrivilegeFilter(unfiltered, readPrivilegeMethodParameter);
+        await filtered.sensitivePrivilegeCheckAndStrip(sensitivePrivilegeMethodParameter);
 
         return filtered;
     }
@@ -1181,7 +1181,7 @@ class ClassModel {
      * pureFind(queryFilter)
      * Finds instances of this ClassModel using the given query filter in the database. 
      *    If called on a super-ClassModel, will recursively check this ClassModel's collection, and then it's sub-ClassModels collections.
-     *    This method DOES NOT do any readControl or sensitiveControl filtering. 
+     *    This method DOES NOT do any readPrivilege or sensitivePrivilege filtering. 
      * Parameters
      * - queryFilter - Object - A mongo query object (required).
      * Returns 
@@ -1227,36 +1227,36 @@ class ClassModel {
     }
 
     /* 
-     * findOne(queryFilter, readControlMethodParameters, sensitiveControlMethodParameters)
+     * findOne(queryFilter, readPrivilegeMethodParameter, sensitivePrivilegeMethodParameter)
      * Finds a single Instance of this ClassModel using the given query filter in the database. 
      *    If called on a super-ClassModel, will recursively check this ClassModel's collection, and then it's sub-ClassModels collections.
-     *    This method respects readControl and sensitiveControl methods. If this ClassModel is read controlled, the Instance found
-     *    during query will not be returned if it does not pass the readControl method(s) for this ClassModel. If this ClassModel
-     *    is sensitive controlled, an Instance which does not pass the sensitiveControl method(s) for this ClassModel will be 
+     *    This method respects readPrivilege and sensitivePrivilege methods. If this ClassModel has read privileges set, the Instance found
+     *    during query will not be returned if it does not pass the readPrivilege method(s) for this ClassModel. If this ClassModel
+     *    has sensitive privileges set, an Instance which does not pass the sensitivePrivilege method(s) for this ClassModel will be 
      *    stripped of any sensitive attributes.
      * Parameters
      * - queryFilter - Object - A mongo query object (required).
-     * - readControlMethodParameters - Object - An object containing parameters that will be passed to the readControl method(s)
+     * - readPrivilegeMethodParameter - Object - An object containing parameters that will be passed to the readPrivilege method(s)
      *    for this ClassModel.
-     * - sensitiveControlMethodParameters - Object - An object containing parameters that will be passed to the sensitiveControl
+     * - sensitivePrivilegeMethodParameter - Object - An object containing parameters that will be passed to the sensitivePrivilege
      *    method(s) for this ClassModel.
      * Returns 
      * - Promise<Instance> - The first Instance of this ClassModel or its children which matches the given query and passes the
-     *    readControl methods if applicable. Returns null if no Instance matches query or if matching Instance does not pass 
-     *    readControl method if applicable.
+     *    readPrivilege methods if applicable. Returns null if no Instance matches query or if matching Instance does not pass 
+     *    readPrivilege method if applicable.
      */
-    async findOne(queryFilter, readControlMethodParameters, sensitiveControlMethodParameters) {
+    async findOne(queryFilter, readPrivilegeMethodParameter, sensitivePrivilegeMethodParameter) {
         const unfiltered = await this.pureFindOne(queryFilter);
         if (unfiltered === null) {
             return null;
         }
 
-        const filtered = await this.readControlFilterInstance(unfiltered, readControlMethodParameters);
+        const filtered = await this.readPrivilegeFilterInstance(unfiltered, readPrivilegeMethodParameter);
         if (filtered === null) {
             return null;
         }
 
-        const needToStrip = await this.sensitiveControlFilterInstance(filtered, sensitiveControlMethodParameters);
+        const needToStrip = await this.sensitivePrivilegeFilterInstance(filtered, sensitivePrivilegeMethodParameter);
         if (needToStrip !== null) {
             filtered.stripSensitiveAttributes();
         }
@@ -1268,7 +1268,7 @@ class ClassModel {
      * pureFindOne(queryFilter)
      * Finds a single instance of this ClassModel using the given query filter in the database. 
      *    If called on a superclass, will recursively check this ClassModel's collection, and then it's sub-ClassModels collections.
-     *    This method does not respect readControl and sensitiveControl methods. 
+     *    This method does not respect readPrivilege and sensitivePrivilege methods. 
      * Parameters
      * - queryFilter - Object - A mongo query object (required).
      * Returns 
@@ -1313,27 +1313,27 @@ class ClassModel {
     }
 
     /* 
-     * findById(id, readControlMethodParameters, sensitiveControlMethodParameters)
+     * findById(id, readPrivilegeMethodParameter, sensitivePrivilegeMethodParameter)
      * Finds a single instance of this ClassModel with the given id. 
      *    If called on a superclass, will recursively check this ClassModel's collection, and then it's sub-ClassModels collections.
-     *    This method respects readControl and sensitiveControl methods. If this ClassModel is read controlled, the Instance found
-     *    during query will not be returned if it does not pass the readControl method(s) for this ClassModel. If this ClassModel
-     *    is sensitive controlled, an instance which does not pass the sensitiveControl method(s) for this ClassModel will be 
+     *    This method respects readPrivilege and sensitivePrivilege methods. If this ClassModel has read privileges set, the Instance found
+     *    during query will not be returned if it does not pass the readPrivilege method(s) for this ClassModel. If this ClassModel
+     *    has sensitve privileges set, an instance which does not pass the sensitivePrivilege method(s) for this ClassModel will be 
      *    stripped of any sensitive attributes.
      * Parameters
      * - id - ObjectId | String - A mongo ObjectId (or hex string representation thereof) of the Instance you which to find.
-     * - readControlMethodParameters - Object - An object containing parameters that will be passed to the readControl method(s)
+     * - readPrivilegeMethodParameter - Object - An object containing parameters that will be passed to the readPrivilege method(s)
      *    for this ClassModel.
-     * - sensitiveControlMethodParameters - Object - An object containing parameters that will be passed to the sensitiveControl
+     * - sensitivePrivilegeMethodParameter - Object - An object containing parameters that will be passed to the sensitivePrivilege
      *    method(s) for this ClassModel.
      * Returns 
      * - Promise<Instance> - The first Instance of this ClassModel or its children
-     *    which has the given id and passes the readControl methods if applicable. Returns null if no Instance with the given id is 
-     *    found, or if matching instance does not pass readControl method (if applicable).
+     *    which has the given id and passes the readPrivilege methods if applicable. Returns null if no Instance with the given id is 
+     *    found, or if matching instance does not pass readPrivilege method (if applicable).
      * Throws
      * - NoommanArgumentError - If given id is a string which is not a valid mongodb id hex string.
      */
-    async findById(id, readControlMethodParameters, sensitiveControlMethodParameters) {
+    async findById(id, readPrivilegeMethodParameter, sensitivePrivilegeMethodParameter) {
         if (typeof(id) === 'string') {
             try {
                 id = database.ObjectId(id);
@@ -1343,14 +1343,14 @@ class ClassModel {
             }
         }
 
-        return this.findOne({_id: id}, readControlMethodParameters, sensitiveControlMethodParameters);
+        return this.findOne({_id: id}, readPrivilegeMethodParameter, sensitivePrivilegeMethodParameter);
     }
 
     /* 
      * pureFindById(id)
      * Finds a single instance of this ClassModel with the given id.
      *    If called on a superclass, will recursively check this ClassModel's collection, and then it's sub-ClassModels collections.
-     *    This method does not respect readControl and sensitiveControl methods. 
+     *    This method does not respect readPrivilege and sensitivePrivilege methods. 
      * Parameters
      * - id - ObjectId - A mongo ObjectId of the Instance you which to find.
      * Returns 
@@ -1360,7 +1360,7 @@ class ClassModel {
         return this.pureFindOne({_id: id});
     }
 
-    async findPage(queryFilter={}, page=0, pageSize=100, orderBy={_id: 1}, readControlMethodParameters, sensitiveControlMethodParameters) {
+    async findPage(queryFilter={}, page=0, pageSize=100, orderBy={_id: 1}, readPrivilegeMethodParameter, sensitivePrivilegeMethodParameter) {
         if (this.abstract && !this.isSuperClass())
             throw new NoommanErrors.NoommanClassModelError('Error in ' + this.className + '.findPage(). This class is abstract and non-discriminated, but it has no sub-classes.');
 
@@ -1430,8 +1430,8 @@ class ClassModel {
             instances.add(new Instance(documentClassModel, document.document));
         }
 
-        const filteredInstances = await instances.readControlFilter(readControlMethodParameters);
-        await filteredInstances.sensitiveControlCheckAndStrip(sensitiveControlMethodParameters);
+        const filteredInstances = await instances.readPrivilegeFilter(readPrivilegeMethodParameter);
+        await filteredInstances.sensitivePrivilegeCheckAndStrip(sensitivePrivilegeMethodParameter);
 
         const hiddenInstances = instances.size - filteredInstances.size;
 
@@ -1600,23 +1600,23 @@ class ClassModel {
     // Crud Control Methods
 
     /*
-     * evaluateCrudControlMethods(instanceSet, controlMethods, methodParameters)
-     * Runs the crudControl methods determined by the controlMethods parameter for each Instance in the 
-     *    given InstanceSet that are applicable for each Instance's ClassModel, using the given methodParameters.
-     *    Returns an InstanceSet of Instances which for which at least one controlMethod returns false.
+     * evaluateCrudControlMethods(instanceSet, privilegeMethods, methodParameter)
+     * Runs the crudControl methods determined by the privilegeMethods parameter for each Instance in the 
+     *    given InstanceSet that are applicable for each Instance's ClassModel, using the given methodParameter.
+     *    Returns an InstanceSet of Instances which for which at least one privilegeMethod returns false.
      *    Internal use only.
      * Parameters
      * - instanceSet - InstanceSet - An InstanceSet of this ClassModel to evaluate crudControl methods on.
-     * - controlMethods - String - A string which determines which type of control methods to run. Valid values
-     *    are 'readControlMethods', 'createControlMethods', 'updateControlMethods', 'deleteControlMethods',
-     *    or 'sensitiveControlMethods'.
-     * - methodParameters - Object - An object containing any parameters that a particular crudControl method
+     * - privilegeMethods - String - A string which determines which type of privilege methods to run. Valid values
+     *    are 'readPrivilegeMethods', 'createPrivilegeMethods', 'updatePrivilegeMethods', 'deletePrivilegeMethods',
+     *    or 'sensitivePrivilegeMethods'.
+     * - methodParameter - Object - An object containing any parameters that a particular crudControl method
      *    may need.
      * Returns
      * - Promise<InstanceSet> - An InstanceSet containing all the instances for which at least one crudControl
      *    method returns false.
      */
-    async evaluateCrudControlMethods(instanceSet, controlMethods, methodParameters) {
+    async evaluateCrudControlMethods(instanceSet, privilegeMethods, methodParameter) {
         let rejectedInstances = new InstanceSet(this);
 
         const instancesOfThisClass = instanceSet.filterToInstanceSet(instance => {
@@ -1624,8 +1624,8 @@ class ClassModel {
         });
 
         for (const instance of instancesOfThisClass) {
-            for (const controlMethod of this[controlMethods]) {
-                let result = controlMethod.call(instance, methodParameters);
+            for (const privilegeMethod of this[privilegeMethods]) {
+                let result = privilegeMethod.call(instance, methodParameter);
                 if (result instanceof Promise) {
                     result = await result;
                 }
@@ -1641,7 +1641,7 @@ class ClassModel {
                 let instancesOfSubClass = instanceSet.filterForClassModel(subClass);
 
                 if (!instancesOfSubClass.isEmpty()) {
-                    const rejectedSubClassInstances = await subClass.evaluateCrudControlMethods(instancesOfSubClass, controlMethods, methodParameters);
+                    const rejectedSubClassInstances = await subClass.evaluateCrudControlMethods(instancesOfSubClass, privilegeMethods, methodParameter);
                     rejectedInstances.addFromIterable(rejectedSubClassInstances);
                 }
             }
@@ -1651,27 +1651,27 @@ class ClassModel {
     }
 
     /*
-     * createControlCheck(instanceSet, createControlMethodParameters)
-     * Runs applicable createControl methods for each Instance in the given InstanceSet, and throws an error if any
-     *    createControl method returns false for any of the Instances in the InstanceSet.
+     * createPrivilegeCheck(instanceSet, createPrivilegeMethodParameter)
+     * Runs applicable createPrivilege methods for each Instance in the given InstanceSet, and throws an error if any
+     *    createPrivilege method returns false for any of the Instances in the InstanceSet.
      * Parameters
-     * - instanceSet - InstanceSet - An InstanceSet of this ClassModel to evaluate createControl methods on.
-     * - createControlMethodParameters - Object - An object containing any parameters that the createControl method(s)
+     * - instanceSet - InstanceSet - An InstanceSet of this ClassModel to evaluate createPrivilege methods on.
+     * - createPrivilegeMethodParameter - Object - An object containing any parameters that the createPrivilege method(s)
      *    may need.
      * Returns
-     * - Promise<undefined> - A promise which resolves to undefined if all Instances pass the createControl methods.
+     * - Promise<undefined> - A promise which resolves to undefined if all Instances pass the createPrivilege methods.
      * Throws
      * - NoommanArgumentError - If instanceSet parameter is not an InstanceSet.
-     * - NoommanSaveError - If any createControl method returns false for any of the Instances in the InstanceSet.
+     * - NoommanSaveError - If any createPrivilege method returns false for any of the Instances in the InstanceSet.
      */
-    async createControlCheck(instanceSet, createControlMethodParameters) {
+    async createPrivilegeCheck(instanceSet, createPrivilegeMethodParameter) {
         if (!(instanceSet instanceof InstanceSet))
-            throw new NoommanErrors.NoommanArgumentError('Incorrect parameters. ' + this.className + '.createControlCheck(InstanceSet instanceSet, createControlMethodParameters)');
+            throw new NoommanErrors.NoommanArgumentError('Incorrect parameters. ' + this.className + '.createPrivilegeCheck(InstanceSet instanceSet, createPrivilegeMethodParameter)');
         
-        if (instanceSet.isEmpty() || !this.createControlMethods.length)
+        if (instanceSet.isEmpty() || !this.createPrivilegeMethods.length)
             return;
 
-        const rejectedInstances = await this.evaluateCrudControlMethods(instanceSet, 'createControlMethods', createControlMethodParameters);
+        const rejectedInstances = await this.evaluateCrudControlMethods(instanceSet, 'createPrivilegeMethods', createPrivilegeMethodParameter);
 
         if (!rejectedInstances.isEmpty())
             throw new NoommanErrors.NoommanSaveError('Illegal attempt to create instances: ' + rejectedInstances.getInstanceIds());
@@ -1679,203 +1679,203 @@ class ClassModel {
 
 
     /*
-     * createControlCheckInstance(instance, createControlMethodParameters)
-     * Runs applicable createControl methods for the given Instance, and throws an error if any
-     *    createControl method returns false for the Instance.
+     * createPrivilegeCheckInstance(instance, createPrivilegeMethodParameter)
+     * Runs applicable createPrivilege methods for the given Instance, and throws an error if any
+     *    createPrivilege method returns false for the Instance.
      * Parameters
-     * - instance - Instance - An Instance of this ClassModel to evaluate createControl methods on.
-     * - createControlMethodParameters - Object - An object containing any parameters that the createControl method(s)
+     * - instance - Instance - An Instance of this ClassModel to evaluate createPrivilege methods on.
+     * - createPrivilegeMethodParameter - Object - An object containing any parameters that the createPrivilege method(s)
      *    may need.
      * Returns
-     * - Promise<undefined> - A promise which resolves to undefined if all Instances pass the createControl methods.
+     * - Promise<undefined> - A promise which resolves to undefined if all Instances pass the createPrivilege methods.
      * Throws
      * - NoommanArgumentError - If instance is not an Instance of this ClassModel.
-     * - NoommanSaveError - If any createControl method returns false for the given Instance.
+     * - NoommanSaveError - If any createPrivilege method returns false for the given Instance.
      */
-    async createControlCheckInstance(instance, createControlMethodParameters) {
+    async createPrivilegeCheckInstance(instance, createPrivilegeMethodParameter) {
         const instanceSet = new InstanceSet(instance.classModel, [instance]);
-        return this.createControlCheck(instanceSet, createControlMethodParameters);
+        return this.createPrivilegeCheck(instanceSet, createPrivilegeMethodParameter);
     }
 
     /*
-     * readControlFilter(instanceSet, readControlMethodParameters)
-     * Runs applicable readControl methods for each Instance in the given InstanceSet, and filters out any
-     *    Instances for which any readControl method returns false.
+     * readPrivilegeFilter(instanceSet, readPrivilegeMethodParameter)
+     * Runs applicable readPrivilege methods for each Instance in the given InstanceSet, and filters out any
+     *    Instances for which any readPrivilege method returns false.
      * Parameters
-     * - instanceSet - InstanceSet - An InstanceSet of this ClassModel to evaluate readControl methods on.
-     * - readControlMethodParameters - Object - An object containing any parameters that the readControl method(s)
+     * - instanceSet - InstanceSet - An InstanceSet of this ClassModel to evaluate readPrivilege methods on.
+     * - readPrivilegeMethodParameter - Object - An object containing any parameters that the readPrivilege method(s)
      *    may need.
      * Returns
-     * - Promise<InstanceSet> - An InstanceSet containing those Instances for which all readControl methods return true.
+     * - Promise<InstanceSet> - An InstanceSet containing those Instances for which all readPrivilege methods return true.
      * Throws
      * - NoommanArgumentError - If instanceSet parameter is not an InstanceSet.
      */
-    async readControlFilter(instanceSet, readControlMethodParameters) {
+    async readPrivilegeFilter(instanceSet, readPrivilegeMethodParameter) {
         if (!(instanceSet instanceof InstanceSet))
-            throw new NoommanErrors.NoommanArgumentError('Incorrect parameters. ' + this.className + '.readControlFilter(InstanceSet instanceSet, readControlMethodParameters)');
+            throw new NoommanErrors.NoommanArgumentError('Incorrect parameters. ' + this.className + '.readPrivilegeFilter(InstanceSet instanceSet, readPrivilegeMethodParameter)');
         
-        // If InstanceSet is empty or not read controlled, just return a copy of it.
-        if (!instanceSet.size || this.readControlMethods.length === 0)
+        // If InstanceSet is empty or ClassModel does not have read privileges set, just return a copy of it.
+        if (!instanceSet.size || this.readPrivilegeMethods.length === 0)
             return new InstanceSet(this, instanceSet);
 
-        const rejectedInstances = await this.evaluateCrudControlMethods(instanceSet, 'readControlMethods', readControlMethodParameters);
+        const rejectedInstances = await this.evaluateCrudControlMethods(instanceSet, 'readPrivilegeMethods', readPrivilegeMethodParameter);
 
         return instanceSet.difference(rejectedInstances);
     }
 
     /*
-     * readControlFilterInstance(instance, readControlMethodParameters)
-     * Runs applicable readControl methods for the given Instance. If each readControl method returns true for 
+     * readPrivilegeFilterInstance(instance, readPrivilegeMethodParameter)
+     * Runs applicable readPrivilege methods for the given Instance. If each readPrivilege method returns true for 
      *    the Instance, then the Instance is returned, otherwise null is returned.
      * Parameters
-     * - instance - Instance - An Instance of this ClassModel to evaluate readControl methods on.
-     * - readControlMethodParameters - Object - An object containing any parameters that the readControl method(s)
+     * - instance - Instance - An Instance of this ClassModel to evaluate readPrivilege methods on.
+     * - readPrivilegeMethodParameter - Object - An object containing any parameters that the readPrivilege method(s)
      *    may need.
      * Returns
-     * - Promise<Instance> - The given Instance if all readControl methods return true, otherwise null.
+     * - Promise<Instance> - The given Instance if all readPrivilege methods return true, otherwise null.
      * Throws
      * - NoommanArgumentError - If instance is not an Instance of this ClassModel.
      */
-    async readControlFilterInstance(instance, readControlMethodParameters) {
+    async readPrivilegeFilterInstance(instance, readPrivilegeMethodParameter) {
         const instanceSet = new InstanceSet(this, [instance]);
-        const filteredInstanceSet = await this.readControlFilter(instanceSet, readControlMethodParameters);
+        const filteredInstanceSet = await this.readPrivilegeFilter(instanceSet, readPrivilegeMethodParameter);
         return filteredInstanceSet.isEmpty() ? null : [...instanceSet][0];
     }
 
     /*
-     * updateControlCheck(instanceSet, updateControlMethodParameters)
-     * Runs applicable updateControl methods for each Instance in the given InstanceSet, throws an error 
-     *    if any updateControl method returns false for any Instance.
+     * updatePrivilegeCheck(instanceSet, updatePrivilegeMethodParameter)
+     * Runs applicable updatePrivilege methods for each Instance in the given InstanceSet, throws an error 
+     *    if any updatePrivilege method returns false for any Instance.
      * Parameters
-     * - instanceSet - InstanceSet - An InstanceSet of this ClassModel to evaluate updateControl methods on.
-     * - updateControlMethodParameters - Object - An object containing any parameters that the updateControl method(s)
+     * - instanceSet - InstanceSet - An InstanceSet of this ClassModel to evaluate updatePrivilege methods on.
+     * - updatePrivilegeMethodParameter - Object - An object containing any parameters that the updatePrivilege method(s)
      *    may need.
      * Returns
-     * - Promise<undefined> - A promise which resolves to undefined if all Instances pass the updateControl methods.
+     * - Promise<undefined> - A promise which resolves to undefined if all Instances pass the updatePrivilege methods.
      * Throws
      * - NoommanArgumentError - If instanceSet parameter is not an InstanceSet.
-     * - NoommanSaveError - If any updateControl method returns false for any of the Instances in the InstanceSet.
+     * - NoommanSaveError - If any updatePrivilege method returns false for any of the Instances in the InstanceSet.
      */
-    async updateControlCheck(instanceSet, updateControlMethodParameters) {
+    async updatePrivilegeCheck(instanceSet, updatePrivilegeMethodParameter) {
         if (!(instanceSet instanceof InstanceSet))
-            throw new NoommanErrors.NoommanArgumentError('Incorrect parameters. ' + this.className + '.updateControlCheck(InstanceSet instanceSet, updateControlMethodParameters)');
+            throw new NoommanErrors.NoommanArgumentError('Incorrect parameters. ' + this.className + '.updatePrivilegeCheck(InstanceSet instanceSet, updatePrivilegeMethodParameter)');
 
-        if (instanceSet.isEmpty() || !this.updateControlMethods.length)
+        if (instanceSet.isEmpty() || !this.updatePrivilegeMethods.length)
             return;
 
-        const rejectedInstances = await this.evaluateCrudControlMethods(instanceSet, 'updateControlMethods', updateControlMethodParameters);
+        const rejectedInstances = await this.evaluateCrudControlMethods(instanceSet, 'updatePrivilegeMethods', updatePrivilegeMethodParameter);
 
         if (!rejectedInstances.isEmpty())
             throw new NoommanErrors.NoommanSaveError('Illegal attempt to update instances: ' + rejectedInstances.getInstanceIds());
     }
 
     /*
-     * updateControlCheckInstance(instance, updateControlMethodParameters)
-     * Runs applicable updateControl methods for the given Instance, throws an error 
-     *    if any updateControl method returns false for the Instance.
+     * updatePrivilegeCheckInstance(instance, updatePrivilegeMethodParameter)
+     * Runs applicable updatePrivilege methods for the given Instance, throws an error 
+     *    if any updatePrivilege method returns false for the Instance.
      * Parameters
-     * - instance - Instance - An Instance of this ClassModel to evaluate updateControl methods on.
-     * - updateControlMethodParameters - Object - An object containing any parameters that the updateControl method(s)
+     * - instance - Instance - An Instance of this ClassModel to evaluate updatePrivilege methods on.
+     * - updatePrivilegeMethodParameter - Object - An object containing any parameters that the updatePrivilege method(s)
      *    may need.
      * Returns
-     * - Promise<undefined> - A promise which resolves to undefined if the Instance passes the updateControl methods.
+     * - Promise<undefined> - A promise which resolves to undefined if the Instance passes the updatePrivilege methods.
      * Throws
      * - NoommanArgumentError - If instance is not an Instance of this ClassModel.
-     * - NoommanSaveError - If any updateControl method returns false for the given Instance.
+     * - NoommanSaveError - If any updatePrivilege method returns false for the given Instance.
      */
-    async updateControlCheckInstance(instance, updateControlMethodParameters) {
+    async updatePrivilegeCheckInstance(instance, updatePrivilegeMethodParameter) {
         const instanceSet = new InstanceSet(instance.classModel, [instance]);
-        return this.updateControlCheck(instanceSet, updateControlMethodParameters);
+        return this.updatePrivilegeCheck(instanceSet, updatePrivilegeMethodParameter);
     }
 
     /*
-     * deleteControlCheck(instanceSet, deleteControlMethodParameters)
-     * Runs applicable deleteControl methods for each Instance in the given InstanceSet, throws an error 
-     *    if any deleteControl method returns false for any Instance.
+     * deletePrivilegeCheck(instanceSet, deletePrivilegeMethodParameter)
+     * Runs applicable deletePrivilege methods for each Instance in the given InstanceSet, throws an error 
+     *    if any deletePrivilege method returns false for any Instance.
      * Parameters
-     * - instanceSet - InstanceSet - An InstanceSet of this ClassModel to evaluate deleteControl methods on.
-     * - deleteControlMethodParameters - Object - An object containing any parameters that the deleteControl method(s)
+     * - instanceSet - InstanceSet - An InstanceSet of this ClassModel to evaluate deletePrivilege methods on.
+     * - deletePrivilegeMethodParameter - Object - An object containing any parameters that the deletePrivilege method(s)
      *    may need.
      * Returns
-     * - Promise<undefined> - A promise which resolves to undefined if all Instances pass the deleteControl methods.
+     * - Promise<undefined> - A promise which resolves to undefined if all Instances pass the deletePrivilege methods.
      * Throws
      * - NoommanArgumentError - If instanceSet parameter is not an InstanceSet.
-     * - NoommanDeleteError - If any deleteControl method returns false for any of the Instances in the InstanceSet.
+     * - NoommanDeleteError - If any deletePrivilege method returns false for any of the Instances in the InstanceSet.
      */
-    async deleteControlCheck(instanceSet, deleteControlMethodParameters) {
+    async deletePrivilegeCheck(instanceSet, deletePrivilegeMethodParameter) {
         if (!(instanceSet instanceof InstanceSet))
-            throw new NoommanErrors.NoommanArgumentError('Incorrect parameters. ' + this.className + '.deleteControlCheck(InstanceSet instanceSet, deleteControlMethodParameters)');
+            throw new NoommanErrors.NoommanArgumentError('Incorrect parameters. ' + this.className + '.deletePrivilegeCheck(InstanceSet instanceSet, deletePrivilegeMethodParameter)');
 
-        if (instanceSet.isEmpty() || !this.deleteControlMethods.length)
+        if (instanceSet.isEmpty() || !this.deletePrivilegeMethods.length)
             return;
 
-        const rejectedInstances = await this.evaluateCrudControlMethods(instanceSet, 'deleteControlMethods', deleteControlMethodParameters);
+        const rejectedInstances = await this.evaluateCrudControlMethods(instanceSet, 'deletePrivilegeMethods', deletePrivilegeMethodParameter);
 
         if (!rejectedInstances.isEmpty())
             throw new NoommanErrors.NoommanDeleteError('Illegal attempt to delete instances: ' + rejectedInstances.getInstanceIds());
     }
 
     /*
-     * deleteControlCheckInstance(instance, deleteControlMethodParameters)
-     * Runs applicable deleteControl methods for the given Instance, throws an error 
-     *    if any deleteControl method returns false for the Instance.
+     * deletePrivilegeCheckInstance(instance, deletePrivilegeMethodParameter)
+     * Runs applicable deletePrivilege methods for the given Instance, throws an error 
+     *    if any deletePrivilege method returns false for the Instance.
      * Parameters
-     * - instance - Instance - An Instance of this ClassModel to evaluate deleteControl methods on.
-     * - deleteControlMethodParameters - Object - An object containing any parameters that the deleteControl method(s)
+     * - instance - Instance - An Instance of this ClassModel to evaluate deletePrivilege methods on.
+     * - deletePrivilegeMethodParameter - Object - An object containing any parameters that the deletePrivilege method(s)
      *    may need.
      * Returns
-     * - Promise<undefined> - A promise which resolves to undefined if the Instance passes the deleteControl methods.
+     * - Promise<undefined> - A promise which resolves to undefined if the Instance passes the deletePrivilege methods.
      * Throws
      * - NoommanArgumentError - If instance is not an Instance of this ClassModel.
-     * - NoommanDeleteError - If any deleteControl method returns false for the given Instance.
+     * - NoommanDeleteError - If any deletePrivilege method returns false for the given Instance.
      */
-    async deleteControlCheckInstance(instance, deleteControlMethodParameters) {
+    async deletePrivilegeCheckInstance(instance, deletePrivilegeMethodParameter) {
         const instanceSet = new InstanceSet(instance.classModel, [instance]);
-        return this.deleteControlCheck(instanceSet, deleteControlMethodParameters);
+        return this.deletePrivilegeCheck(instanceSet, deletePrivilegeMethodParameter);
     }
 
     /*
-     * sensitiveControlFilter(instanceSet, sensitiveControlMethodParameters)
-     * Runs applicable sensitiveControl methods for each Instance in the given InstanceSet, and returns those for which
-     *    at least one sensitiveControl method fails.
+     * sensitivePrivilegeFilter(instanceSet, sensitivePrivilegeMethodParameter)
+     * Runs applicable sensitivePrivilege methods for each Instance in the given InstanceSet, and returns those for which
+     *    at least one sensitivePrivilege method fails.
      * Parameters
-     * - instanceSet - InstanceSet - An InstanceSet of this ClassModel to evaluate sensitiveControl methods on.
-     * - sensitiveControlMethodParameters - Object - An object containing any parameters that the sensitiveControl method(s)
+     * - instanceSet - InstanceSet - An InstanceSet of this ClassModel to evaluate sensitivePrivilege methods on.
+     * - sensitivePrivilegeMethodParameter - Object - An object containing any parameters that the sensitivePrivilege method(s)
      *    may need.
      * Returns
-     * - Promise<InstanceSet> - An InstanceSet containing those Instances for which any sensitiveControl method returns false.
+     * - Promise<InstanceSet> - An InstanceSet containing those Instances for which any sensitivePrivilege method returns false.
      * Throws
      * - NoommanArgumentError - If instanceSet parameter is not an InstanceSet.
      */
-    async sensitiveControlFilter(instanceSet, sensitiveControlMethodParameters) {
+    async sensitivePrivilegeFilter(instanceSet, sensitivePrivilegeMethodParameter) {
         if (!(instanceSet instanceof InstanceSet))
-            throw new NoommanErrors.NoommanArgumentError('Incorrect parameters. ' + this.className + '.sensitiveControlFilter(InstanceSet instanceSet, sensitiveControlMethodParameters)');
+            throw new NoommanErrors.NoommanArgumentError('Incorrect parameters. ' + this.className + '.sensitivePrivilegeFilter(InstanceSet instanceSet, sensitivePrivilegeMethodParameter)');
         
-        // If InstanceSet is empty or not sensitive controlled, just return a copy of it.
-        if (!instanceSet.size || this.sensitiveControlMethods.length === 0)
+        // If InstanceSet is empty does not have sensitive privileges set, just return a copy of it.
+        if (!instanceSet.size || this.sensitivePrivilegeMethods.length === 0)
             return new InstanceSet(this, instanceSet);
 
-        const rejectedInstances = await this.evaluateCrudControlMethods(instanceSet, 'sensitiveControlMethods', sensitiveControlMethodParameters);
+        const rejectedInstances = await this.evaluateCrudControlMethods(instanceSet, 'sensitivePrivilegeMethods', sensitivePrivilegeMethodParameter);
 
         return rejectedInstances;
     }
 
     /*
-     * sensitiveControlFilterInstance(instance, sensitiveControlMethodParameters)
-     * Runs applicable sensitiveControl methods for the given Instance, and returns the instance if 
-     *    any sensitiveControl method returns false. Returns null otherwise.
+     * sensitivePrivilegeFilterInstance(instance, sensitivePrivilegeMethodParameter)
+     * Runs applicable sensitivePrivilege methods for the given Instance, and returns the instance if 
+     *    any sensitivePrivilege method returns false. Returns null otherwise.
      * Parameters
-     * - instance - Instance - An Instance of this ClassModel to evaluate sensitiveControl methods on.
-     * - sensitiveControlMethodParameters - Object - An object containing any parameters that the sensitiveControl method(s)
+     * - instance - Instance - An Instance of this ClassModel to evaluate sensitivePrivilege methods on.
+     * - sensitivePrivilegeMethodParameter - Object - An object containing any parameters that the sensitivePrivilege method(s)
      *    may need.
      * Returns
-     * - Promise<Instance> - The given Instance if any sensitiveControl method returns false, otherwise null.
+     * - Promise<Instance> - The given Instance if any sensitivePrivilege method returns false, otherwise null.
      * Throws
      * - NoommanArgumentError - If instance is not an Instance of this ClassModel.
      */
-    async sensitiveControlFilterInstance(instance, sensitiveControlMethodParameters) {
+    async sensitivePrivilegeFilterInstance(instance, sensitivePrivilegeMethodParameter) {
         const instanceSet = new InstanceSet(this, [instance]);
-        const rejectedInstances = await this.sensitiveControlFilter(instanceSet, sensitiveControlMethodParameters);
+        const rejectedInstances = await this.sensitivePrivilegeFilter(instanceSet, sensitivePrivilegeMethodParameter);
         return rejectedInstances.size > 0 ? instance : null;
     }
 
