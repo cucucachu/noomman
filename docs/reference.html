@@ -62,7 +62,7 @@
                         <li><a href="#classmodel_schema">Class Model Schema</a></li>
                         <li><a href="#attribute_schema">Attributes</a></li>
                         <li><a href="#relationship_schema">Relationships</a></li>
-                        <li><a href="#crud_schema">CRUD Control Functions</a></li>
+                        <li><a href="#crud_schema">Privilege Functions</a></li>
                         <li><a href="#validation_schema">Validations</a></li>
                     </ul>
                 </li>
@@ -158,12 +158,12 @@
             required: true,
         },
     ],
-    crudControls: {
-        createControl: undefined,
-        readControl: requesterIsLoggedInAsThisAccount,
-        updateControl: requesterIsLoggedInAsThisAccount,
-        deleteControl: requesterIsLoggedInAsThisAccount,
-        sensitiveControl: requesterIsLoggedInAsThisAccount,
+    privileges: {
+        create: undefined,
+        read: requesterIsLoggedInAsThisAccount,
+        update: requesterIsLoggedInAsThisAccount,
+        delete: requesterIsLoggedInAsThisAccount,
+        sensitive: requesterIsLoggedInAsThisAccount,
     },
     validations: [
         emailIsValid,
@@ -253,11 +253,11 @@
     
                 <div class="row">
                     <div class="two columns">
-                        <strong>crudControls</strong>
+                        <strong>privileges</strong>
                     </div>
                     <div class="ten columns">
-                        An object which can have up to five properties: createControl, readControl, updateControl, 
-                        deleteControl, and sensitiveControl. Set each of these properties to an asynchonous function 
+                        An object which can have up to five properties: create, read, update, 
+                        delete, and sensitive. Set each of these properties to an asynchonous function 
                         which will resolve if the particular operation is allowed on a given instance of this ClassModel,
                         and throw an error otherwise. If any of these properties is left undefined, it is equivalent to 
                         setting the property to a function which returns a promise which immediately resolves to true.
@@ -399,8 +399,8 @@
                     <div class="eight columns">
                         <p>
                             A boolean which indicates that this attribute is 'sensitive'. Sensitive attributes will be stripped
-                            out when the instance is returned by a query, unless the sensitiveControl function defined in the 
-                            crudControls object on the schema returns a promise resolving to true. You can use this funtionallity
+                            out when the instance is returned by a query, unless the sensitive function defined in the 
+                            privileges object on the schema returns a promise resolving to true. You can use this funtionallity
                             as added protection for sensitive information such as social security numbers and other personally
                             identifiable information. If false or undefined, the attribute is not considered sensitive.
                         </p>
@@ -547,13 +547,13 @@
             <div id="crud_schema">
                 <div class="row">
                     <div class = "twelve columns">
-                        <h5><strong>CRUD Controls</strong></h5>
+                        <h5><strong>Privileges</strong></h5>
                     </div>
                 </div>
                 <div class="row">
                     <div class="twelve columns">
                         <p>
-                            The crudControls object allows you to specify functions which will be called before 
+                            The privileges object allows you to specify functions which will be called before 
                             attempting a CRUD operation. These functions are expected to either resolve or 
                             throw an error. If the function throws an error, the operation will not 
                             be allowed to continue. There are four properties to set, one for each CRUD operation,
@@ -563,7 +563,7 @@
                     </div>
                 </div>
                 <div class="row">
-                    <div class="two columns"><strong>createControl</strong></div>
+                    <div class="two columns"><strong>create</strong></div>
                     <div class="ten columns">
                         <p>
                             An asynchronus function which will be called whenever a new instance is saved (i.e.
@@ -574,7 +574,7 @@
                     </div>
                 </div>
                 <div class="row">
-                    <div class="two columns"><strong>readControl</strong></div>
+                    <div class="two columns"><strong>read</strong></div>
                     <div class="ten columns">
                         <p>
                             An asynchronus function which will be called for every instance returned by a query.
@@ -585,7 +585,7 @@
                     </div>
                 </div>
                 <div class="row">
-                    <div class="two columns"><strong>updateControl</strong></div>
+                    <div class="two columns"><strong>update</strong></div>
                     <div class="ten columns">
                         <p>
                             An asynchronus function which will be called whenever an existing instance is saved (i.e.
@@ -596,7 +596,7 @@
                     </div>
                 </div>
                 <div class="row">
-                    <div class="two columns"><strong>deleteControl</strong></div>
+                    <div class="two columns"><strong>delete</strong></div>
                     <div class="ten columns">
                         <p>
                             An asynchronus function which will be called whenever an instance is deleted. 
@@ -607,7 +607,7 @@
                     </div>
                 </div>
                 <div class="row">
-                    <div class="two columns"><strong>sensitiveControl</strong></div>
+                    <div class="two columns"><strong>sensitive</strong></div>
                     <div class="ten columns">
                         <p>
                             An asynchronus function which will be called for each instance whenever a query
@@ -669,7 +669,7 @@ const UserAccount = new ClassModel({
     relationships: [
         ...
     ],
-    crudControls: {
+    privileges: {
         ...
     },
     validations: [
@@ -688,9 +688,9 @@ module.exports = UserAccount;
 
             <div id="functions">
 
-                <h5><strong>Validation and CRUD Control functions.</strong></h5>
+                <h5><strong>Validation and Privilege Methods.</strong></h5>
                 <p>
-                    For strong encapsilation, write your validation and CRUD control functions
+                    For strong encapsilation, write your validation and privilege methods
                     directly below your Class Model, and reference them within the schema.
                 </p>
                 
@@ -707,8 +707,8 @@ const UserAccount = new ClassModel({
     relationships: [
         ...
     ],
-    crudControls: {
-        updateControl: requesterIsLoggedInAsThisAccount
+    privileges: {
+        update: requesterIsLoggedInAsThisAccount
     },
     validations: [
         emailIsValid,
@@ -1084,9 +1084,9 @@ const filteredUserAccounts = userAccounts.query({ userName: "coolUser1" });
                             are brand new instances. 
                             It also will run the correct validations for each instance in the Instance Set
                             before saving (including custom validations, required, mutex, and required group 
-                            validations and createControl and updateControl functions).
+                            validations and create and update functions).
                             All of the validations run before any instance is saved. If <strong>any</strong>
-                            of the instances fail any validation or CRUD control function, none of the instances 
+                            of the instances fail any validation or privilege function, none of the instances 
                             will be saved and an error will be thrown. 
                         </p>
     
@@ -1105,9 +1105,9 @@ await userAccounts.save();
             
                         <p>
                             InstanceSet has non-static method delete which will delete all of the
-                            instances in the InstanceSet. It will run the deleteControl function(s) for 
+                            instances in the InstanceSet. It will run the delete function(s) for 
                             each instance using the instances ClassModel. If an error is thrown for
-                            any instance by a deleteControl function, the error will be thrown by the
+                            any instance by a delete function, the error will be thrown by the
                             delete method and none of the instances will be deleted. 
                         </p>
     

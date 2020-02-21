@@ -69,7 +69,7 @@
                 <li><a href="#instanceAt">instanceAt()</a></li>
                 <li><a href="#isInstanceSetOf">isInstanceSetOf()</a></li>
                 <li><a href="#mapToInstanceSet">mapToInstanceSet()</a></li>
-                <li><a href="#readControlFilter">readControlFilter()</a></li>
+                <li><a href="#readPrivilegeFilter">readPrivilegeFilter()</a></li>
                 <li><a href="#remove">remove()</a></li>
                 <li><a href="#removeInstances">removeInstances()</a></li>
                 <li><a href="#save">save()</a></li>
@@ -239,7 +239,7 @@
             </div>
             
             <div class="docs-section" id="delete">
-                <h5>delete(deleteControlMethodParameters) </h5>
+                <h5>delete(deletePrivilegeMethodParameter) </h5>
                 <div>
                     <strong>Description</strong>
                     <p>
@@ -254,9 +254,9 @@
                         </thead>
                         <tbody>
                             <tr>
-                                <td>deleteControlMethodParameters</td>
+                                <td>deletePrivilegeMethodParameter</td>
                                 <td>Object</td>
-                                <td>An object containing any parameters needed by a deleteControl method.</td>
+                                <td>An object containing any parameters needed by a deletePrivilege method.</td>
                             </tr>
                         </tbody>
                     </table>
@@ -278,7 +278,7 @@
                             </tr>
                             <tr>
                                 <td>NoommanDeleteError</td>
-                                <td>If deleteControlCheck() throws a NoommanDeleteError.</td>
+                                <td>If deletePrivilegeCheck() throws a NoommanDeleteError.</td>
                             </tr>
                         </tbody>
                     </table>
@@ -756,13 +756,13 @@
                 </div>
             </div>
             
-            <div class="docs-section" id="readControlFilter">
-                <h5>readControlFilter(readControlMethodParameters)</h5>
+            <div class="docs-section" id="readPrivilegeFilter">
+                <h5>readPrivilegeFilter(readPrivilegeMethodParameter)</h5>
                 <div>
                     <strong>Description</strong>
                     <p>
-                        Runs applicable readControl methods for each Instance in this InstanceSet, and filters out any
-                        Instances for which any readControl method returns false. Returns a new InstanceSet, does not
+                        Runs applicable readPrivilege methods for each Instance in this InstanceSet, and filters out any
+                        Instances for which any readPrivilege method returns false. Returns a new InstanceSet, does not
                         update this InstanceSet.
                     </p>
                     <strong>Parameters</strong>
@@ -774,10 +774,10 @@
                         </thead>
                         <tbody>
                             <tr>
-                                <td>readControlMethodParameters</td>
+                                <td>readPrivilegeMethodParameter</td>
                                 <td>Object</td>
                                 <td>
-                                    An object containing any parameters that the readControl method(s)
+                                    An object containing any parameters that the readPrivilege method(s)
                                     may need.
                                 </td>
                             </tr>
@@ -785,7 +785,7 @@
                     </table>
                     <strong>Returns</strong>
                     <p>
-                        Promise&lt;InstanceSet&gt; - An InstanceSet containing those Instances for which all readControl methods return true.
+                        Promise&lt;InstanceSet&gt; - An InstanceSet containing those Instances for which all readPrivilege methods return true.
                     </p>
                 </div>
             </div>
@@ -859,7 +859,7 @@
             </div>
             
             <div class="docs-section" id="save">
-                <h5>save(createControlMethodParameters, updateControlMethodParameters)</h5>
+                <h5>save(createPrivilegeMethodParameter, updatePrivilegeMethodParameter)</h5>
                 <div>
                     <strong>Description</strong>
                     <p>
@@ -875,14 +875,14 @@
                         </thead>
                         <tbody>
                             <tr>
-                                <td>createControlMethodParameters</td>
+                                <td>createPrivilegeMethodParameter</td>
                                 <td>Object</td>
-                                <td>An object containing parameters needed by a createControl method.</td>
+                                <td>An object containing parameters needed by a createPrivilege method.</td>
                             </tr>
                             <tr>
-                                <td>updateControlMethodParameters</td>
+                                <td>updatePrivilegeMethodParameter</td>
                                 <td>Object</td>
-                                <td>An object containing parameters needed by a updateControl method.</td>
+                                <td>An object containing parameters needed by a updatePrivilege method.</td>
                             </tr>
                         </tbody>
                     </table>
@@ -904,11 +904,11 @@
                             </tr>
                             <tr>
                                 <td>NoommanSaveError</td>
-                                <td>If any unsaved Instance in this InstanceSet fails a createControl method.</td>
+                                <td>If any unsaved Instance in this InstanceSet fails a createPrivilege method.</td>
                             </tr>
                             <tr>
                                 <td>NoommanSaveError</td>
-                                <td>If any previously saved Instance in this InstanceSet fails a updateControl method.</td>
+                                <td>If any previously saved Instance in this InstanceSet fails a updatePrivilege method.</td>
                             </tr>
                             <tr>
                                 <td>NoommanSaveError</td>

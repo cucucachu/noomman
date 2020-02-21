@@ -59,7 +59,7 @@
             <li><a href="#equals">equals()</a></li>
             <li><a href="#isInstanceOf">isInstanceOf()</a></li>
             <li><a href="#propertyIsSet">propertyIsSet()</a></li>
-            <li><a href="#readControlFilter">readControlFilter()</a></li>
+            <li><a href="#readPrivilegeFilter">readPrivilegeFilter()</a></li>
             <li><a href="#save">save()</a></li>
             <li><a href="#saved">saved()</a></li>
             <li><a href="#saveWithoutValidation">saveWithoutValidation()</a></li>
@@ -169,7 +169,7 @@
             </div>
             
             <div class="docs-section" id="delete">
-                <h5>delete(deleteControlMethodParameters)</h5>
+                <h5>delete(deletePrivilegeMethodParameter)</h5>
                 <div>
                     <strong>Description</strong>
                     <p>
@@ -184,9 +184,9 @@
                         </thead>
                         <tbody>
                             <tr>
-                                <td>deleteControlMethodParameters</td>
+                                <td>deletePrivilegeMethodParameter</td>
                                 <td>Object</td>
-                                <td>An object containing any parameters needed by a deleteControl method.</td>
+                                <td>An object containing any parameters needed by a deletePrivilege method.</td>
                             </tr>
                         </tbody>
                     </table>
@@ -207,7 +207,7 @@
                             </tr>
                             <tr>
                                 <td>NoommanDeleteError</td>
-                                <td>If deleteControl method returns false for this Instance.</td>
+                                <td>If deletePrivilege method returns false for this Instance.</td>
                             </tr>
                         </tbody>
                     </table>
@@ -337,12 +337,12 @@
                 </div>
             </div>
             
-            <div class="docs-section" id="readControlFilter">
-                <h5>readControlFilter(readControlMethodParameters)</h5>
+            <div class="docs-section" id="readPrivilegeFilter">
+                <h5>readPrivilegeFilter(readPrivilegeMethodParameter)</h5>
                 <div>
                     <strong>Description</strong>
                     <p>
-                        Runs applicable readControl methods for this Instance. If each readControl method returns true for
+                        Runs applicable readPrivilege methods for this Instance. If each readPrivilege method returns true for
                         this Instance, then this Instance is returned, otherwise null is returned.
                     </p>
                     <strong>Parameters</strong>
@@ -354,10 +354,10 @@
                         </thead>
                         <tbody>
                             <tr>
-                                <td>readControlMethodParameters</td>
+                                <td>readPrivilegeMethodParameter</td>
                                 <td>Object</td>
                                 <td>
-                                    An object containing any parameters that the readControl method(s)
+                                    An object containing any parameters that the readPrivilege method(s)
                                     may need.
                                 </td>
                             </tr>
@@ -365,13 +365,13 @@
                     </table>
                     <strong>Returns</strong>
                     <p>
-                        Promise&lt;Instance&gt; - This Instance if all readControl methods return true, otherwise null.
+                        Promise&lt;Instance&gt; - This Instance if all readPrivilege methods return true, otherwise null.
                     </p>
                 </div>
             </div>
             
             <div class="docs-section" id="save">
-                <h5>save(createControlMethodParameters, updateControlMethodParameters)</h5>
+                <h5>save(createPrivilegeMethodParameter, updatePrivilegeMethodParameter)</h5>
                 <div>
                     <strong>Description</strong>
                     <p>
@@ -398,7 +398,7 @@
                             </tr>
                             <tr>
                                 <td>NoommanSaveError</td>
-                                <td>If Instance does not pass createControl or updateControl methods.</td>
+                                <td>If Instance does not pass createPrivilege or updatePrivilege methods.</td>
                             </tr>
                             <tr>
                                 <td>NoommanValidationError</td>
@@ -442,9 +442,9 @@
                     <strong>Description</strong>
                     <p>
                         Saves the current state of this Instance to the database in the proper collection according to its ClassModel.
-                        Does not do any validation or run crudControl functions, recommended not to be used outside internal 
+                        Does not do any validation or run crudPrivilege functions, recommended not to be used outside internal 
                         noomman methods. The purpose is for use in saving multiple instances at once, and any calling method is 
-                        expected to have already run validations and crudControl functions.
+                        expected to have already run validations and crudPrivilege functions.
                     </p>
                     <strong>Returns</strong>
                     <p>

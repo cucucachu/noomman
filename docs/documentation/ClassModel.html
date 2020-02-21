@@ -145,31 +145,31 @@
                             </tr>
                             <tr>
                                 <td>NoommanConstructorError</td>
-                                <td>If property createControl of property crudControls is not a Function.</td>
+                                <td>If property createPrivilege of property crudPrivileges is not a Function.</td>
                             </tr>
                             <tr>
                                 <td>NoommanConstructorError</td>
-                                <td>If property readControl of property crudControls is not a Function.</td>
+                                <td>If property readPrivilege of property crudPrivileges is not a Function.</td>
                             </tr>
                             <tr>
                                 <td>NoommanConstructorError</td>
-                                <td>If property updateControl of property crudControls is not a Function.</td>
+                                <td>If property updatePrivilege of property crudPrivileges is not a Function.</td>
                             </tr>
                             <tr>
                                 <td>NoommanConstructorError</td>
-                                <td>If property deleteControl of property crudControls is not a Function.</td>
+                                <td>If property deletePrivilege of property crudPrivileges is not a Function.</td>
                             </tr>
                             <tr>
                                 <td>NoommanConstructorError</td>
-                                <td>If property sensitiveControl of property crudControls is not a Function.</td>
+                                <td>If property sensitivePrivilege of property crudPrivileges is not a Function.</td>
                             </tr>
                             <tr>
                                 <td>NoommanConstructorError</td>
-                                <td>If ClassModel has a sensitive attribute but no sensitiveControl method.</td>
+                                <td>If ClassModel has a sensitive attribute but no sensitivePrivilege method.</td>
                             </tr>
                             <tr>
                                 <td>NoommanConstructorError</td>
-                                <td>If ClassModel has a sensitiveControl method but no sensitive attribute.</td>
+                                <td>If ClassModel has a sensitivePrivilege method but no sensitive attribute.</td>
                             </tr>
                             <tr>
                                 <td>NoommanConstructorError</td>
@@ -296,15 +296,15 @@
             </div>
             
             <div class="docs-section" id="find">
-                <h5>find(queryFilter, readControlMethodParameters, sensitiveControlMethodParameters)</h5>
+                <h5>find(queryFilter, readPrivilegeMethodParameter, sensitivePrivilegeMethodParameter)</h5>
                 <div>
                     <strong>Description</strong>
                     <p>
                         Finds Instances of this ClassModel using the given query filter in the database. 
                         If called on a super-ClassModel, will recursively check this ClassModel's collection, and then it's sub-ClassModels' collections.
-                        This method respects readControl and sensitiveControl methods. If this ClassModel is read controlled, Instances found
-                        during query will be filtered down to those which pass the readControl method(s) for this ClassModel. If this ClassModel
-                        is sensitive controlled, all Instances which do not pass the sensitiveControl method(s) for this ClassModel will be
+                        This method respects readPrivilege and sensitivePrivilege methods. If this ClassModel has read privileges set, Instances found
+                        during query will be filtered down to those which pass the readPrivilege method(s) for this ClassModel. If this ClassModel
+                        has sensitive privileges set, all Instances which do not pass the sensitivePrivilege method(s) for this ClassModel will be
                         stripped of any sensitive attributes.
                     </p>
                     <strong>Parameters</strong>
@@ -321,18 +321,18 @@
                                 <td>A mongo query object (required).</td>
                             </tr>
                             <tr>
-                                <td>readControlMethodParameters</td>
+                                <td>readPrivilegeMethodParameter</td>
                                 <td>Object</td>
                                 <td>
-                                    An object containing parameters that will be passed to the readControl method(s)
+                                    An object containing parameters that will be passed to the readPrivilege method(s)
                                     for this ClassModel.
                                 </td>
                             </tr>
                             <tr>
-                                <td>sensitiveControlMethodParameters</td>
+                                <td>sensitivePrivilegeMethodParameter</td>
                                 <td>Object</td>
                                 <td>
-                                    An object containing parameters that will be passed to the sensitiveControl
+                                    An object containing parameters that will be passed to the sensitivePrivilege
                                     method(s) for this ClassModel.
                                 </td>
                             </tr>
@@ -341,21 +341,21 @@
                     <strong>Returns</strong>
                     <p>
                         Promise&lt;InstanceSet&gt; - An InstanceSet of this ClassModel containing all instances of this ClassModel or its children
-                        which match the given query and pass the readControl methods if applicable.
+                        which match the given query and pass the readPrivilege methods if applicable.
                     </p>
                 </div>
             </div>
             
             <div class="docs-section" id="findById">
-                <h5>findById(id, readControlMethodParameters, sensitiveControlMethodParameters)</h5>
+                <h5>findById(id, readPrivilegeMethodParameter, sensitivePrivilegeMethodParameter)</h5>
                 <div>
                     <strong>Description</strong>
                     <p>
                         Finds a single instance of this ClassModel with the given id.
                         If called on a superclass, will recursively check this ClassModel's collection, and then it's sub-ClassModels collections.
-                        This method respects readControl and sensitiveControl methods. If this ClassModel is read controlled, the Instance found
-                        during query will not be returned if it does not pass the readControl method(s) for this ClassModel. If this ClassModel
-                        is sensitive controlled, an instance which does not pass the sensitiveControl method(s) for this ClassModel will be
+                        This method respects readPrivilege and sensitivePrivilege methods. If this ClassModel has read privileges set, the Instance found
+                        during query will not be returned if it does not pass the readPrivilege method(s) for this ClassModel. If this ClassModel
+                        has sensitive privileges set, an instance which does not pass the sensitivePrivilege method(s) for this ClassModel will be
                         stripped of any sensitive attributes.
                     </p>
                     <strong>Parameters</strong>
@@ -372,18 +372,18 @@
                                 <td>A mongo ObjectId (or hex string representation thereof) of the Instance you which to find.</td>
                             </tr>
                             <tr>
-                                <td>readControlMethodParameters</td>
+                                <td>readPrivilegeMethodParameter</td>
                                 <td>Object</td>
                                 <td>
-                                    An object containing parameters that will be passed to the readControl method(s)
+                                    An object containing parameters that will be passed to the readPrivilege method(s)
                                     for this ClassModel.
                                 </td>
                             </tr>
                             <tr>
-                                <td>sensitiveControlMethodParameters</td>
+                                <td>sensitivePrivilegeMethodParameter</td>
                                 <td>Object</td>
                                 <td>
-                                    An object containing parameters that will be passed to the sensitiveControl
+                                    An object containing parameters that will be passed to the sensitivePrivilege
                                     method(s) for this ClassModel.
                                 </td>
                             </tr>
@@ -392,8 +392,8 @@
                     <strong>Returns</strong>
                     <p>
                         Promise&lt;Instance&gt; - The first Instance of this ClassModel or its children
-                        which has the given id and passes the readControl methods if applicable. Returns null if no Instance with the given id is 
-                        found, or if matching instance does not pass readControl method (if applicable).
+                        which has the given id and passes the readPrivilege methods if applicable. Returns null if no Instance with the given id is 
+                        found, or if matching instance does not pass readPrivilege method (if applicable).
                     </p>
                     <strong>Throws</strong>
                     <table>
@@ -414,15 +414,15 @@
             </div>
             
             <div class="docs-section" id="findOne">
-                <h5>findOne(queryFilter, readControlMethodParameters, sensitiveControlMethodParameters)</h5>
+                <h5>findOne(queryFilter, readPrivilegeMethodParameter, sensitivePrivilegeMethodParameter)</h5>
                 <div>
                     <strong>Description</strong>
                     <p>
                         Finds a single Instance of this ClassModel using the given query filter in the database. 
                         If called on a super-ClassModel, will recursively check this ClassModel's collection, and then it's sub-ClassModels collections.
-                        This method respects readControl and sensitiveControl methods. If this ClassModel is read controlled, the Instance found
-                        during query will not be returned if it does not pass the readControl method(s) for this ClassModel. If this ClassModel
-                        is sensitive controlled, an Instance which does not pass the sensitiveControl method(s) for this ClassModel will be 
+                        This method respects readPrivilege and sensitivePrivilege methods. If this ClassModel has read privileges set, the Instance found
+                        during query will not be returned if it does not pass the readPrivilege method(s) for this ClassModel. If this ClassModel
+                        has sensitive privileges set, an Instance which does not pass the sensitivePrivilege method(s) for this ClassModel will be 
                         stripped of any sensitive attributes.
                     </p>
                     <strong>Parameters</strong>
@@ -439,18 +439,18 @@
                                 <td>A mongo query object (required).</td>
                             </tr>
                             <tr>
-                                <td>readControlMethodParameters</td>
+                                <td>readPrivilegeMethodParameter</td>
                                 <td>Object</td>
                                 <td>
-                                    An object containing parameters that will be passed to the readControl method(s)
+                                    An object containing parameters that will be passed to the readPrivilege method(s)
                                     for this ClassModel.
                                 </td>
                             </tr>
                             <tr>
-                                <td>sensitiveControlMethodParameters</td>
+                                <td>sensitivePrivilegeMethodParameter</td>
                                 <td>Object</td>
                                 <td>
-                                    An object containing parameters that will be passed to the sensitiveControlMethodParameters
+                                    An object containing parameters that will be passed to the sensitivePrivilegeMethodParameter
                                     method(s) for this ClassModel.
                                 </td>
                             </tr>
@@ -459,8 +459,8 @@
                     <strong>Returns</strong>
                     <p>
                         Promise&lt;Instance&gt; - The first Instance of this ClassModel or its children which matches the given query and passes the
-                        readControl methods if applicable. Returns null if no Instance matches query or if matching Instance does not pass 
-                        readControl method if applicable.
+                        readPrivilege methods if applicable. Returns null if no Instance matches query or if matching Instance does not pass 
+                        readPrivilege method if applicable.
                     </p>
                 </div>
             </div>
@@ -484,7 +484,7 @@
                     <p>
                         Finds instances of this ClassModel using the given query filter in the database.
                         If called on a super-ClassModel, will recursively check this ClassModel's collection, and then it's sub-ClassModels collections.
-                        This method DOES NOT do any readControl or sensitiveControl filtering. 
+                        This method DOES NOT do any readPrivilege or sensitivePrivilege filtering. 
                     </p>
                     <strong>Parameters</strong>
                     <table>
@@ -531,7 +531,7 @@
                     <p>
                         Finds a single instance of this ClassModel with the given id.
                         If called on a superclass, will recursively check this ClassModel's collection, and then it's sub-ClassModels collections.
-                        This method does not respect readControl and sensitiveControl methods. 
+                        This method does not respect readPrivilege and sensitivePrivilege methods. 
                     </p>
                     <strong>Parameters</strong>
                     <table>
@@ -562,7 +562,7 @@
                     <p>
                         Finds a single instance of this ClassModel using the given query filter in the database. 
                         If called on a superclass, will recursively check this ClassModel's collection, and then it's sub-ClassModels collections.
-                        This method does not respect readControl and sensitiveControl methods. 
+                        This method does not respect readPrivilege and sensitivePrivilege methods. 
                     </p>
                     <strong>Parameters</strong>
                     <table>
@@ -647,12 +647,12 @@
             requiredGroup: String,
         }
     ],
-    crudFunctions: {
-        createControl: Function,
-        readControl: Function,
-        updateControl: Function,
-        deleteControl: Function,
-        sensitiveControl: Function,
+    privileges: {
+        create: Function,
+        read: Function,
+        update: Function,
+        delete: Function,
+        sensitive: Function,
     },
     validations: [ Function ],
     indices: [ fieldOrSpec ], 
