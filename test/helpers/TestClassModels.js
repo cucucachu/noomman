@@ -827,10 +827,16 @@ const NoommanValidationError = NoommanErrors.NoommanValidationError;
 
     // CreatePrivileged Classes
     {
+        var UnPrivilegedSuperClass = new ClassModel({
+            className: 'UnPrivilegedSuperClass',
+        });
+
+
         // A class which is createPrivileged by another instance. If that instance has a boolean attribute 'allowed' set to 
         // true, then the instance of this class can be viewed. 
         var CreatePrivilegedSuperClass = new ClassModel({
             className: 'CreatePrivilegedSuperClass',
+            superClasses: [UnPrivilegedSuperClass],
             attributes: [
                 {
                     name: 'name',
@@ -939,6 +945,7 @@ const NoommanValidationError = NoommanErrors.NoommanValidationError;
         // true, then the instance of this class can be viewed. 
         var ReadPrivilegedSuperClass = new ClassModel({
             className: 'ReadPrivilegedSuperClass',
+            superClasses: [UnPrivilegedSuperClass],
             attributes: [
                 {
                     name: 'name',
@@ -1079,6 +1086,7 @@ const NoommanValidationError = NoommanErrors.NoommanValidationError;
         // true, then the instance of this class can be viewed. 
         var UpdatePrivilegedSuperClass = new ClassModel({
             className: 'UpdatePrivilegedSuperClass',
+            superClasses: [UnPrivilegedSuperClass],
             attributes: [
                 {
                     name: 'name',
@@ -1190,6 +1198,7 @@ const NoommanValidationError = NoommanErrors.NoommanValidationError;
         // true, then the instance of this class can be viewed. 
         var DeletePrivilegedSuperClass = new ClassModel({
             className: 'DeletePrivilegedSuperClass',
+            superClasses: [UnPrivilegedSuperClass],
             attributes: [
                 {
                     name: 'name',
@@ -1295,6 +1304,7 @@ const NoommanValidationError = NoommanErrors.NoommanValidationError;
         // true, then the instance of this class can be viewed. 
         var SensitivePrivilegedSuperClass = new ClassModel({
             className: 'SensitivePrivilegedSuperClass',
+            superClasses: [UnPrivilegedSuperClass],
             attributes: [
                 {
                     name: 'name',
@@ -1654,6 +1664,7 @@ module.exports = {
     TreeClass,
     ClassOwnsOtherClass,
     ClassOwnedByOtherClass,
+    UnPrivilegedSuperClass,
     CreatePrivilegedSuperClass, 
     CreatePrivilegedSubClassOfCreatePrivilegedSuperClass,
     CreatePrivilegedDiscriminatedSuperClass,

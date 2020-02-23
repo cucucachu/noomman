@@ -1597,26 +1597,60 @@ class ClassModel {
         return allRelatedInstances.saveWithoutRelatedUpdates();
     }
 
-    // Crud Control Methods
+    // Privilege Methods
 
     /*
-     * evaluateCrudControlMethods(instanceSet, privilegeMethods, methodParameter)
-     * Runs the crudControl methods determined by the privilegeMethods parameter for each Instance in the 
+     * needsPrivilegeCheck(instanceSet, privilegeMethods)
+     * Used to determine if we need to run a privilege check on the given InstanceSet for the 
+     *    given privilegeMethods.
+     * Parameters: 
+     * - instanceSet - InstanceSet - An InstanceSet of this ClassModel to evaluate whether we need to run Privilege methods on.
+     * - privilegeMethods - String - A string which determines which type of privilege methods to check for. Valid values
+     *    are 'readPrivilegeMethods', 'createPrivilegeMethods', 'updatePrivilegeMethods', 'deletePrivilegeMethods',
+     *    or 'sensitivePrivilegeMethods'.
+     * Returns
+     * - Boolean - True if there are Instances in the given InstanceSet that are for a ClassModel that has the given privilege 
+     *    methods set.
+     */
+    needsPrivilegeCheck(instanceSet, privilegeMethods) {
+
+        if (instanceSet.isEmpty()) {
+            return false;
+        }
+
+        if (this[privilegeMethods].length) {
+            return true;
+        }
+
+        for (const subClass of this.subClasses) {
+            const subClassInstances = instanceSet.filterForClassModel(subClass);
+
+            if (subClass.needsPrivilegeCheck(subClassInstances, privilegeMethods)) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    /*
+     * evaluatePrivilegeMethods(instanceSet, privilegeMethods, methodParameter)
+     * Runs the Privilege methods determined by the privilegeMethods parameter for each Instance in the 
      *    given InstanceSet that are applicable for each Instance's ClassModel, using the given methodParameter.
      *    Returns an InstanceSet of Instances which for which at least one privilegeMethod returns false.
      *    Internal use only.
      * Parameters
-     * - instanceSet - InstanceSet - An InstanceSet of this ClassModel to evaluate crudControl methods on.
+     * - instanceSet - InstanceSet - An InstanceSet of this ClassModel to evaluate Privilege methods on.
      * - privilegeMethods - String - A string which determines which type of privilege methods to run. Valid values
      *    are 'readPrivilegeMethods', 'createPrivilegeMethods', 'updatePrivilegeMethods', 'deletePrivilegeMethods',
      *    or 'sensitivePrivilegeMethods'.
-     * - methodParameter - Object - An object containing any parameters that a particular crudControl method
+     * - methodParameter - Object - An object containing any parameters that a particular Privilege method
      *    may need.
      * Returns
-     * - Promise<InstanceSet> - An InstanceSet containing all the instances for which at least one crudControl
+     * - Promise<InstanceSet> - An InstanceSet containing all the instances for which at least one Privilege
      *    method returns false.
      */
-    async evaluateCrudControlMethods(instanceSet, privilegeMethods, methodParameter) {
+    async evaluatePrivilegeMethods(instanceSet, privilegeMethods, methodParameter) {
         let rejectedInstances = new InstanceSet(this);
 
         const instancesOfThisClass = instanceSet.filterToInstanceSet(instance => {
@@ -1641,7 +1675,7 @@ class ClassModel {
                 let instancesOfSubClass = instanceSet.filterForClassModel(subClass);
 
                 if (!instancesOfSubClass.isEmpty()) {
-                    const rejectedSubClassInstances = await subClass.evaluateCrudControlMethods(instancesOfSubClass, privilegeMethods, methodParameter);
+                    const rejectedSubClassInstances = await subClass.evaluatePrivilegeMethods(instancesOfSubClass, privilegeMethods, methodParameter);
                     rejectedInstances.addFromIterable(rejectedSubClassInstances);
                 }
             }
@@ -1668,10 +1702,10 @@ class ClassModel {
         if (!(instanceSet instanceof InstanceSet))
             throw new NoommanErrors.NoommanArgumentError('Incorrect parameters. ' + this.className + '.createPrivilegeCheck(InstanceSet instanceSet, createPrivilegeMethodParameter)');
         
-        if (instanceSet.isEmpty() || !this.createPrivilegeMethods.length)
-            return;
+        if (!this.needsPrivilegeCheck(instanceSet, 'createPrivilegeMethods'))
+            return instanceSet;
 
-        const rejectedInstances = await this.evaluateCrudControlMethods(instanceSet, 'createPrivilegeMethods', createPrivilegeMethodParameter);
+        const rejectedInstances = await this.evaluatePrivilegeMethods(instanceSet, 'createPrivilegeMethods', createPrivilegeMethodParameter);
 
         if (!rejectedInstances.isEmpty())
             throw new NoommanErrors.NoommanSaveError('Illegal attempt to create instances: ' + rejectedInstances.getInstanceIds());
@@ -1714,11 +1748,10 @@ class ClassModel {
         if (!(instanceSet instanceof InstanceSet))
             throw new NoommanErrors.NoommanArgumentError('Incorrect parameters. ' + this.className + '.readPrivilegeFilter(InstanceSet instanceSet, readPrivilegeMethodParameter)');
         
-        // If InstanceSet is empty or ClassModel does not have read privileges set, just return a copy of it.
-        if (!instanceSet.size || this.readPrivilegeMethods.length === 0)
-            return new InstanceSet(this, instanceSet);
+        if (!this.needsPrivilegeCheck(instanceSet, 'readPrivilegeMethods'))
+            return instanceSet;
 
-        const rejectedInstances = await this.evaluateCrudControlMethods(instanceSet, 'readPrivilegeMethods', readPrivilegeMethodParameter);
+        const rejectedInstances = await this.evaluatePrivilegeMethods(instanceSet, 'readPrivilegeMethods', readPrivilegeMethodParameter);
 
         return instanceSet.difference(rejectedInstances);
     }
@@ -1759,11 +1792,11 @@ class ClassModel {
     async updatePrivilegeCheck(instanceSet, updatePrivilegeMethodParameter) {
         if (!(instanceSet instanceof InstanceSet))
             throw new NoommanErrors.NoommanArgumentError('Incorrect parameters. ' + this.className + '.updatePrivilegeCheck(InstanceSet instanceSet, updatePrivilegeMethodParameter)');
-
-        if (instanceSet.isEmpty() || !this.updatePrivilegeMethods.length)
+        
+        if (!this.needsPrivilegeCheck(instanceSet, 'updatePrivilegeMethods'))
             return;
 
-        const rejectedInstances = await this.evaluateCrudControlMethods(instanceSet, 'updatePrivilegeMethods', updatePrivilegeMethodParameter);
+        const rejectedInstances = await this.evaluatePrivilegeMethods(instanceSet, 'updatePrivilegeMethods', updatePrivilegeMethodParameter);
 
         if (!rejectedInstances.isEmpty())
             throw new NoommanErrors.NoommanSaveError('Illegal attempt to update instances: ' + rejectedInstances.getInstanceIds());
@@ -1805,11 +1838,11 @@ class ClassModel {
     async deletePrivilegeCheck(instanceSet, deletePrivilegeMethodParameter) {
         if (!(instanceSet instanceof InstanceSet))
             throw new NoommanErrors.NoommanArgumentError('Incorrect parameters. ' + this.className + '.deletePrivilegeCheck(InstanceSet instanceSet, deletePrivilegeMethodParameter)');
-
-        if (instanceSet.isEmpty() || !this.deletePrivilegeMethods.length)
+        
+        if (!this.needsPrivilegeCheck(instanceSet, 'deletePrivilegeMethods'))
             return;
 
-        const rejectedInstances = await this.evaluateCrudControlMethods(instanceSet, 'deletePrivilegeMethods', deletePrivilegeMethodParameter);
+        const rejectedInstances = await this.evaluatePrivilegeMethods(instanceSet, 'deletePrivilegeMethods', deletePrivilegeMethodParameter);
 
         if (!rejectedInstances.isEmpty())
             throw new NoommanErrors.NoommanDeleteError('Illegal attempt to delete instances: ' + rejectedInstances.getInstanceIds());
@@ -1851,11 +1884,10 @@ class ClassModel {
         if (!(instanceSet instanceof InstanceSet))
             throw new NoommanErrors.NoommanArgumentError('Incorrect parameters. ' + this.className + '.sensitivePrivilegeFilter(InstanceSet instanceSet, sensitivePrivilegeMethodParameter)');
         
-        // If InstanceSet is empty does not have sensitive privileges set, just return a copy of it.
-        if (!instanceSet.size || this.sensitivePrivilegeMethods.length === 0)
-            return new InstanceSet(this, instanceSet);
+        if (!this.needsPrivilegeCheck(instanceSet, 'sensitivePrivilegeMethods'))
+            return instanceSet;
 
-        const rejectedInstances = await this.evaluateCrudControlMethods(instanceSet, 'sensitivePrivilegeMethods', sensitivePrivilegeMethodParameter);
+        const rejectedInstances = await this.evaluatePrivilegeMethods(instanceSet, 'sensitivePrivilegeMethods', sensitivePrivilegeMethodParameter);
 
         return rejectedInstances;
     }

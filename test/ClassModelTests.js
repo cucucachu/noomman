@@ -52,6 +52,7 @@ const arraysEqual = TestingFunctions.arraysEqual;
     var TwoWayRelationshipClass2 = TestClassModels.TwoWayRelationshipClass2;
 
     // CreatePrivileged Classes
+    var UnPrivilegedSuperClass = TestClassModels.UnPrivilegedSuperClass
     var CreatePrivilegedSuperClass = TestClassModels.CreatePrivilegedSuperClass;
     var CreatePrivilegedSubClassOfCreatePrivilegedSuperClass = TestClassModels.CreatePrivilegedSubClassOfCreatePrivilegedSuperClass;
     var CreatePrivilegedDiscriminatedSuperClass = TestClassModels.CreatePrivilegedDiscriminatedSuperClass;
@@ -1155,9 +1156,7 @@ describe('Class Model Tests', () => {
                         const relatedInstance = new Instance(TwoWayRelationshipClass2);
 
                         instance[relationship] = relatedInstance;
-
                         await TwoWayRelationshipClass1.updateRelatedInstancesForInstance(instance);
-
                         const foundRelatedInstance = await TwoWayRelationshipClass2.findById(relatedInstance._id);
 
                         if (foundRelatedInstance === null) {
@@ -4113,13 +4112,18 @@ describe('Class Model Tests', () => {
 
     });
 
-    describe('CRUD Control Methods', () => {
+    describe('Privilege Methods', () => {
+
+        {
+            var instanceOfUnPrivilegedSuperClass = new Instance(UnPrivilegedSuperClass);
+        }
 
         describe('ClassModel.createPrivilegeCheck()', () => {
     
             // Set up createPrivileged Instances
             // For each class, create on instance which will pass all create control filters, and one each that will fail due to one of the create control methods
             {
+
                 // ClassPrivilegesCreatePrivilegedSuperClass Instances
                 var instanceOfClassPrivilegesCreatePrivilegedSuperClassAllowed = new Instance(ClassPrivilegesCreatePrivilegedSuperClass);
                 instanceOfClassPrivilegesCreatePrivilegedSuperClassAllowed.allowed = true;
@@ -4317,6 +4321,76 @@ describe('Class Model Tests', () => {
             });
     
             describe('Test Create Control Check throws error when an instance doesn\'t pass check.', () => {
+    
+                describe('UnPrivilegedSuperClass.createPrivilegeCheck()', () => {
+    
+                    it('Create Control Check called on Class with only direct instances of Class.', async () => {
+                        const instanceSet = new InstanceSet(UnPrivilegedSuperClass, [
+                            instanceOfUnPrivilegedSuperClass,
+                        ]);
+
+                        await UnPrivilegedSuperClass.createPrivilegeCheck(instanceSet);
+                    });
+    
+                    it('Create Control Check called on Class with instances of class and sub class.', async () => {
+                        const instanceSet = new InstanceSet(UnPrivilegedSuperClass, [
+                            instanceOfUnPrivilegedSuperClass,
+                            instanceOfCreatePrivilegedSuperClassPasses,
+                            instanceOfCreatePrivilegedSuperClassFailsRelationship,
+                            instanceOfCreatePrivilegedSubClassOfCreatePrivilegedSuperClassPasses,
+                            instanceOfCreatePrivilegedSubClassOfCreatePrivilegedSuperClassFailsBoolean,
+                            instanceOfCreatePrivilegedSubClassOfCreatePrivilegedSuperClassFailsRelationship
+                        ]);
+                        const instancesExpectedToFail = new InstanceSet(UnPrivilegedSuperClass, [
+                            instanceOfCreatePrivilegedSuperClassFailsRelationship,
+                            instanceOfCreatePrivilegedSubClassOfCreatePrivilegedSuperClassFailsBoolean,
+                            instanceOfCreatePrivilegedSubClassOfCreatePrivilegedSuperClassFailsRelationship
+                        ]);
+                        const expectedErrorMessage = 'Illegal attempt to create instances: ' + instancesExpectedToFail.getInstanceIds();
+    
+                        await testForErrorAsync('ClassModel.createPrivilegeCheck', expectedErrorMessage, async () => {
+                            return  UnPrivilegedSuperClass.createPrivilegeCheck(instanceSet);
+                        });
+                    });
+    
+                    it('Create Control Check called on Class with instances of class and 3 layers of sub classes.', async () => {
+                        const instanceSet = new InstanceSet(UnPrivilegedSuperClass, [
+                            instanceOfUnPrivilegedSuperClass,
+                            instanceOfCreatePrivilegedSuperClassPasses,
+                            instanceOfCreatePrivilegedSuperClassFailsRelationship,
+                            instanceOfCreatePrivilegedSubClassOfCreatePrivilegedSuperClassPasses,
+                            instanceOfCreatePrivilegedSubClassOfCreatePrivilegedSuperClassFailsBoolean,
+                            instanceOfCreatePrivilegedSubClassOfCreatePrivilegedSuperClassFailsRelationship,
+                            instanceOfCreatePrivilegedDiscriminatedSuperClassPasses,
+                            instanceOfCreatePrivilegedDiscriminatedSuperClassFailsString,
+                            instanceOfCreatePrivilegedDiscriminatedSuperClassFailsBoolean,
+                            instanceOfCreatePrivilegedDiscriminatedSuperClassFailsRelationship,
+                            instanceOfCreatePrivilegedSubClassOfCreatePrivilegedDiscriminatedSuperClassPasses,
+                            instanceOfCreatePrivilegedSubClassOfCreatePrivilegedDiscriminatedSuperClassFailsRelationship,
+                            instanceOfCreatePrivilegedSubClassOfCreatePrivilegedDiscriminatedSuperClassFailsString,
+                            instanceOfCreatePrivilegedSubClassOfCreatePrivilegedDiscriminatedSuperClassFailsBoolean,
+                            instanceOfCreatePrivilegedSubClassOfCreatePrivilegedDiscriminatedSuperClassFailsNumber
+                        ]);
+                        const instancesExpectedToFail = new InstanceSet(UnPrivilegedSuperClass, [
+                            instanceOfCreatePrivilegedSuperClassFailsRelationship,
+                            instanceOfCreatePrivilegedSubClassOfCreatePrivilegedSuperClassFailsBoolean,
+                            instanceOfCreatePrivilegedSubClassOfCreatePrivilegedSuperClassFailsRelationship,
+                            instanceOfCreatePrivilegedDiscriminatedSuperClassFailsString,
+                            instanceOfCreatePrivilegedDiscriminatedSuperClassFailsBoolean,
+                            instanceOfCreatePrivilegedDiscriminatedSuperClassFailsRelationship,
+                            instanceOfCreatePrivilegedSubClassOfCreatePrivilegedDiscriminatedSuperClassFailsRelationship,
+                            instanceOfCreatePrivilegedSubClassOfCreatePrivilegedDiscriminatedSuperClassFailsString,
+                            instanceOfCreatePrivilegedSubClassOfCreatePrivilegedDiscriminatedSuperClassFailsBoolean,
+                            instanceOfCreatePrivilegedSubClassOfCreatePrivilegedDiscriminatedSuperClassFailsNumber
+                        ]);
+                        const expectedErrorMessage = 'Illegal attempt to create instances: ' + instancesExpectedToFail.getInstanceIds();
+    
+                        await testForErrorAsync('ClassModel.createPrivilegeCheck', expectedErrorMessage, async () => {
+                            return  UnPrivilegedSuperClass.createPrivilegeCheck(instanceSet);
+                        });
+                    });
+    
+                });
     
                 describe('CreatePrivilegedSuperClass.createPrivilegeCheck()', () => {
     
@@ -4775,6 +4849,107 @@ describe('Class Model Tests', () => {
             });
     
             describe('Test filtering out instances that don\'t pass read control check.', () => {
+    
+                describe('UnPrivilegedSuperClass.readPrivilegeFilter()', () => {
+    
+                    it('Read Control Filter called on Class with only direct instances of Class.', async () => {
+                        const classModel = UnPrivilegedSuperClass;
+                        const instanceSet = new InstanceSet(classModel, [
+                            instanceOfUnPrivilegedSuperClass,
+                        ]);
+                        const expectedInstanceSet = new InstanceSet(classModel, [
+                            instanceOfUnPrivilegedSuperClass,
+                        ]);
+    
+                        const filteredInstanceSet = await classModel.readPrivilegeFilter(instanceSet);
+                        
+                        if (!expectedInstanceSet.equals(filteredInstanceSet))
+                            throw new Error('classModel.readPrivilegeFilter() did not return the expected InstanceSet.');
+                    });
+    
+                    it('Read Control Filter called on Class with instances of class and sub class.', async () => {
+                        const classModel = UnPrivilegedSuperClass;
+                        const instanceSet = new InstanceSet(classModel, [
+                            instanceOfUnPrivilegedSuperClass,
+                            instanceOfReadPrivilegedSuperClassPasses,
+                            instanceOfReadPrivilegedSuperClassFailsRelationship,
+                            instanceOfReadPrivilegedSubClassOfReadPrivilegedSuperClassPasses,
+                            instanceOfReadPrivilegedSubClassOfReadPrivilegedSuperClassFailsBoolean,
+                            instanceOfReadPrivilegedSubClassOfReadPrivilegedSuperClassFailsRelationship
+                        ]);
+                        const expectedInstanceSet = new InstanceSet(classModel, [
+                            instanceOfUnPrivilegedSuperClass,
+                            instanceOfReadPrivilegedSuperClassPasses,
+                            instanceOfReadPrivilegedSubClassOfReadPrivilegedSuperClassPasses
+                        ]);
+    
+                        const filteredInstanceSet = await classModel.readPrivilegeFilter(instanceSet);
+                        
+                        if (!expectedInstanceSet.equals(filteredInstanceSet))
+                            throw new Error('classModel.readPrivilegeFilter() did not return the expected InstanceSet.');
+                    });
+    
+                    it('Read Control Filter called on Class with instances of class and 2 layers of sub classes.', async () => {
+                        const classModel = UnPrivilegedSuperClass;
+                        const instanceSet = new InstanceSet(classModel, [
+                            instanceOfUnPrivilegedSuperClass,
+                            instanceOfReadPrivilegedSuperClassPasses,
+                            instanceOfReadPrivilegedSuperClassFailsRelationship,
+                            instanceOfReadPrivilegedSubClassOfReadPrivilegedSuperClassPasses,
+                            instanceOfReadPrivilegedSubClassOfReadPrivilegedSuperClassFailsBoolean,
+                            instanceOfReadPrivilegedSubClassOfReadPrivilegedSuperClassFailsRelationship,
+                            instanceOfReadPrivilegedDiscriminatedSuperClassPasses,
+                            instanceOfReadPrivilegedDiscriminatedSuperClassFailsString,
+                            instanceOfReadPrivilegedDiscriminatedSuperClassFailsBoolean,
+                            instanceOfReadPrivilegedDiscriminatedSuperClassFailsRelationship
+                        ]);
+                        const expectedInstanceSet = new InstanceSet(classModel, [
+                            instanceOfUnPrivilegedSuperClass,
+                            instanceOfReadPrivilegedSuperClassPasses,
+                            instanceOfReadPrivilegedSubClassOfReadPrivilegedSuperClassPasses,
+                            instanceOfReadPrivilegedDiscriminatedSuperClassPasses
+                        ]);
+    
+                        const filteredInstanceSet = await classModel.readPrivilegeFilter(instanceSet);
+                        
+                        if (!expectedInstanceSet.equals(filteredInstanceSet))
+                            throw new Error('classModel.readPrivilegeFilter() did not return the expected InstanceSet.');
+                    });
+    
+                    it('Read Control Filter called on Class with instances of 3 layers of sub classes.', async () => {
+                        const classModel = UnPrivilegedSuperClass;
+                        const instanceSet = new InstanceSet(classModel, [
+                            instanceOfUnPrivilegedSuperClass,
+                            instanceOfReadPrivilegedSuperClassPasses,
+                            instanceOfReadPrivilegedSuperClassFailsRelationship,
+                            instanceOfReadPrivilegedSubClassOfReadPrivilegedSuperClassPasses,
+                            instanceOfReadPrivilegedSubClassOfReadPrivilegedSuperClassFailsBoolean,
+                            instanceOfReadPrivilegedSubClassOfReadPrivilegedSuperClassFailsRelationship,
+                            instanceOfReadPrivilegedDiscriminatedSuperClassPasses,
+                            instanceOfReadPrivilegedDiscriminatedSuperClassFailsString,
+                            instanceOfReadPrivilegedDiscriminatedSuperClassFailsBoolean,
+                            instanceOfReadPrivilegedDiscriminatedSuperClassFailsRelationship,
+                            instanceOfReadPrivilegedSubClassOfReadPrivilegedDiscriminatedSuperClassPasses,
+                            instanceOfReadPrivilegedSubClassOfReadPrivilegedDiscriminatedSuperClassFailsRelationship,
+                            instanceOfReadPrivilegedSubClassOfReadPrivilegedDiscriminatedSuperClassFailsString,
+                            instanceOfReadPrivilegedSubClassOfReadPrivilegedDiscriminatedSuperClassFailsBoolean,
+                            instanceOfReadPrivilegedSubClassOfReadPrivilegedDiscriminatedSuperClassFailsNumber
+                        ]);
+                        const expectedInstanceSet = new InstanceSet(classModel, [
+                            instanceOfUnPrivilegedSuperClass,
+                            instanceOfReadPrivilegedSuperClassPasses,
+                            instanceOfReadPrivilegedSubClassOfReadPrivilegedSuperClassPasses,
+                            instanceOfReadPrivilegedDiscriminatedSuperClassPasses,
+                            instanceOfReadPrivilegedSubClassOfReadPrivilegedDiscriminatedSuperClassPasses
+                        ]);
+                        const filteredInstanceSet = await classModel.readPrivilegeFilter(instanceSet);
+    
+                        
+                        if (!expectedInstanceSet.equals(filteredInstanceSet))
+                            throw new Error('classModel.readPrivilegeFilter() did not return the expected InstanceSet.');
+                    });
+    
+                });
     
                 describe('ReadPrivilegedSuperClass.readPrivilegeFilter()', () => {
     
@@ -5507,6 +5682,82 @@ describe('Class Model Tests', () => {
     
             describe('Test Update Control Check throws error when an instance doesn\'t pass check.', () => {
     
+                describe('UnPrivilegedSuperClass.updatePrivilegeCheck()', () => {
+    
+                    it('Update Control Check called on Class with only direct instances of Class.', async () => {
+                        const instanceSet = new InstanceSet(UnPrivilegedSuperClass, [
+                            instanceOfUnPrivilegedSuperClass,
+                            instanceOfUpdatePrivilegedSuperClassPasses,
+                            instanceOfUpdatePrivilegedSuperClassFailsRelationship
+                        ]);
+                        const instancesExpectedToFail = new InstanceSet(UnPrivilegedSuperClass, [instanceOfUpdatePrivilegedSuperClassFailsRelationship]);
+                        const expectedErrorMessage = 'Illegal attempt to update instances: ' + instancesExpectedToFail.getInstanceIds();
+    
+                        await testForErrorAsync('ClassModel.updatePrivilegeCheck', expectedErrorMessage, async () => {
+                            return  UnPrivilegedSuperClass.updatePrivilegeCheck(instanceSet);
+                        });
+                    });
+    
+                    it('Update Control Check called on Class with instances of class and sub class.', async () => {
+                        const instanceSet = new InstanceSet(UnPrivilegedSuperClass, [
+                            instanceOfUnPrivilegedSuperClass,
+                            instanceOfUpdatePrivilegedSuperClassPasses,
+                            instanceOfUpdatePrivilegedSuperClassFailsRelationship,
+                            instanceOfUpdatePrivilegedSubClassOfUpdatePrivilegedSuperClassPasses,
+                            instanceOfUpdatePrivilegedSubClassOfUpdatePrivilegedSuperClassFailsBoolean,
+                            instanceOfUpdatePrivilegedSubClassOfUpdatePrivilegedSuperClassFailsRelationship
+                        ]);
+                        const instancesExpectedToFail = new InstanceSet(UnPrivilegedSuperClass, [
+                            instanceOfUpdatePrivilegedSuperClassFailsRelationship,
+                            instanceOfUpdatePrivilegedSubClassOfUpdatePrivilegedSuperClassFailsBoolean,
+                            instanceOfUpdatePrivilegedSubClassOfUpdatePrivilegedSuperClassFailsRelationship
+                        ]);
+                        const expectedErrorMessage = 'Illegal attempt to update instances: ' + instancesExpectedToFail.getInstanceIds();
+    
+                        await testForErrorAsync('ClassModel.updatePrivilegeCheck', expectedErrorMessage, async () => {
+                            return  UnPrivilegedSuperClass.updatePrivilegeCheck(instanceSet);
+                        });
+                    });
+    
+                    it('Update Control Check called on Class with instances of class and 3 layers of sub classes.', async () => {
+                        const instanceSet = new InstanceSet(UnPrivilegedSuperClass, [
+                            instanceOfUnPrivilegedSuperClass,
+                            instanceOfUpdatePrivilegedSuperClassPasses,
+                            instanceOfUpdatePrivilegedSuperClassFailsRelationship,
+                            instanceOfUpdatePrivilegedSubClassOfUpdatePrivilegedSuperClassPasses,
+                            instanceOfUpdatePrivilegedSubClassOfUpdatePrivilegedSuperClassFailsBoolean,
+                            instanceOfUpdatePrivilegedSubClassOfUpdatePrivilegedSuperClassFailsRelationship,
+                            instanceOfUpdatePrivilegedDiscriminatedSuperClassPasses,
+                            instanceOfUpdatePrivilegedDiscriminatedSuperClassFailsString,
+                            instanceOfUpdatePrivilegedDiscriminatedSuperClassFailsBoolean,
+                            instanceOfUpdatePrivilegedDiscriminatedSuperClassFailsRelationship,
+                            instanceOfUpdatePrivilegedSubClassOfUpdatePrivilegedDiscriminatedSuperClassPasses,
+                            instanceOfUpdatePrivilegedSubClassOfUpdatePrivilegedDiscriminatedSuperClassFailsRelationship,
+                            instanceOfUpdatePrivilegedSubClassOfUpdatePrivilegedDiscriminatedSuperClassFailsString,
+                            instanceOfUpdatePrivilegedSubClassOfUpdatePrivilegedDiscriminatedSuperClassFailsBoolean,
+                            instanceOfUpdatePrivilegedSubClassOfUpdatePrivilegedDiscriminatedSuperClassFailsNumber
+                        ]);
+                        const instancesExpectedToFail = new InstanceSet(UnPrivilegedSuperClass, [
+                            instanceOfUpdatePrivilegedSuperClassFailsRelationship,
+                            instanceOfUpdatePrivilegedSubClassOfUpdatePrivilegedSuperClassFailsBoolean,
+                            instanceOfUpdatePrivilegedSubClassOfUpdatePrivilegedSuperClassFailsRelationship,
+                            instanceOfUpdatePrivilegedDiscriminatedSuperClassFailsString,
+                            instanceOfUpdatePrivilegedDiscriminatedSuperClassFailsBoolean,
+                            instanceOfUpdatePrivilegedDiscriminatedSuperClassFailsRelationship,
+                            instanceOfUpdatePrivilegedSubClassOfUpdatePrivilegedDiscriminatedSuperClassFailsRelationship,
+                            instanceOfUpdatePrivilegedSubClassOfUpdatePrivilegedDiscriminatedSuperClassFailsString,
+                            instanceOfUpdatePrivilegedSubClassOfUpdatePrivilegedDiscriminatedSuperClassFailsBoolean,
+                            instanceOfUpdatePrivilegedSubClassOfUpdatePrivilegedDiscriminatedSuperClassFailsNumber
+                        ]);
+                        const expectedErrorMessage = 'Illegal attempt to update instances: ' + instancesExpectedToFail.getInstanceIds();
+    
+                        await testForErrorAsync('ClassModel.updatePrivilegeCheck', expectedErrorMessage, async () => {
+                            return  UnPrivilegedSuperClass.updatePrivilegeCheck(instanceSet);
+                        });
+                    });
+    
+                });
+    
                 describe('UpdatePrivilegedSuperClass.updatePrivilegeCheck()', () => {
     
                     it('Update Control Check called on Class with only direct instances of Class.', async () => {
@@ -5989,6 +6240,82 @@ describe('Class Model Tests', () => {
             });
     
             describe('Test Delete Control Check throws error when an instance doesn\'t pass check.', () => {
+    
+                describe('UnPrivilegedSuperClass.deletePrivilegeCheck()', () => {
+    
+                    it('Delete Control Check called on Class with only direct instances of Class.', async () => {
+                        const instanceSet = new InstanceSet(UnPrivilegedSuperClass, [
+                            instanceOfUnPrivilegedSuperClass,
+                            instanceOfDeletePrivilegedSuperClassPasses,
+                            instanceOfDeletePrivilegedSuperClassFailsRelationship
+                        ]);
+                        const instancesExpectedToFail = new InstanceSet(UnPrivilegedSuperClass, [instanceOfDeletePrivilegedSuperClassFailsRelationship]);
+                        const expectedErrorMessage = 'Illegal attempt to delete instances: ' + instancesExpectedToFail.getInstanceIds();
+    
+                        await testForErrorAsync('ClassModel.deletePrivilegeCheck', expectedErrorMessage, async () => {
+                            return  UnPrivilegedSuperClass.deletePrivilegeCheck(instanceSet);
+                        });
+                    });
+    
+                    it('Delete Control Check called on Class with instances of class and sub class.', async () => {
+                        const instanceSet = new InstanceSet(UnPrivilegedSuperClass, [
+                            instanceOfUnPrivilegedSuperClass,
+                            instanceOfDeletePrivilegedSuperClassPasses,
+                            instanceOfDeletePrivilegedSuperClassFailsRelationship,
+                            instanceOfDeletePrivilegedSubClassOfDeletePrivilegedSuperClassPasses,
+                            instanceOfDeletePrivilegedSubClassOfDeletePrivilegedSuperClassFailsBoolean,
+                            instanceOfDeletePrivilegedSubClassOfDeletePrivilegedSuperClassFailsRelationship
+                        ]);
+                        const instancesExpectedToFail = new InstanceSet(UnPrivilegedSuperClass, [
+                            instanceOfDeletePrivilegedSuperClassFailsRelationship,
+                            instanceOfDeletePrivilegedSubClassOfDeletePrivilegedSuperClassFailsBoolean,
+                            instanceOfDeletePrivilegedSubClassOfDeletePrivilegedSuperClassFailsRelationship
+                        ]);
+                        const expectedErrorMessage = 'Illegal attempt to delete instances: ' + instancesExpectedToFail.getInstanceIds();
+    
+                        await testForErrorAsync('ClassModel.deletePrivilegeCheck', expectedErrorMessage, async () => {
+                            return  UnPrivilegedSuperClass.deletePrivilegeCheck(instanceSet);
+                        });
+                    });
+    
+                    it('Delete Control Check called on Class with instances of class and 3 layers of sub classes.', async () => {
+                        const instanceSet = new InstanceSet(UnPrivilegedSuperClass, [
+                            instanceOfUnPrivilegedSuperClass,
+                            instanceOfDeletePrivilegedSuperClassPasses,
+                            instanceOfDeletePrivilegedSuperClassFailsRelationship,
+                            instanceOfDeletePrivilegedSubClassOfDeletePrivilegedSuperClassPasses,
+                            instanceOfDeletePrivilegedSubClassOfDeletePrivilegedSuperClassFailsBoolean,
+                            instanceOfDeletePrivilegedSubClassOfDeletePrivilegedSuperClassFailsRelationship,
+                            instanceOfDeletePrivilegedDiscriminatedSuperClassPasses,
+                            instanceOfDeletePrivilegedDiscriminatedSuperClassFailsString,
+                            instanceOfDeletePrivilegedDiscriminatedSuperClassFailsBoolean,
+                            instanceOfDeletePrivilegedDiscriminatedSuperClassFailsRelationship,
+                            instanceOfDeletePrivilegedSubClassOfDeletePrivilegedDiscriminatedSuperClassPasses,
+                            instanceOfDeletePrivilegedSubClassOfDeletePrivilegedDiscriminatedSuperClassFailsRelationship,
+                            instanceOfDeletePrivilegedSubClassOfDeletePrivilegedDiscriminatedSuperClassFailsString,
+                            instanceOfDeletePrivilegedSubClassOfDeletePrivilegedDiscriminatedSuperClassFailsBoolean,
+                            instanceOfDeletePrivilegedSubClassOfDeletePrivilegedDiscriminatedSuperClassFailsNumber
+                        ]);
+                        const instancesExpectedToFail = new InstanceSet(UnPrivilegedSuperClass, [
+                            instanceOfDeletePrivilegedSuperClassFailsRelationship,
+                            instanceOfDeletePrivilegedSubClassOfDeletePrivilegedSuperClassFailsBoolean,
+                            instanceOfDeletePrivilegedSubClassOfDeletePrivilegedSuperClassFailsRelationship,
+                            instanceOfDeletePrivilegedDiscriminatedSuperClassFailsString,
+                            instanceOfDeletePrivilegedDiscriminatedSuperClassFailsBoolean,
+                            instanceOfDeletePrivilegedDiscriminatedSuperClassFailsRelationship,
+                            instanceOfDeletePrivilegedSubClassOfDeletePrivilegedDiscriminatedSuperClassFailsRelationship,
+                            instanceOfDeletePrivilegedSubClassOfDeletePrivilegedDiscriminatedSuperClassFailsString,
+                            instanceOfDeletePrivilegedSubClassOfDeletePrivilegedDiscriminatedSuperClassFailsBoolean,
+                            instanceOfDeletePrivilegedSubClassOfDeletePrivilegedDiscriminatedSuperClassFailsNumber
+                        ]);
+                        const expectedErrorMessage = 'Illegal attempt to delete instances: ' + instancesExpectedToFail.getInstanceIds();
+    
+                        await testForErrorAsync('ClassModel.deletePrivilegeCheck', expectedErrorMessage, async () => {
+                            return  UnPrivilegedSuperClass.deletePrivilegeCheck(instanceSet);
+                        });
+                    });
+    
+                });
     
                 describe('DeletePrivilegedSuperClass.deletePrivilegeCheck()', () => {
     
@@ -6502,6 +6829,116 @@ describe('Class Model Tests', () => {
             });
     
             describe('Test instances that fail sensitive control check are returned.', () => {
+    
+                describe('SensitivePrivilegedSuperClass.sensitivePrivilegeFilter()', () => {
+    
+                    it('Sensitive Control Check called on Class with only direct instances of Class.', async () => {
+                        const classModel = UnPrivilegedSuperClass;
+                        const instanceSet = new InstanceSet(classModel, [
+                            instanceOfUnPrivilegedSuperClass,
+                            instanceOfSensitivePrivilegedSuperClassPasses,
+                            instanceOfSensitivePrivilegedSuperClassFailsRelationship
+                        ]);
+                        const expectedInstanceSet = new InstanceSet(classModel, [
+                            instanceOfSensitivePrivilegedSuperClassFailsRelationship
+                        ]);
+    
+                        const filteredInstanceSet = await classModel.sensitivePrivilegeFilter(instanceSet);
+
+                        if (!expectedInstanceSet.equals(filteredInstanceSet))
+                            throw new Error('classModel.sensitivePrivilegeFilter() did not return the expected InstanceSet.');
+                    });
+    
+                    it('Sensitive Control Check called on Class with instances of class and sub class.', async () => {
+                        const classModel = UnPrivilegedSuperClass;
+                        const instanceSet = new InstanceSet(classModel, [
+                            instanceOfUnPrivilegedSuperClass,
+                            instanceOfSensitivePrivilegedSuperClassPasses,
+                            instanceOfSensitivePrivilegedSuperClassFailsRelationship,
+                            instanceOfSensitivePrivilegedSubClassOfSensitivePrivilegedSuperClassPasses,
+                            instanceOfSensitivePrivilegedSubClassOfSensitivePrivilegedSuperClassFailsBoolean,
+                            instanceOfSensitivePrivilegedSubClassOfSensitivePrivilegedSuperClassFailsRelationship
+                        ]);
+                        const expectedInstanceSet = new InstanceSet(classModel, [
+                            instanceOfSensitivePrivilegedSuperClassFailsRelationship,
+                            instanceOfSensitivePrivilegedSubClassOfSensitivePrivilegedSuperClassFailsBoolean,
+                            instanceOfSensitivePrivilegedSubClassOfSensitivePrivilegedSuperClassFailsRelationship,
+                        ]);
+    
+                        const filteredInstanceSet = await classModel.sensitivePrivilegeFilter(instanceSet);
+                        
+                        if (!expectedInstanceSet.equals(filteredInstanceSet))
+                            throw new Error('classModel.sensitivePrivilegeFilter() did not return the expected InstanceSet.');
+                    });
+    
+                    it('Sensitive Control Check called on Class with instances of class and 2 layers of sub classes.', async () => {
+                        const classModel = UnPrivilegedSuperClass;
+                        const instanceSet = new InstanceSet(classModel, [
+                            instanceOfUnPrivilegedSuperClass,
+                            instanceOfSensitivePrivilegedSuperClassPasses,
+                            instanceOfSensitivePrivilegedSuperClassFailsRelationship,
+                            instanceOfSensitivePrivilegedSubClassOfSensitivePrivilegedSuperClassPasses,
+                            instanceOfSensitivePrivilegedSubClassOfSensitivePrivilegedSuperClassFailsBoolean,
+                            instanceOfSensitivePrivilegedSubClassOfSensitivePrivilegedSuperClassFailsRelationship,
+                            instanceOfSensitivePrivilegedDiscriminatedSuperClassPasses,
+                            instanceOfSensitivePrivilegedDiscriminatedSuperClassFailsString,
+                            instanceOfSensitivePrivilegedDiscriminatedSuperClassFailsBoolean,
+                            instanceOfSensitivePrivilegedDiscriminatedSuperClassFailsRelationship
+                        ]);
+                        const expectedInstanceSet = new InstanceSet(classModel, [
+                            instanceOfSensitivePrivilegedSuperClassFailsRelationship,
+                            instanceOfSensitivePrivilegedSubClassOfSensitivePrivilegedSuperClassFailsBoolean,
+                            instanceOfSensitivePrivilegedSubClassOfSensitivePrivilegedSuperClassFailsRelationship,
+                            instanceOfSensitivePrivilegedDiscriminatedSuperClassFailsString,
+                            instanceOfSensitivePrivilegedDiscriminatedSuperClassFailsBoolean,
+                            instanceOfSensitivePrivilegedDiscriminatedSuperClassFailsRelationship,
+                        ]);
+    
+                        const filteredInstanceSet = await classModel.sensitivePrivilegeFilter(instanceSet);
+                        
+                        if (!expectedInstanceSet.equals(filteredInstanceSet))
+                            throw new Error('classModel.sensitivePrivilegeFilter() did not return the expected InstanceSet.');
+                    });
+    
+                    it('Sensitive Control Check called on Class with instances of 3 layers of sub classes.', async () => {
+                        const classModel = UnPrivilegedSuperClass;
+                        const instanceSet = new InstanceSet(classModel, [
+                            instanceOfUnPrivilegedSuperClass,
+                            instanceOfSensitivePrivilegedSuperClassPasses,
+                            instanceOfSensitivePrivilegedSuperClassFailsRelationship,
+                            instanceOfSensitivePrivilegedSubClassOfSensitivePrivilegedSuperClassPasses,
+                            instanceOfSensitivePrivilegedSubClassOfSensitivePrivilegedSuperClassFailsBoolean,
+                            instanceOfSensitivePrivilegedSubClassOfSensitivePrivilegedSuperClassFailsRelationship,
+                            instanceOfSensitivePrivilegedDiscriminatedSuperClassPasses,
+                            instanceOfSensitivePrivilegedDiscriminatedSuperClassFailsString,
+                            instanceOfSensitivePrivilegedDiscriminatedSuperClassFailsBoolean,
+                            instanceOfSensitivePrivilegedDiscriminatedSuperClassFailsRelationship,
+                            instanceOfSensitivePrivilegedSubClassOfSensitivePrivilegedDiscriminatedSuperClassPasses,
+                            instanceOfSensitivePrivilegedSubClassOfSensitivePrivilegedDiscriminatedSuperClassFailsRelationship,
+                            instanceOfSensitivePrivilegedSubClassOfSensitivePrivilegedDiscriminatedSuperClassFailsString,
+                            instanceOfSensitivePrivilegedSubClassOfSensitivePrivilegedDiscriminatedSuperClassFailsBoolean,
+                            instanceOfSensitivePrivilegedSubClassOfSensitivePrivilegedDiscriminatedSuperClassFailsNumber
+                        ]);
+                        const expectedInstanceSet = new InstanceSet(classModel, [
+                            instanceOfSensitivePrivilegedSuperClassFailsRelationship,
+                            instanceOfSensitivePrivilegedSubClassOfSensitivePrivilegedSuperClassFailsBoolean,
+                            instanceOfSensitivePrivilegedSubClassOfSensitivePrivilegedSuperClassFailsRelationship,
+                            instanceOfSensitivePrivilegedDiscriminatedSuperClassFailsString,
+                            instanceOfSensitivePrivilegedDiscriminatedSuperClassFailsBoolean,
+                            instanceOfSensitivePrivilegedDiscriminatedSuperClassFailsRelationship,
+                            instanceOfSensitivePrivilegedSubClassOfSensitivePrivilegedDiscriminatedSuperClassFailsRelationship,
+                            instanceOfSensitivePrivilegedSubClassOfSensitivePrivilegedDiscriminatedSuperClassFailsString,
+                            instanceOfSensitivePrivilegedSubClassOfSensitivePrivilegedDiscriminatedSuperClassFailsBoolean,
+                            instanceOfSensitivePrivilegedSubClassOfSensitivePrivilegedDiscriminatedSuperClassFailsNumber
+                        ]);
+                        const filteredInstanceSet = await classModel.sensitivePrivilegeFilter(instanceSet);
+    
+                        
+                        if (!expectedInstanceSet.equals(filteredInstanceSet))
+                            throw new Error('classModel.sensitivePrivilegeFilter() did not return the expected InstanceSet.');
+                    });
+    
+                });
     
                 describe('SensitivePrivilegedSuperClass.sensitivePrivilegeFilter()', () => {
     
