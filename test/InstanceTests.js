@@ -4357,7 +4357,7 @@ describe('Instance Tests', () => {
                         await instance.save();
 
                         instance[relationship] = relatedInstances;
-
+                        
                         await instance.save();
 
                         const foundRelatedInstances = await TwoWayRelationshipClass2.find({
@@ -5441,6 +5441,40 @@ describe('Instance Tests', () => {
                 })
             });
 
+        });
+
+        describe('Instance.walk() warnings', () => {
+            
+            it ('Walking a singular relationship which is set to an Instance that has not been saved yet causes a console warning.', async () => {
+                let instance = new Instance(AllAttributesAndRelationshipsClass);
+                let relatedInstance = new Instance(CompareClass1);
+
+                instance.class1 = relatedInstance;
+                await instance.save();
+                
+                instance = await AllAttributesAndRelationshipsClass.findById(instance._id);
+
+                //await instance.class1;
+            });
+            
+            it ('Walking a non-singular relationship which is set to Instances that have not been saved yet causes a console warning.', async () => {
+                let instance = new Instance(AllAttributesAndRelationshipsClass);
+                let relatedSet = new InstanceSet(CompareClass2, [new Instance(CompareClass2), new Instance(CompareClass2)]);
+                let additionalInstance = new Instance(CompareClass2);
+
+                instance.class2s = relatedSet;
+                await relatedSet.save();
+                await instance.save();
+                
+                instance = await AllAttributesAndRelationshipsClass.findById(instance._id);
+                const actualRelatedInstanceSet = await instance.class2s;
+                actualRelatedInstanceSet.add(additionalInstance);
+
+                await instance.save();
+                const found = await AllAttributesAndRelationshipsClass.findById(instance._id);
+
+                //await found.class2s;
+            })
         });
 
         describe('Test walking the relationships.', () => {

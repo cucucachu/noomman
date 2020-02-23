@@ -320,7 +320,7 @@ class Instance extends Diffable {
             throw new NoommanErrors.NoommanArgumentError('instance.walk(): property "' + relationshipName + '" is not a relationship.');
     
         
-        const relationshipDefinition = this.classModel.relationships.filter(relationship => relationship.name ===relationshipName)[0];
+        const relationshipDefinition = this.classModel.getRelationship(relationshipName);
         const relatedClass = this.classModel.getRelatedClassModel(relationshipName);
 
         if (usePreviousState && this.previousState === null) {
@@ -344,6 +344,13 @@ class Instance extends Diffable {
                 if (!usePreviousState) {
                     if (!(relationshipCurrentValue instanceof Instance))
                         this[relationshipName] = await relatedClass.pureFindById(relationshipCurrentValue);
+
+                        if (this['_' + relationshipName] === null) {
+                            console.warn('WARNING: Walking relationship "' + relationshipName + '" on instance ' + 
+                                this.classModel.className + ':' + this.id + ' resulted in fewer instances returned ' + 
+                                'than expected. Check that all of the related instances have been saved and are in the database.' 
+                            );
+                        }
     
                         walkResult = this['_' + relationshipName];
                 }
@@ -363,9 +370,17 @@ class Instance extends Diffable {
             else {
                 if (!usePreviousState) {
                     if (Array.isArray(relationshipCurrentValue)) {
+                        const expectedNumberOfRelatedInstances = relationshipCurrentValue.length;
                         this[relationshipName] = await relatedClass.pureFind({
                             _id: {$in: relationshipCurrentValue}
                         });
+
+                        if (this['_' + relationshipName].size !== expectedNumberOfRelatedInstances) {
+                            console.warn('WARNING: Walking relationship "' + relationshipName + '" on instance ' + 
+                                this.classModel.className + ':' + this.id + ' resulted in fewer instances returned ' + 
+                                'than expected. Check that all of the related instances have been saved and are in the database.' 
+                            );
+                        }
                     }
                     
                     walkResult = this['_' + relationshipName];
