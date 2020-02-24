@@ -4,7 +4,6 @@ const NoommanValidationError = NoommanErrors.NoommanValidationError;
 
 // Create Class Models that will be used across tests.
 {
-
     // Compare Classes
     {        
         var CompareClass1 = new ClassModel({

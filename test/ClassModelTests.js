@@ -115,7 +115,7 @@ describe('Class Model Tests', () => {
 
     before(async () => {
         await database.connect(DatabaseConnection.mongo_uri, DatabaseConnection.testDatabase);
-        ClassModel.finalize();
+        await ClassModel.finalize();
     });
 
     after(async () => {
@@ -443,8 +443,8 @@ describe('Class Model Tests', () => {
                 }
             });
     
-            it.skip('An abstract, non-discriminated class should have no collection.', () => {
-                if (AbstractSuperClass.collection);
+            it('An abstract, non-discriminated class should have no collection.', () => {
+                if (AbstractSuperClass.collection)
                     throw new Error('An abstract class should not have a collection.');
             });
 

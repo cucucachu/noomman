@@ -511,11 +511,18 @@ class ClassModel {
      * - NoommanClassModelError - Validations errors thrown by validateRelationships()
      */
     static async finalize() {
-        for (const classModel of AllClassModels) { 
+        for (const className in AllClassModels) {
+            const classModel = AllClassModels[className];
             classModel.validateRelationships();
         }
-        for (const classModel of AllClassModels) {
+
+        for (const className in AllClassModels) {
+            const classModel = AllClassModels[className];
             await classModel.index();
+
+            if (classModel.abstract && !classModel.discriminated()) {
+                delete classModel.collection;
+            }
         }
     }
 
