@@ -3973,6 +3973,42 @@ describe('InstanceSet Tests', () => {
                 });
             });
 
+            it('InstanceSet.delete() deletes all the instances in an InstanceSet of discriminated sub class.', async () => {
+                const instance1 = new Instance(SubClassOfDiscriminatedSubClassOfSuperClass);
+                const instance2 = new Instance(SubClassOfDiscriminatedSubClassOfSuperClass);
+                const instanceSet = new InstanceSet(SubClassOfDiscriminatedSubClassOfSuperClass, [instance1, instance2]);
+                await instanceSet.save();
+                await instanceSet.delete();
+
+                const instancesFound = await SubClassOfDiscriminatedSubClassOfSuperClass.find({ _id: { $in: instanceSet.getInstanceIds() } });
+
+                if (!instancesFound.isEmpty())
+                    throw new Error('instanceSet.delete() did not throw an error, but the instances were not deleted.');
+
+                instanceSet.forEach(instance => {
+                    if (instance.deleted() !== true)
+                        throw new Error('Not all of the instances were marked deleted.');
+                });
+            });
+
+            it('InstanceSet.delete() deletes all the instances in an InstanceSet of discriminated class.', async () => {
+                const instance1 = new Instance(DiscriminatedSubClassOfSuperClass);
+                const instance2 = new Instance(DiscriminatedSubClassOfSuperClass);
+                const instanceSet = new InstanceSet(DiscriminatedSubClassOfSuperClass, [instance1, instance2]);
+                await instanceSet.save();
+                await instanceSet.delete();
+
+                const instancesFound = await DiscriminatedSubClassOfSuperClass.find({ _id: { $in: instanceSet.getInstanceIds() } });
+
+                if (!instancesFound.isEmpty())
+                    throw new Error('instanceSet.delete() did not throw an error, but the instances were not deleted.');
+
+                instanceSet.forEach(instance => {
+                    if (instance.deleted() !== true)
+                        throw new Error('Not all of the instances were marked deleted.');
+                });
+            });
+
             it('InstanceSet.delete() deletes all the instances in a set containing sub class and discriminated instances.', async () => {
                 const instance1 = new Instance(SuperClass);
                 const instance2 = new Instance(SubClassOfSuperClass);

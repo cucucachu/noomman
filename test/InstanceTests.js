@@ -4956,6 +4956,46 @@ describe('Instance Tests', () => {
 
         });
 
+        it('Instance of discriminated class can be deleted as expected.', async () => {
+            const instance = new Instance(DiscriminatedSuperClass);
+            instance.assign({
+                name: 'String',
+                boolean: true,
+                number: 1,
+            });
+            await instance.save();
+            await instance.delete();
+
+            const found = await DiscriminatedSuperClass.findById(instance._id);
+
+            if (found) 
+                throw new Error('instance.delete() did no throw an error, but the instance was not deleted.');
+
+            if (!instance.deleted)
+                throw new Error('Instance was deleted, but the deleted property was not set to true.');
+
+        });
+
+        it('Instance of discriminated sub class can be deleted as expected.', async () => {
+            const instance = new Instance(SubClassOfDiscriminatedSuperClass);
+            instance.assign({
+                name: 'String',
+                boolean: true,
+                number: 1,
+            });
+            await instance.save();
+            await instance.delete();
+
+            const found = await SubClassOfDiscriminatedSuperClass.findById(instance._id);
+
+            if (found) 
+                throw new Error('instance.delete() did no throw an error, but the instance was not deleted.');
+
+            if (!instance.deleted)
+                throw new Error('Instance was deleted, but the deleted property was not set to true.');
+
+        });
+
         it('Instance cannot be deleted if it has never been saved.', async () => {
             const expectedErrorMessage = 'instance.delete(): You cannot delete an instance which hasn\'t been saved yet';
             const instance = new Instance(AllFieldsRequiredClass);
