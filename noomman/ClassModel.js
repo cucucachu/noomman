@@ -536,6 +536,9 @@ class ClassModel {
     async index() {
         const indicesApplied = [];
 
+        if (!this.collection) 
+            return;
+
         for (const index of this.indices) {
             indicesApplied.push(await database.index(this.collection, index));
         }
