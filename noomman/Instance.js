@@ -421,7 +421,7 @@ class Instance extends Diffable {
                 throw new NoommanErrors.NoommanValidationError(this.classModel.className + ' ' + this.id + ': ' + error.message, error.properties);
             }
             else {
-                throw new NoommanErrors.NoommanValidationError('New Instance of ' + this.classModel.className + ': ' + error.message, error.properties)
+                throw new NoommanErrors.NoommanValidationError('New Instance With Id: ' + this.id + ' of ' + this.classModel.className + ': ' + error.message, error.properties)
             }
             
         }
