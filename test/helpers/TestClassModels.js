@@ -4,7 +4,6 @@ const NoommanValidationError = NoommanErrors.NoommanValidationError;
 
 // Create Class Models that will be used across tests.
 {
-
     // Compare Classes
     {        
         var CompareClass1 = new ClassModel({
@@ -449,7 +448,7 @@ const NoommanValidationError = NoommanErrors.NoommanValidationError;
             abstract: true,
             attributes: [
                 {
-                    name: 'name',
+                    name: 'abstractName',
                     type: String,
                 },
                 {
@@ -825,12 +824,18 @@ const NoommanValidationError = NoommanErrors.NoommanValidationError;
 
     }
 
-    // CreateControlled Classes
+    // CreatePrivileged Classes
     {
-        // A class which is createControlled by another instance. If that instance has a boolean attribute 'allowed' set to 
+        var UnPrivilegedSuperClass = new ClassModel({
+            className: 'UnPrivilegedSuperClass',
+        });
+
+
+        // A class which is createPrivileged by another instance. If that instance has a boolean attribute 'allowed' set to 
         // true, then the instance of this class can be viewed. 
-        var CreateControlledSuperClass = new ClassModel({
-            className: 'CreateControlledSuperClass',
+        var CreatePrivilegedSuperClass = new ClassModel({
+            className: 'CreatePrivilegedSuperClass',
+            superClasses: [UnPrivilegedSuperClass],
             attributes: [
                 {
                     name: 'name',
@@ -839,14 +844,14 @@ const NoommanValidationError = NoommanErrors.NoommanValidationError;
             ],
             relationships: [
                 {
-                    name: 'createControlledBy',
-                    toClass: 'ClassControlsCreateControlledSuperClass',
+                    name: 'createPrivilegedBy',
+                    toClass: 'ClassPrivilegesCreatePrivilegedSuperClass',
                     singular: true,
                 },
             ],
-            crudControls: {
-                createControl: async function() {
-                    const relatedInstance = await this.createControlledBy;
+            privileges: {
+                create: async function() {
+                    const relatedInstance = await this.createPrivilegedBy;
                     if (!relatedInstance)
                         return false;
                     return relatedInstance.allowed;
@@ -854,47 +859,47 @@ const NoommanValidationError = NoommanErrors.NoommanValidationError;
             }
         });
 
-        // A class which is createControlled by it's own boolean attribute. If the boolean is set to true, and it passes the 
+        // A class which is createPrivileged by it's own boolean attribute. If the boolean is set to true, and it passes the 
         // its super class'es create filter, then the instance will be returned by create filter.
-        var CreateControlledSubClassOfCreateControlledSuperClass = new ClassModel({
-            className: 'CreateControlledSubClassOfCreateControlledSuperClass',
-            superClasses: [CreateControlledSuperClass],
+        var CreatePrivilegedSubClassOfCreatePrivilegedSuperClass = new ClassModel({
+            className: 'CreatePrivilegedSubClassOfCreatePrivilegedSuperClass',
+            superClasses: [CreatePrivilegedSuperClass],
             attributes: [
                 {
                     name: 'boolean',
                     type: Boolean
                 },
             ],
-            crudControls: {
-                createControl: function() { 
+            privileges: {
+                create: function() { 
                     return this.boolean 
                 },
             },
         });
 
-        // A class which is createControlled by it's own string attribute. If the string matches 'createControlled', and it passes all
+        // A class which is createPrivileged by it's own string attribute. If the string matches 'createPrivileged', and it passes all
         // it's super classes createfilters, than an instance of this class will be returned by createFilter().
-        var CreateControlledDiscriminatedSuperClass = new ClassModel({
-            className: 'CreateControlledDiscriminatedSuperClass',
-            superClasses: [CreateControlledSubClassOfCreateControlledSuperClass],
+        var CreatePrivilegedDiscriminatedSuperClass = new ClassModel({
+            className: 'CreatePrivilegedDiscriminatedSuperClass',
+            superClasses: [CreatePrivilegedSubClassOfCreatePrivilegedSuperClass],
             attributes: [
                 {
                     name: 'string',
                     type: String,
                 },
             ],
-            crudControls: {
-                createControl:  function() {
-                    return this.string == 'createControlled';
+            privileges: {
+                create:  function() {
+                    return this.string == 'createPrivileged';
                 },
             }
         });
 
-        // A class which is createControlled by it's own number attribute. If the number is greater than 0, and it passes all
+        // A class which is createPrivileged by it's own number attribute. If the number is greater than 0, and it passes all
         // it's super classes createfilters, than an instance of this class will be returned by createFilter().
-        var CreateControlledSubClassOfCreateControlledDiscriminatedSuperClass = new ClassModel({
-            className: 'CreateControlledSubClassOfCreateControlledDiscriminatedSuperClass',
-            superClasses: [CreateControlledDiscriminatedSuperClass],
+        var CreatePrivilegedSubClassOfCreatePrivilegedDiscriminatedSuperClass = new ClassModel({
+            className: 'CreatePrivilegedSubClassOfCreatePrivilegedDiscriminatedSuperClass',
+            superClasses: [CreatePrivilegedDiscriminatedSuperClass],
             useSuperClassCollection: true,
             attributes: [
                 {
@@ -902,17 +907,17 @@ const NoommanValidationError = NoommanErrors.NoommanValidationError;
                     type: Number,
                 },
             ],
-            crudControls: {
-                createControl: function() {
+            privileges: {
+                create: function() {
                     return this.number > 0;
                 }
             },
         });
 
         // A class which is used to secure another class. If an instance of this class has its 'allowed' attribute
-        // set to true, than instances of CreateControlledSuperClass related to this instance will pass the createFilter.
-        var ClassControlsCreateControlledSuperClass = new ClassModel({
-            className: 'ClassControlsCreateControlledSuperClass',
+        // set to true, than instances of CreatePrivilegedSuperClass related to this instance will pass the createFilter.
+        var ClassPrivilegesCreatePrivilegedSuperClass = new ClassModel({
+            className: 'ClassPrivilegesCreatePrivilegedSuperClass',
             attributes: [
                 {
                     name: 'allowed',
@@ -921,24 +926,25 @@ const NoommanValidationError = NoommanErrors.NoommanValidationError;
             ],
         });
 
-        // A class which is createControlled by parameters passed into the createFilter method. If the two numbers add up to a 
+        // A class which is createPrivileged by parameters passed into the createFilter method. If the two numbers add up to a 
         // positive number, and the boolean is true, than the instance will pass the create filter. 
-        var CreateControlledClassCreateControlledByParameters = new ClassModel({
-            className: 'CreateControlledClassCreateControlledByParameters',
-            crudControls: {
-                createControl: parameters => {
+        var CreatePrivilegedClassCreatePrivilegedByParameters = new ClassModel({
+            className: 'CreatePrivilegedClassCreatePrivilegedByParameters',
+            privileges: {
+                create: parameters => {
                     return (parameters.numberA + parameters.numberB > 0) && parameters.boolean;
                 },
             },
         });
     }
 
-    // ReadControlled Classes
+    // ReadPrivileged Classes
     {
-        // A class which is readControlled by another instance. If that instance has a boolean attribute 'allowed' set to 
+        // A class which is readPrivileged by another instance. If that instance has a boolean attribute 'allowed' set to 
         // true, then the instance of this class can be viewed. 
-        var ReadControlledSuperClass = new ClassModel({
-            className: 'ReadControlledSuperClass',
+        var ReadPrivilegedSuperClass = new ClassModel({
+            className: 'ReadPrivilegedSuperClass',
+            superClasses: [UnPrivilegedSuperClass],
             attributes: [
                 {
                     name: 'name',
@@ -947,60 +953,60 @@ const NoommanValidationError = NoommanErrors.NoommanValidationError;
             ],
             relationships: [
                 {
-                    name: 'readControlledBy',
-                    toClass: 'ClassControlsReadControlledSuperClass',
+                    name: 'readPrivilegedBy',
+                    toClass: 'ClassPrivilegesReadPrivilegedSuperClass',
                     singular: true,
                     required: true,
                 },
             ],
-            crudControls: {
-                readControl: async function() {
-                    return (await this.readControlledBy).allowed;
+            privileges: {
+                read: async function() {
+                    return (await this.readPrivilegedBy).allowed;
                 },
             }
         });
 
-        // A class which is readControlled by it's own boolean attribute. If the boolean is set to true, and it passes the 
+        // A class which is readPrivileged by it's own boolean attribute. If the boolean is set to true, and it passes the 
         // its super class'es read filter, then the instance will be returned by read filter.
-        var ReadControlledSubClassOfReadControlledSuperClass = new ClassModel({
-            className: 'ReadControlledSubClassOfReadControlledSuperClass',
-            superClasses: [ReadControlledSuperClass],
+        var ReadPrivilegedSubClassOfReadPrivilegedSuperClass = new ClassModel({
+            className: 'ReadPrivilegedSubClassOfReadPrivilegedSuperClass',
+            superClasses: [ReadPrivilegedSuperClass],
             attributes: [
                 {
                     name: 'boolean',
                     type: Boolean,
                 },
             ],
-            crudControls: {
-                readControl: function() {
+            privileges: {
+                read: function() {
                     return this.boolean;
                 },
             },
         });
 
-        // A class which is readControlled by it's own string attribute. If the string matches 'readControlled', and it passes all
+        // A class which is readPrivileged by it's own string attribute. If the string matches 'readPrivileged', and it passes all
         // it's super classes readfilters, than an instance of this class will be returned by readFilter().
-        var ReadControlledDiscriminatedSuperClass = new ClassModel({
-            className: 'ReadControlledDiscriminatedSuperClass',
-            superClasses: [ReadControlledSubClassOfReadControlledSuperClass],
+        var ReadPrivilegedDiscriminatedSuperClass = new ClassModel({
+            className: 'ReadPrivilegedDiscriminatedSuperClass',
+            superClasses: [ReadPrivilegedSubClassOfReadPrivilegedSuperClass],
             attributes: [
                 {
                     name: 'string',
                     type: String,
                 },
             ],
-            crudControls: {
-                readControl: function() {
-                    return this.string == 'readControlled';
+            privileges: {
+                read: function() {
+                    return this.string == 'readPrivileged';
                 }
             },
         });
 
-        // A class which is readControlled by it's own number attribute. If the number is greater than 0, and it passes all
+        // A class which is readPrivileged by it's own number attribute. If the number is greater than 0, and it passes all
         // it's super classes readfilters, than an instance of this class will be returned by readFilter().
-        var ReadControlledSubClassOfReadControlledDiscriminatedSuperClass = new ClassModel({
-            className: 'ReadControlledSubClassOfReadControlledDiscriminatedSuperClass',
-            superClasses: [ReadControlledDiscriminatedSuperClass],
+        var ReadPrivilegedSubClassOfReadPrivilegedDiscriminatedSuperClass = new ClassModel({
+            className: 'ReadPrivilegedSubClassOfReadPrivilegedDiscriminatedSuperClass',
+            superClasses: [ReadPrivilegedDiscriminatedSuperClass],
             useSuperClassCollection: true,
             attributes: [
                 {
@@ -1008,17 +1014,17 @@ const NoommanValidationError = NoommanErrors.NoommanValidationError;
                     type: Number,
                 },
             ],
-            crudControls: {
-                readControl: function() {
+            privileges: {
+                read: function() {
                     return this.number > 0;
                 }
             }
         });
 
         // A class which is used to secure another class. If an instance of this class has its 'allowed' attribute
-        // set to true, than instances of ReadControlledSuperClass related to this instance will pass the readFilter.
-        var ClassControlsReadControlledSuperClass = new ClassModel({
-            className: 'ClassControlsReadControlledSuperClass',
+        // set to true, than instances of ReadPrivilegedSuperClass related to this instance will pass the readFilter.
+        var ClassPrivilegesReadPrivilegedSuperClass = new ClassModel({
+            className: 'ClassPrivilegesReadPrivilegedSuperClass',
             attributes: [
                 {
                     name: 'allowed',
@@ -1027,19 +1033,19 @@ const NoommanValidationError = NoommanErrors.NoommanValidationError;
             ],
         });
 
-        // A class which is readControlled by parameters passed into the readFilter method. If the two numbers add up to a 
+        // A class which is readPrivileged by parameters passed into the readFilter method. If the two numbers add up to a 
         // positive number, and the boolean is true, than the instance will pass the read filter. 
-        var ReadControlledClassReadControlledByParameters = new ClassModel({
-            className: 'ReadControlledClassReadControlledByParameters',
-            crudControls: {
-                readControl: (readControlMethodParameters) => {
+        var ReadPrivilegedClassReadPrivilegedByParameters = new ClassModel({
+            className: 'ReadPrivilegedClassReadPrivilegedByParameters',
+            privileges: {
+                read: (readControlMethodParameters) => {
                     return (readControlMethodParameters.numberA + readControlMethodParameters.numberB > 0) && readControlMethodParameters.boolean;
                 },
             },
         });
 
-        var SingularRelationshipToReadControlledClassReadControlledByParameters = new ClassModel({
-            className: 'SingularRelationshipToReadControlledClassReadControlledByParameters',
+        var SingularRelationshipToReadPrivilegedClassReadPrivilegedByParameters = new ClassModel({
+            className: 'SingularRelationshipToReadPrivilegedClassReadPrivilegedByParameters',
             attributes: [
                 {
                     name: 'name',
@@ -1049,14 +1055,14 @@ const NoommanValidationError = NoommanErrors.NoommanValidationError;
             relationships: [
                 {
                     name: 'singularRelationship',
-                    toClass: 'ReadControlledClassReadControlledByParameters',
+                    toClass: 'ReadPrivilegedClassReadPrivilegedByParameters',
                     singular: true,
                 },
             ],
         });
 
-        var NonSingularRelationshipToReadControlledClassReadControlledByParameters = new ClassModel({
-            className: 'NonSingularRelationshipToReadControlledClassReadControlledByParameters',
+        var NonSingularRelationshipToReadPrivilegedClassReadPrivilegedByParameters = new ClassModel({
+            className: 'NonSingularRelationshipToReadPrivilegedClassReadPrivilegedByParameters',
             attributes: [
                 {
                     name: 'name',
@@ -1066,19 +1072,20 @@ const NoommanValidationError = NoommanErrors.NoommanValidationError;
             relationships: [
                 {
                     name: 'nonSingularRelationship',
-                    toClass: 'ReadControlledClassReadControlledByParameters',
+                    toClass: 'ReadPrivilegedClassReadPrivilegedByParameters',
                     singular: false,
                 },
             ],
         });
     }
 
-    // UpdateControlled Classes
+    // UpdatePrivileged Classes
     {
-        // A class which is updateControlled by another instance. If that instance has a boolean attribute 'allowed' set to 
+        // A class which is updatePrivileged by another instance. If that instance has a boolean attribute 'allowed' set to 
         // true, then the instance of this class can be viewed. 
-        var UpdateControlledSuperClass = new ClassModel({
-            className: 'UpdateControlledSuperClass',
+        var UpdatePrivilegedSuperClass = new ClassModel({
+            className: 'UpdatePrivilegedSuperClass',
+            superClasses: [UnPrivilegedSuperClass],
             attributes: [
                 {
                     name: 'name',
@@ -1087,59 +1094,59 @@ const NoommanValidationError = NoommanErrors.NoommanValidationError;
             ],
             relationships: [
                 {
-                    name: 'updateControlledBy',
-                    toClass: 'ClassControlsUpdateControlledSuperClass',
+                    name: 'updatePrivilegedBy',
+                    toClass: 'ClassPrivilegesUpdatePrivilegedSuperClass',
                     singular: true,
                 },
             ],
-            crudControls: {
-                updateControl: async function() {
-                    return (await this.updateControlledBy).allowed;
+            privileges: {
+                update: async function() {
+                    return (await this.updatePrivilegedBy).allowed;
                 },
             }
         });
 
-        // A class which is updateControlled by it's own boolean attribute. If the boolean is set to true, and it passes the 
+        // A class which is updatePrivileged by it's own boolean attribute. If the boolean is set to true, and it passes the 
         // its super class'es update filter, then the instance will be returned by update filter.
-        var UpdateControlledSubClassOfUpdateControlledSuperClass = new ClassModel({
-            className: 'UpdateControlledSubClassOfUpdateControlledSuperClass',
-            superClasses: [UpdateControlledSuperClass],
+        var UpdatePrivilegedSubClassOfUpdatePrivilegedSuperClass = new ClassModel({
+            className: 'UpdatePrivilegedSubClassOfUpdatePrivilegedSuperClass',
+            superClasses: [UpdatePrivilegedSuperClass],
             attributes: [
                 {
                     name: 'boolean',
                     type: Boolean
                 },
             ],
-            crudControls: {
-                updateControl: function() {
+            privileges: {
+                update: function() {
                     return this.boolean;
                 }
             },
         });
 
-        // A class which is updateControlled by it's own string attribute. If the string matches 'updateControlled', and it passes all
+        // A class which is updatePrivileged by it's own string attribute. If the string matches 'updatePrivileged', and it passes all
         // it's super classes updatefilters, than an instance of this class will be returned by updateFilter().
-        var UpdateControlledDiscriminatedSuperClass = new ClassModel({
-            className: 'UpdateControlledDiscriminatedSuperClass',
-            superClasses: [UpdateControlledSubClassOfUpdateControlledSuperClass],
+        var UpdatePrivilegedDiscriminatedSuperClass = new ClassModel({
+            className: 'UpdatePrivilegedDiscriminatedSuperClass',
+            superClasses: [UpdatePrivilegedSubClassOfUpdatePrivilegedSuperClass],
             attributes: [
                 {
                     name: 'string',
                     type: String,
                 },
             ],
-            crudControls: {
-                updateControl: function() {
-                    return this.string === 'updateControlled';
+            privileges: {
+                update: function() {
+                    return this.string === 'updatePrivileged';
                 }
             }
         });
 
-        // A class which is updateControlled by it's own number attribute. If the number is greater than 0, and it passes all
+        // A class which is updatePrivileged by it's own number attribute. If the number is greater than 0, and it passes all
         // it's super classes updatefilters, than an instance of this class will be returned by updateFilter().
-        var UpdateControlledSubClassOfUpdateControlledDiscriminatedSuperClass = new ClassModel({
-            className: 'UpdateControlledSubClassOfUpdateControlledDiscriminatedSuperClass',
-            superClasses: [UpdateControlledDiscriminatedSuperClass],
+        var UpdatePrivilegedSubClassOfUpdatePrivilegedDiscriminatedSuperClass = new ClassModel({
+            className: 'UpdatePrivilegedSubClassOfUpdatePrivilegedDiscriminatedSuperClass',
+            superClasses: [UpdatePrivilegedDiscriminatedSuperClass],
             useSuperClassCollection: true,
             attributes: [
                 {
@@ -1147,17 +1154,17 @@ const NoommanValidationError = NoommanErrors.NoommanValidationError;
                     type: Number,
                 },
             ],
-            crudControls: {
-                updateControl: function() {
+            privileges: {
+                update: function() {
                     return this.number > 0;
                 },
             },
         });
 
         // A class which is used to secure another class. If an instance of this class has its 'allowed' attribute
-        // set to true, than instances of UpdateControlledSuperClass related to this instance will pass the updateFilter.
-        var ClassControlsUpdateControlledSuperClass = new ClassModel({
-            className: 'ClassControlsUpdateControlledSuperClass',
+        // set to true, than instances of UpdatePrivilegedSuperClass related to this instance will pass the updateFilter.
+        var ClassPrivilegesUpdatePrivilegedSuperClass = new ClassModel({
+            className: 'ClassPrivilegesUpdatePrivilegedSuperClass',
             attributes: [
                 {
                     name: 'allowed',
@@ -1166,30 +1173,31 @@ const NoommanValidationError = NoommanErrors.NoommanValidationError;
             ],
         });
 
-        // A class which is updateControlled by parameters passed into the updateFilter method. If the two numbers add up to a 
+        // A class which is updatePrivileged by parameters passed into the updateFilter method. If the two numbers add up to a 
         // positive number, and the boolean is true, than the instance will pass the update filter. 
-        var UpdateControlledClassUpdateControlledByParameters = new ClassModel({
-            className: 'UpdateControlledClassUpdateControlledByParameters',
+        var UpdatePrivilegedClassUpdatePrivilegedByParameters = new ClassModel({
+            className: 'UpdatePrivilegedClassUpdatePrivilegedByParameters',
             attributes: [
                 {
                     name: 'name',
                     type: String,
                 }
             ],
-            crudControls: {
-                updateControl: (updateControlMethodParameters) => {
+            privileges: {
+                update: (updateControlMethodParameters) => {
                     return (updateControlMethodParameters.numberA + updateControlMethodParameters.numberB > 0) && updateControlMethodParameters.boolean;
                 },
             },
         });
     }
 
-    // DeleteControlled Classes
+    // DeletePrivileged Classes
     {
-        // A class which is deleteControlled by another instance. If that instance has a boolean attribute 'allowed' set to 
+        // A class which is deletePrivileged by another instance. If that instance has a boolean attribute 'allowed' set to 
         // true, then the instance of this class can be viewed. 
-        var DeleteControlledSuperClass = new ClassModel({
-            className: 'DeleteControlledSuperClass',
+        var DeletePrivilegedSuperClass = new ClassModel({
+            className: 'DeletePrivilegedSuperClass',
+            superClasses: [UnPrivilegedSuperClass],
             attributes: [
                 {
                     name: 'name',
@@ -1198,59 +1206,59 @@ const NoommanValidationError = NoommanErrors.NoommanValidationError;
             ],
             relationships: [
                 {
-                    name: 'deleteControlledBy',
-                    toClass: 'ClassControlsDeleteControlledSuperClass',
+                    name: 'deletePrivilegedBy',
+                    toClass: 'ClassPrivilegesDeletePrivilegedSuperClass',
                     singular: true,
                 },
             ],
-            crudControls: {
-                deleteControl: async function() {
-                    return (await this.deleteControlledBy).allowed;
+            privileges: {
+                delete: async function() {
+                    return (await this.deletePrivilegedBy).allowed;
                 },
             }
         });
 
-        // A class which is deleteControlled by it's own boolean attribute. If the boolean is set to true, and it passes the 
+        // A class which is deletePrivileged by it's own boolean attribute. If the boolean is set to true, and it passes the 
         // its super class'es delete filter, then the instance will be returned by delete filter.
-        var DeleteControlledSubClassOfDeleteControlledSuperClass = new ClassModel({
-            className: 'DeleteControlledSubClassOfDeleteControlledSuperClass',
-            superClasses: [DeleteControlledSuperClass],
+        var DeletePrivilegedSubClassOfDeletePrivilegedSuperClass = new ClassModel({
+            className: 'DeletePrivilegedSubClassOfDeletePrivilegedSuperClass',
+            superClasses: [DeletePrivilegedSuperClass],
             attributes: [
                 {
                     name: 'boolean',
                     type: Boolean
                 },
             ],
-            crudControls: {
-                deleteControl: function() {
+            privileges: {
+                delete: function() {
                     return this.boolean;
                 },
             },
         });
 
-        // A class which is deleteControlled by it's own string attribute. If the string matches 'deleteControlled', and it passes all
+        // A class which is deletePrivileged by it's own string attribute. If the string matches 'deletePrivileged', and it passes all
         // it's super classes deletefilters, than an instance of this class will be returned by deleteFilter().
-        var DeleteControlledDiscriminatedSuperClass = new ClassModel({
-            className: 'DeleteControlledDiscriminatedSuperClass',
-            superClasses: [DeleteControlledSubClassOfDeleteControlledSuperClass],
+        var DeletePrivilegedDiscriminatedSuperClass = new ClassModel({
+            className: 'DeletePrivilegedDiscriminatedSuperClass',
+            superClasses: [DeletePrivilegedSubClassOfDeletePrivilegedSuperClass],
             attributes: [
                 {
                     name: 'string',
                     type: String,
                 },
             ],
-            crudControls: {
-                deleteControl: function() {
-                    return this.string === 'deleteControlled';
+            privileges: {
+                delete: function() {
+                    return this.string === 'deletePrivileged';
                 },
             }
         });
 
-        // A class which is deleteControlled by it's own number attribute. If the number is greater than 0, and it passes all
+        // A class which is deletePrivileged by it's own number attribute. If the number is greater than 0, and it passes all
         // it's super classes deletefilters, than an instance of this class will be returned by deleteFilter().
-        var DeleteControlledSubClassOfDeleteControlledDiscriminatedSuperClass = new ClassModel({
-            className: 'DeleteControlledSubClassOfDeleteControlledDiscriminatedSuperClass',
-            superClasses: [DeleteControlledDiscriminatedSuperClass],
+        var DeletePrivilegedSubClassOfDeletePrivilegedDiscriminatedSuperClass = new ClassModel({
+            className: 'DeletePrivilegedSubClassOfDeletePrivilegedDiscriminatedSuperClass',
+            superClasses: [DeletePrivilegedDiscriminatedSuperClass],
             useSuperClassCollection: true,
             attributes: [
                 {
@@ -1258,17 +1266,17 @@ const NoommanValidationError = NoommanErrors.NoommanValidationError;
                     type: Number,
                 },
             ],
-            crudControls: {
-                deleteControl: function() {
+            privileges: {
+                delete: function() {
                     return this.number > 0;
                 },
             },
         });
 
         // A class which is used to secure another class. If an instance of this class has its 'allowed' attribute
-        // set to true, than instances of DeleteControlledSuperClass related to this instance will pass the deleteFilter.
-        var ClassControlsDeleteControlledSuperClass = new ClassModel({
-            className: 'ClassControlsDeleteControlledSuperClass',
+        // set to true, than instances of DeletePrivilegedSuperClass related to this instance will pass the deleteFilter.
+        var ClassPrivilegesDeletePrivilegedSuperClass = new ClassModel({
+            className: 'ClassPrivilegesDeletePrivilegedSuperClass',
             attributes: [
                 {
                     name: 'allowed',
@@ -1277,24 +1285,25 @@ const NoommanValidationError = NoommanErrors.NoommanValidationError;
             ],
         });
 
-        // A class which is deleteControlled by parameters passed into the deleteFilter method. If the two numbers add up to a 
+        // A class which is deletePrivileged by parameters passed into the deleteFilter method. If the two numbers add up to a 
         // positive number, and the boolean is true, than the instance will pass the delete filter. 
-        var DeleteControlledClassDeleteControlledByParameters = new ClassModel({
-            className: 'DeleteControlledClassDeleteControlledByParameters',
-            crudControls: {
-                deleteControl: parameters => {
+        var DeletePrivilegedClassDeletePrivilegedByParameters = new ClassModel({
+            className: 'DeletePrivilegedClassDeletePrivilegedByParameters',
+            privileges: {
+                delete: parameters => {
                     return (parameters.numberA + parameters.numberB > 0) && parameters.boolean;
                 },
             },
         });
     }
 
-    // SensitiveControlled Classes
+    // SensitivePrivileged Classes
     {
-        // A class which is sensitiveControlled by another instance. If that instance has a boolean attribute 'allowed' set to 
+        // A class which is sensitivePrivileged by another instance. If that instance has a boolean attribute 'allowed' set to 
         // true, then the instance of this class can be viewed. 
-        var SensitiveControlledSuperClass = new ClassModel({
-            className: 'SensitiveControlledSuperClass',
+        var SensitivePrivilegedSuperClass = new ClassModel({
+            className: 'SensitivePrivilegedSuperClass',
+            superClasses: [UnPrivilegedSuperClass],
             attributes: [
                 {
                     name: 'name',
@@ -1308,60 +1317,60 @@ const NoommanValidationError = NoommanErrors.NoommanValidationError;
             ],
             relationships: [
                 {
-                    name: 'sensitiveControlledBy',
-                    toClass: 'ClassControlsSensitiveControlledSuperClass',
+                    name: 'sensitivePrivilegedBy',
+                    toClass: 'ClassPrivilegesSensitivePrivilegedSuperClass',
                     singular: true,
                 },
             ],
-            crudControls: {
-                sensitiveControl: async function() {
-                    const controlledBy = await this.sensitiveControlledBy;
+            privileges: {
+                sensitive: async function() {
+                    const controlledBy = await this.sensitivePrivilegedBy;
                     return controlledBy !== null ? controlledBy.allowed : false;
                 },
             }
         });
 
-        // A class which is sensitiveControlled by it's own boolean attribute. If the boolean is set to true, and it passes the 
+        // A class which is sensitivePrivileged by it's own boolean attribute. If the boolean is set to true, and it passes the 
         // its super class'es sensitive filter, then the instance will be returned by sensitive filter.
-        var SensitiveControlledSubClassOfSensitiveControlledSuperClass = new ClassModel({
-            className: 'SensitiveControlledSubClassOfSensitiveControlledSuperClass',
-            superClasses: [SensitiveControlledSuperClass],
+        var SensitivePrivilegedSubClassOfSensitivePrivilegedSuperClass = new ClassModel({
+            className: 'SensitivePrivilegedSubClassOfSensitivePrivilegedSuperClass',
+            superClasses: [SensitivePrivilegedSuperClass],
             attributes: [
                 {
                     name: 'boolean',
                     type: Boolean,
                 },
             ],
-            crudControls: {
-                sensitiveControl: function() {
+            privileges: {
+                sensitive: function() {
                     return this.boolean;
                 },
             },
         });
 
-        // A class which is sensitiveControlled by it's own string attribute. If the string matches 'sensitiveControlled', and it passes all
+        // A class which is sensitivePrivileged by it's own string attribute. If the string matches 'sensitivePrivileged', and it passes all
         // it's super classes sensitivefilters, than an instance of this class will be returned by sensitiveFilter().
-        var SensitiveControlledDiscriminatedSuperClass = new ClassModel({
-            className: 'SensitiveControlledDiscriminatedSuperClass',
-            superClasses: [SensitiveControlledSubClassOfSensitiveControlledSuperClass],
+        var SensitivePrivilegedDiscriminatedSuperClass = new ClassModel({
+            className: 'SensitivePrivilegedDiscriminatedSuperClass',
+            superClasses: [SensitivePrivilegedSubClassOfSensitivePrivilegedSuperClass],
             attributes: [
                 {
                     name: 'string',
                     type: String,
                 },
             ],
-            crudControls: {
-                sensitiveControl: function() {
-                    return this.string == 'sensitiveControlled';
+            privileges: {
+                sensitive: function() {
+                    return this.string == 'sensitivePrivileged';
                 }
             },
         });
 
-        // A class which is sensitiveControlled by it's own number attribute. If the number is greater than 0, and it passes all
+        // A class which is sensitivePrivileged by it's own number attribute. If the number is greater than 0, and it passes all
         // it's super classes sensitivefilters, than an instance of this class will be returned by sensitiveFilter().
-        var SensitiveControlledSubClassOfSensitiveControlledDiscriminatedSuperClass = new ClassModel({
-            className: 'SensitiveControlledSubClassOfSensitiveControlledDiscriminatedSuperClass',
-            superClasses: [SensitiveControlledDiscriminatedSuperClass],
+        var SensitivePrivilegedSubClassOfSensitivePrivilegedDiscriminatedSuperClass = new ClassModel({
+            className: 'SensitivePrivilegedSubClassOfSensitivePrivilegedDiscriminatedSuperClass',
+            superClasses: [SensitivePrivilegedDiscriminatedSuperClass],
             useSuperClassCollection: true,
             attributes: [
                 {
@@ -1374,17 +1383,17 @@ const NoommanValidationError = NoommanErrors.NoommanValidationError;
                     sensitive: true,
                 }
             ],
-            crudControls: {
-                sensitiveControl: function() {
+            privileges: {
+                sensitive: function() {
                     return this.number > 0;
                 }
             }
         });
 
         // A class which is used to secure another class. If an instance of this class has its 'allowed' attribute
-        // set to true, than instances of SensitiveControlledSuperClass related to this instance will pass the sensitiveFilter.
-        var ClassControlsSensitiveControlledSuperClass = new ClassModel({
-            className: 'ClassControlsSensitiveControlledSuperClass',
+        // set to true, than instances of SensitivePrivilegedSuperClass related to this instance will pass the sensitiveFilter.
+        var ClassPrivilegesSensitivePrivilegedSuperClass = new ClassModel({
+            className: 'ClassPrivilegesSensitivePrivilegedSuperClass',
             attributes: [
                 {
                     name: 'allowed',
@@ -1393,10 +1402,10 @@ const NoommanValidationError = NoommanErrors.NoommanValidationError;
             ],
         });
 
-        // A class which is sensitiveControlled by parameters passed into the sensitiveFilter method. If the two numbers add up to a 
+        // A class which is sensitivePrivileged by parameters passed into the sensitiveFilter method. If the two numbers add up to a 
         // positive number, and the boolean is true, than the instance will pass the sensitive filter. 
-        var SensitiveControlledClassSensitiveControlledByParameters = new ClassModel({
-            className: 'SensitiveControlledClassSensitiveControlledByParameters',
+        var SensitivePrivilegedClassSensitivePrivilegedByParameters = new ClassModel({
+            className: 'SensitivePrivilegedClassSensitivePrivilegedByParameters',
             attributes: [
                 {
                     name: 'SSN',
@@ -1409,8 +1418,8 @@ const NoommanValidationError = NoommanErrors.NoommanValidationError;
                     sensitive: true,
                 }
             ],
-            crudControls: {
-                sensitiveControl: (parameters) => {
+            privileges: {
+                sensitive: (parameters) => {
                     return (parameters.numberA + parameters.numberB > 0) && parameters.boolean;
                 },
             },
@@ -1654,38 +1663,39 @@ module.exports = {
     TreeClass,
     ClassOwnsOtherClass,
     ClassOwnedByOtherClass,
-    CreateControlledSuperClass, 
-    CreateControlledSubClassOfCreateControlledSuperClass,
-    CreateControlledDiscriminatedSuperClass,
-    CreateControlledSubClassOfCreateControlledDiscriminatedSuperClass,
-    ClassControlsCreateControlledSuperClass,
-    CreateControlledClassCreateControlledByParameters,
-    ReadControlledSuperClass,
-    ReadControlledSubClassOfReadControlledSuperClass,
-    ReadControlledDiscriminatedSuperClass,
-    ReadControlledSubClassOfReadControlledDiscriminatedSuperClass,
-    ClassControlsReadControlledSuperClass,
-    ReadControlledClassReadControlledByParameters,
-    SingularRelationshipToReadControlledClassReadControlledByParameters,
-    NonSingularRelationshipToReadControlledClassReadControlledByParameters,
-    UpdateControlledSuperClass, 
-    UpdateControlledSubClassOfUpdateControlledSuperClass,
-    UpdateControlledDiscriminatedSuperClass,
-    UpdateControlledSubClassOfUpdateControlledDiscriminatedSuperClass,
-    ClassControlsUpdateControlledSuperClass,
-    UpdateControlledClassUpdateControlledByParameters,
-    DeleteControlledSuperClass, 
-    DeleteControlledSubClassOfDeleteControlledSuperClass,
-    DeleteControlledDiscriminatedSuperClass,
-    DeleteControlledSubClassOfDeleteControlledDiscriminatedSuperClass,
-    SensitiveControlledSuperClass,
-    SensitiveControlledSubClassOfSensitiveControlledSuperClass,
-    SensitiveControlledDiscriminatedSuperClass,
-    SensitiveControlledSubClassOfSensitiveControlledDiscriminatedSuperClass,
-    ClassControlsSensitiveControlledSuperClass,
-    SensitiveControlledClassSensitiveControlledByParameters,
-    ClassControlsDeleteControlledSuperClass,
-    DeleteControlledClassDeleteControlledByParameters,
+    UnPrivilegedSuperClass,
+    CreatePrivilegedSuperClass, 
+    CreatePrivilegedSubClassOfCreatePrivilegedSuperClass,
+    CreatePrivilegedDiscriminatedSuperClass,
+    CreatePrivilegedSubClassOfCreatePrivilegedDiscriminatedSuperClass,
+    ClassPrivilegesCreatePrivilegedSuperClass,
+    CreatePrivilegedClassCreatePrivilegedByParameters,
+    ReadPrivilegedSuperClass,
+    ReadPrivilegedSubClassOfReadPrivilegedSuperClass,
+    ReadPrivilegedDiscriminatedSuperClass,
+    ReadPrivilegedSubClassOfReadPrivilegedDiscriminatedSuperClass,
+    ClassPrivilegesReadPrivilegedSuperClass,
+    ReadPrivilegedClassReadPrivilegedByParameters,
+    SingularRelationshipToReadPrivilegedClassReadPrivilegedByParameters,
+    NonSingularRelationshipToReadPrivilegedClassReadPrivilegedByParameters,
+    UpdatePrivilegedSuperClass, 
+    UpdatePrivilegedSubClassOfUpdatePrivilegedSuperClass,
+    UpdatePrivilegedDiscriminatedSuperClass,
+    UpdatePrivilegedSubClassOfUpdatePrivilegedDiscriminatedSuperClass,
+    ClassPrivilegesUpdatePrivilegedSuperClass,
+    UpdatePrivilegedClassUpdatePrivilegedByParameters,
+    DeletePrivilegedSuperClass, 
+    DeletePrivilegedSubClassOfDeletePrivilegedSuperClass,
+    DeletePrivilegedDiscriminatedSuperClass,
+    DeletePrivilegedSubClassOfDeletePrivilegedDiscriminatedSuperClass,
+    SensitivePrivilegedSuperClass,
+    SensitivePrivilegedSubClassOfSensitivePrivilegedSuperClass,
+    SensitivePrivilegedDiscriminatedSuperClass,
+    SensitivePrivilegedSubClassOfSensitivePrivilegedDiscriminatedSuperClass,
+    ClassPrivilegesSensitivePrivilegedSuperClass,
+    SensitivePrivilegedClassSensitivePrivilegedByParameters,
+    ClassPrivilegesDeletePrivilegedSuperClass,
+    DeletePrivilegedClassDeletePrivilegedByParameters,
     ValidationSuperClass,
     SubClassOfValidationSuperClass,
     ValidationDiscriminatedSuperClass,

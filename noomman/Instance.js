@@ -100,9 +100,42 @@ class Instance extends Diffable {
             get(trapTarget, key, receiver) {
                 if (classModel.relationships.map(relationship => relationship.name).includes(key))
                     return receiver.walk(key);
+                
+                if (key.length >= 2 && key.substr(0, 2) === '->') {
+                    const path = Instance.parsePath(key);
+                    return receiver.walkPath(path);
+                }
 
                 if (classModel.relationships.map(relationship => '_' + relationship.name).includes(key))
                     return trapTarget.currentState[key.slice(1)];
+
+                if (key !== '_id' && typeof(key) === 'string' && key.includes('_id')) {
+                    const relationship = classModel.getRelationship(key.substr(0, key.length - 3));
+                    if (relationship && relationship.singular) {
+                        trapTarget.currentState.sync();
+                        const relationshipValue = trapTarget.currentState[relationship.name];
+                        if (relationshipValue instanceof Instance) {
+                            return relationshipValue._id;
+                        }
+                        else {
+                            return relationshipValue;
+                        }
+                    }
+                }
+
+                if (typeof(key) === 'string' && key.includes('_ids')) {
+                    const relationship = classModel.getRelationship(key.substr(0, key.length - 4));
+                    if (relationship && !relationship.singular) {
+                        trapTarget.currentState.sync();
+                        const relationshipValue = trapTarget.currentState[relationship.name];
+                        if (Array.isArray(relationshipValue)) {
+                            return relationshipValue;
+                        }
+                        else {
+                            return relationshipValue.getObjectIds();
+                        }
+                    }
+                }
 
                 if (attributeNames.includes(key))
                     return trapTarget.currentState[key];
@@ -176,8 +209,21 @@ class Instance extends Diffable {
      * - String - A string representation of this instance.
      */
     toString() {
-        return this.currentState.toString();
+        return JSON.stringify(Object.assign({className: this.classModel.className}, this.toDocument()), null, 2);
     }
+
+    /*
+     * inspect()
+     * Overrides default util.inspect() behavior for more helpful output when using
+     *    console.log(instance); Custom inspection functions are deprecated, so this method
+     *    is commented out and should not be used, but is left here in case a developer really 
+     *    wants it for debugging purposes.
+     * Returns
+     * - String - A string representation of this instance.
+    inspect() {
+        return this.toString();
+    }
+     */
 
     /* 
      * saved()
@@ -274,7 +320,7 @@ class Instance extends Diffable {
             throw new NoommanErrors.NoommanArgumentError('instance.walk(): property "' + relationshipName + '" is not a relationship.');
     
         
-        const relationshipDefinition = this.classModel.relationships.filter(relationship => relationship.name ===relationshipName)[0];
+        const relationshipDefinition = this.classModel.getRelationship(relationshipName);
         const relatedClass = this.classModel.getRelatedClassModel(relationshipName);
 
         if (usePreviousState && this.previousState === null) {
@@ -298,6 +344,13 @@ class Instance extends Diffable {
                 if (!usePreviousState) {
                     if (!(relationshipCurrentValue instanceof Instance))
                         this[relationshipName] = await relatedClass.pureFindById(relationshipCurrentValue);
+
+                        if (this['_' + relationshipName] === null) {
+                            console.warn('WARNING: Walking relationship "' + relationshipName + '" on instance ' + 
+                                this.classModel.className + ':' + this.id + ' resulted in fewer instances returned ' + 
+                                'than expected. Check that all of the related instances have been saved and are in the database.' 
+                            );
+                        }
     
                         walkResult = this['_' + relationshipName];
                 }
@@ -317,9 +370,17 @@ class Instance extends Diffable {
             else {
                 if (!usePreviousState) {
                     if (Array.isArray(relationshipCurrentValue)) {
+                        const expectedNumberOfRelatedInstances = relationshipCurrentValue.length;
                         this[relationshipName] = await relatedClass.pureFind({
                             _id: {$in: relationshipCurrentValue}
                         });
+
+                        if (this['_' + relationshipName].size !== expectedNumberOfRelatedInstances) {
+                            console.warn('WARNING: Walking relationship "' + relationshipName + '" on instance ' + 
+                                this.classModel.className + ':' + this.id + ' resulted in fewer instances returned ' + 
+                                'than expected. Check that all of the related instances have been saved and are in the database.' 
+                            );
+                        }
                     }
                     
                     walkResult = this['_' + relationshipName];
@@ -340,17 +401,60 @@ class Instance extends Diffable {
     }
 
     /*
-     * readControlFilter(readControlMethodParameters)
-     * Runs applicable readControl methods for this Instance. If each readControl method returns true for 
+     * parsePath(path)
+     * Parses a string path for the Instance get trap, when property starts with "->". 
+     * Parameters
+     * - path - String - a relationship walking path string, with each relationship to walk preceded 
+     *    by the substring "->".
+     * Returns
+     * - Array<String> - An array of strings that were separated by the "->" string in the given path string.
+     */
+    static parsePath(path) {
+        const pathArray = [];
+        const char = '->';
+        
+        while(path.includes(char)) {
+            path = path.substr(2);
+            const index = path.indexOf(char) === -1 ? undefined : path.indexOf(char);
+            pathArray.push(path.substr(0, index));
+            path = path.substr(index);
+        }
+
+        return pathArray;
+    }
+
+    /*
+     * walkPath(path)
+     * Walks the relationships in the given path from this Instance, and returns a single InstanceSet containing all the Instances
+     *    at the end of the path. 
+     * - path - Array<String> - An array of strings that represent a sequence or relationships to walk from 
+     *    this Instance.
+     * Returns
+     * - InstanceSet - An InstanceSet containing the Instances that result from walking the given path. InstanceSet will always be 
+     *    for the ClassModel at the end of the relationship path. If relationships are empty somewhere in the middle of the path, 
+     *    or there are no Instances at the end of the path, the returned InstanceSet will be empty.
+     * Throws
+     * - NoommanArgumentError - If ClassModel.validatePath() throws a NoommanArgumentError.
+     */
+    async walkPath(path) {
+        const instanceSet = this.classModel.emptyInstanceSet();
+        instanceSet.add(this);
+
+        return instanceSet.walkPath(path);        
+    }
+
+    /*
+     * readPrivilegeFilter(readPrivilegeMethodParameters)
+     * Runs applicable readPrivilege methods for this Instance. If each readPrivilege method returns true for 
      *    this Instance, then this Instance is returned, otherwise null is returned.
      * Parameters
-     * - readControlMethodParameters - Object - An object containing any parameters that the readControl method(s)
+     * - readPrivilegeMethodParameters - Object - An object containing any parameters that the readPrivilege method(s)
      *    may need.
      * Returns
-     * - Promise<Instance> - This Instance if all readControl methods return true, otherwise null.
+     * - Promise<Instance> - This Instance if all readPrivilege methods return true, otherwise null.
      */
-    async readControlFilter(readControlMethodParameters) {
-        return this.classModel.readControlFilterInstance(this, readControlMethodParameters);
+    async readPrivilegeFilter(readPrivilegeMethodParameters) {
+        return this.classModel.readPrivilegeFilterInstance(this, readPrivilegeMethodParameters);
     }
 
     // Validation Methods
@@ -548,20 +652,20 @@ class Instance extends Diffable {
     // Update and Delete Methods Methods
 
     /*
-     * save(createControlMethodParameters, updateControlMethodParameters)
+     * save(createPrivilegeMethodParameters, updatePrivilegeMethodParameters)
      * Saves the current state of this Instance to the database in the proper collection according to its ClassModel.
      * Parameters
-     * - createControlMethodParameters - Object - An object containing parameters needed by a createControl method.
-     * - updateControlMethodParameters - Object - An object containing parameters needed by a updateControl method.
+     * - createPrivilegeMethodParameters - Object - An object containing parameters needed by a createPrivilege method.
+     * - updatePrivilegeMethodParameters - Object - An object containing parameters needed by a updatePrivilege method.
      * Returns
      * - Promise<Instance> - This Instance, if save is successful.
      * Throws
      * - NoommanSaveError - If this Instance has already been deleted.
      * - NoommanSaveError - If this Instance has been stripped by stripSensitiveAttributes().
      * - NoommanValidationError - If a call to validate() throws an NoommanValidationError.
-     * - NoommanSaveError - If Instance does not pass createControl or updateControl methods.
+     * - NoommanSaveError - If Instance does not pass createPrivilege or updatePrivilege methods.
      */ 
-    async save(createControlMethodParameters, updateControlMethodParameters) {
+    async save(createPrivilegeMethodParameters, updatePrivilegeMethodParameters) {
         if (this.deleted()) {
             throw new NoommanErrors.NoommanSaveError('instance.save(): You cannot save an instance which has been deleted.');
         }
@@ -582,7 +686,7 @@ class Instance extends Diffable {
         }
 
         if (!this.saved()) {
-            await this.classModel.createControlCheckInstance(this, createControlMethodParameters);
+            await this.classModel.createPrivilegeCheckInstance(this, createPrivilegeMethodParameters);
             
             if (Object.keys(this.relatedDiffs()).length !== 0) {
                 await this.classModel.updateRelatedInstancesForInstance(this);
@@ -591,7 +695,7 @@ class Instance extends Diffable {
             await this.classModel.insertOne(this.toDocument());
         }
         else {
-            await this.classModel.updateControlCheckInstance(this, updateControlMethodParameters);
+            await this.classModel.updatePrivilegeCheckInstance(this, updatePrivilegeMethodParameters);
 
             if (Object.keys(this.relatedDiffs()).length !== 0) {
                 await this.classModel.updateRelatedInstancesForInstance(this);
@@ -613,9 +717,9 @@ class Instance extends Diffable {
     /*
      * saveWithoutValidation()
      * Saves the current state of this Instance to the database in the proper collection according to its ClassModel.
-     *    Does not do any validation or run crudControl functions, recommended not to be used outside internal 
+     *    Does not do any validation or run crudPrivilege functions, recommended not to be used outside internal 
      *    noomman methods. The purpose is for use in saving multiple instances at once, and any calling method is 
-     *    expected to have already run validations and crudControl functions.
+     *    expected to have already run validations and crudPrivilege functions.
      * Returns
      * - Promise<Instance> - This Instance, if save is successful.
      * Throws
@@ -650,21 +754,21 @@ class Instance extends Diffable {
     }
 
     /*
-     * delete(deleteControlMethodParameters) 
+     * delete(deletePrivilegeMethodParameters) 
      * Deletes this Instance from the database.
      * Parameters
-     * - deleteControlMethodParameters - Object - An object containing any parameters needed by a deleteControl method.
+     * - deletePrivilegeMethodParameters - Object - An object containing any parameters needed by a deletePrivilege method.
      * Returns
      * - Promise<Boolean> - True if Instance is deleted properly.
      * Throws
      * - NoommanDeleteError - If this Instance has not yet been saved (i.e. is not in the database).
-     * - NoommanDeleteError - If deleteControl method returns false for this Instance.
+     * - NoommanDeleteError - If deletePrivilege method returns false for this Instance.
      */
-    async delete(deleteControlMethodParameters) {
+    async delete(deletePrivilegeMethodParameters) {
         if (!this.saved())
             throw new NoommanErrors.NoommanDeleteError('instance.delete(): You cannot delete an instance which hasn\'t been saved yet');
 
-        await this.classModel.deleteControlCheckInstance(this, deleteControlMethodParameters)
+        await this.classModel.deletePrivilegeCheckInstance(this, deletePrivilegeMethodParameters)
 
         await this.deleteOwnedInstances();
 
@@ -693,18 +797,18 @@ class Instance extends Diffable {
     }
 
     /*
-     * deleteOwnedInstances(deleteControlMethodParameters)
+     * deleteOwnedInstances(deletePrivilegeMethodParameters)
      * Deletes any Instances related to this Instance through an 'owns' relationship.
      * Parameters
-     * - deleteControlMethodParameters - Object - An object containing any parameters needed by a deleteControl method.
+     * - deletePrivilegeMethodParameters - Object - An object containing any parameters needed by a deletePrivilege method.
      * Returns 
      * - Promise<Array<Boolean>> - An Array of Booleans, each of which will be true if all related instances were deleted
      *    successfully.
      * Throws
      * - NoommanDeleteError - If a related owned Instance has not yet been saved (i.e. is not in the database).
-     * - NoommanDeleteError - If deleteControl method returns false for a related owned Instance.
+     * - NoommanDeleteError - If deletePrivilege method returns false for a related owned Instance.
      */
-    async deleteOwnedInstances(deleteControlMethodParameters) {
+    async deleteOwnedInstances(deletePrivilegeMethodParameters) {
         const ownsRelationships = this.classModel.relationships.filter(r => r.owns === true);
         const deletePromises = [];
 
@@ -717,7 +821,7 @@ class Instance extends Diffable {
             if (!relationship.singular && related.isEmpty()) {
                 continue;
             }
-            deletePromises.push(related.delete(deleteControlMethodParameters));
+            deletePromises.push(related.delete(deletePrivilegeMethodParameters));
         }
 
         if (deletePromises.length === 0) {

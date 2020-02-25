@@ -26,6 +26,108 @@ describe('Database Tests', () => {
             await database.close();
         });
 
+        describe('Methods throw error if database is not connected.', () => {
+
+            it('database.close(): Error thrown if database is not connected.', async () => {
+                const expectedErrorMessage = 'database.close(): No connection to database.';
+                await testForErrorAsync('database.close()', expectedErrorMessage, async () => {
+                    return database.close();
+                });
+            });
+
+            it('database.index(): Error thrown if database is not connected.', async () => {
+                const expectedErrorMessage = 'database.index(): No connection to database.';
+                await testForErrorAsync('database.index()', expectedErrorMessage, async () => {
+                    return database.index();
+                });
+            });
+
+            it('database.insertOne(): Error thrown if database is not connected.', async () => {
+                const expectedErrorMessage = 'database.insertOne(): No connection to database.';
+                await testForErrorAsync('database.insertOne()', expectedErrorMessage, async () => {
+                    return database.insertOne();
+                });
+            });
+
+            it('database.insertMany(): Error thrown if database is not connected.', async () => {
+                const expectedErrorMessage = 'database.insertMany(): No connection to database.';
+                await testForErrorAsync('database.insertMany()', expectedErrorMessage, async () => {
+                    return database.insertMany();
+                });
+            });
+
+            it('database.overwrite(): Error thrown if database is not connected.', async () => {
+                const expectedErrorMessage = 'database.overwrite(): No connection to database.';
+                await testForErrorAsync('database.overwrite()', expectedErrorMessage, async () => {
+                    return database.overwrite();
+                });
+            });
+
+            it('database.update(): Error thrown if database is not connected.', async () => {
+                const expectedErrorMessage = 'database.update(): No connection to database.';
+                await testForErrorAsync('database.update()', expectedErrorMessage, async () => {
+                    return database.update();
+                });
+            });
+
+            it('database.find(): Error thrown if database is not connected.', async () => {
+                const expectedErrorMessage = 'database.find(): No connection to database.';
+                await testForErrorAsync('database.find()', expectedErrorMessage, async () => {
+                    return database.find();
+                });
+            });
+
+            it('database.findOne(): Error thrown if database is not connected.', async () => {
+                const expectedErrorMessage = 'database.findOne(): No connection to database.';
+                await testForErrorAsync('database.findOne()', expectedErrorMessage, async () => {
+                    return database.findOne();
+                });
+            });
+
+            it('database.findById(): Error thrown if database is not connected.', async () => {
+                const expectedErrorMessage = 'database.findById(): No connection to database.';
+                await testForErrorAsync('database.findById()', expectedErrorMessage, async () => {
+                    return database.findById();
+                });
+            });
+
+            it('database.findCursor(): Error thrown if database is not connected.', async () => {
+                const expectedErrorMessage = 'database.findCursor(): No connection to database.';
+                await testForErrorAsync('database.findCursor()', expectedErrorMessage, async () => {
+                    return database.findCursor();
+                });
+            });
+
+            it('database.deleteOne(): Error thrown if database is not connected.', async () => {
+                const expectedErrorMessage = 'database.deleteOne(): No connection to database.';
+                await testForErrorAsync('database.deleteOne()', expectedErrorMessage, async () => {
+                    return database.deleteOne();
+                });
+            });
+
+            it('database.deleteMany(): Error thrown if database is not connected.', async () => {
+                const expectedErrorMessage = 'database.deleteMany(): No connection to database.';
+                await testForErrorAsync('database.deleteMany()', expectedErrorMessage, async () => {
+                    return database.deleteMany();
+                });
+            });
+
+            it('database.clearCollection(): Error thrown if database is not connected.', async () => {
+                const expectedErrorMessage = 'database.clearCollection(): No connection to database.';
+                await testForErrorAsync('database.clearCollection()', expectedErrorMessage, async () => {
+                    return database.clearCollection();
+                });
+            });
+
+            it('database.collection(): Error thrown if database is not connected.', async () => {
+                const expectedErrorMessage = 'database.collection(): No connection to database.';
+                await testForErrorAsync('database.collection()', expectedErrorMessage, async () => {
+                    return database.collection();
+                });
+            });
+
+        });
+
     });
 
     describe('index()', () => {

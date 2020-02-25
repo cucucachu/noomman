@@ -45,26 +45,26 @@ const DatabaseConnection = require('./helpers/DatabaseConnection');
     var SubClassOfSubClassOfSuperClass = TestClassModels.SubClassOfSubClassOfSuperClass;
     var SubClassOfAbstractSubClassOfSuperClass = TestClassModels.SubClassOfAbstractSubClassOfSuperClass;
 
-    // CreateControlled Classes
-    var CreateControlledSuperClass = TestClassModels.CreateControlledSuperClass;
-    var CreateControlledSubClassOfCreateControlledSuperClass = TestClassModels.CreateControlledSubClassOfCreateControlledSuperClass;
-    var CreateControlledDiscriminatedSuperClass = TestClassModels.CreateControlledDiscriminatedSuperClass;
-    var CreateControlledSubClassOfCreateControlledDiscriminatedSuperClass = TestClassModels.CreateControlledSubClassOfCreateControlledDiscriminatedSuperClass;
-    var ClassControlsCreateControlledSuperClass = TestClassModels.ClassControlsCreateControlledSuperClass;
-    var CreateControlledClassCreateControlledByParameters = TestClassModels.CreateControlledClassCreateControlledByParameters;
+    // CreatePrivileged Classes
+    var CreatePrivilegedSuperClass = TestClassModels.CreatePrivilegedSuperClass;
+    var CreatePrivilegedSubClassOfCreatePrivilegedSuperClass = TestClassModels.CreatePrivilegedSubClassOfCreatePrivilegedSuperClass;
+    var CreatePrivilegedDiscriminatedSuperClass = TestClassModels.CreatePrivilegedDiscriminatedSuperClass;
+    var CreatePrivilegedSubClassOfCreatePrivilegedDiscriminatedSuperClass = TestClassModels.CreatePrivilegedSubClassOfCreatePrivilegedDiscriminatedSuperClass;
+    var ClassPrivilegesCreatePrivilegedSuperClass = TestClassModels.ClassPrivilegesCreatePrivilegedSuperClass;
+    var CreatePrivilegedClassCreatePrivilegedByParameters = TestClassModels.CreatePrivilegedClassCreatePrivilegedByParameters;
 
-    // Update Controlled Classes
-    var UpdateControlledSuperClass = TestClassModels.UpdateControlledSuperClass;
-    var ClassControlsUpdateControlledSuperClass = TestClassModels.ClassControlsUpdateControlledSuperClass;
-    var UpdateControlledClassUpdateControlledByParameters = TestClassModels.UpdateControlledClassUpdateControlledByParameters;
+    // Update Privileged Classes
+    var UpdatePrivilegedSuperClass = TestClassModels.UpdatePrivilegedSuperClass;
+    var ClassPrivilegesUpdatePrivilegedSuperClass = TestClassModels.ClassPrivilegesUpdatePrivilegedSuperClass;
+    var UpdatePrivilegedClassUpdatePrivilegedByParameters = TestClassModels.UpdatePrivilegedClassUpdatePrivilegedByParameters;
 
-    // Delete Controlled Classes
-    var DeleteControlledSuperClass = TestClassModels.DeleteControlledSuperClass;
-    var ClassControlsDeleteControlledSuperClass = TestClassModels.ClassControlsDeleteControlledSuperClass;
-    var DeleteControlledClassDeleteControlledByParameters = TestClassModels.DeleteControlledClassDeleteControlledByParameters;
+    // Delete Privileged Classes
+    var DeletePrivilegedSuperClass = TestClassModels.DeletePrivilegedSuperClass;
+    var ClassPrivilegesDeletePrivilegedSuperClass = TestClassModels.ClassPrivilegesDeletePrivilegedSuperClass;
+    var DeletePrivilegedClassDeletePrivilegedByParameters = TestClassModels.DeletePrivilegedClassDeletePrivilegedByParameters;
     
-    // SensitiveControlled Classes
-    var SensitiveControlledSuperClass = TestClassModels.SensitiveControlledSuperClass;
+    // SensitivePrivileged Classes
+    var SensitivePrivilegedSuperClass = TestClassModels.SensitivePrivilegedSuperClass;
 
     // Validation Classes
     var ValidationSuperClass = TestClassModels.ValidationSuperClass;
@@ -1916,61 +1916,61 @@ describe('InstanceSet Tests', () => {
 
         describe('InstanceSet.save()', () => {
 
-            // Set up createControlled Instances
+            // Set up createPrivileged Instances
             {
-                // ClassControlsCreateControlledSuperClass Instances
-                var instanceOfClassControlsCreateControlledSuperClassAllowed = new Instance(ClassControlsCreateControlledSuperClass);
-                instanceOfClassControlsCreateControlledSuperClassAllowed.allowed = true;
+                // ClassPrivilegesCreatePrivilegedSuperClass Instances
+                var instanceOfClassPrivilegesCreatePrivilegedSuperClassAllowed = new Instance(ClassPrivilegesCreatePrivilegedSuperClass);
+                instanceOfClassPrivilegesCreatePrivilegedSuperClassAllowed.allowed = true;
                 
-                var instanceOfClassControlsCreateControlledSuperClassNotAllowed = new Instance(ClassControlsCreateControlledSuperClass);
-                instanceOfClassControlsCreateControlledSuperClassNotAllowed.allowed = false;
+                var instanceOfClassPrivilegesCreatePrivilegedSuperClassNotAllowed = new Instance(ClassPrivilegesCreatePrivilegedSuperClass);
+                instanceOfClassPrivilegesCreatePrivilegedSuperClassNotAllowed.allowed = false;
     
-                // CreateControlledSuperClass Instances
-                var instanceOfCreateControlledSuperClassPasses = new Instance(CreateControlledSuperClass);
-                instanceOfCreateControlledSuperClassPasses.name = 'instanceOfCreateControlledSuperClassPasses';
-                instanceOfCreateControlledSuperClassPasses.createControlledBy = instanceOfClassControlsCreateControlledSuperClassAllowed;
+                // CreatePrivilegedSuperClass Instances
+                var instanceOfCreatePrivilegedSuperClassPasses = new Instance(CreatePrivilegedSuperClass);
+                instanceOfCreatePrivilegedSuperClassPasses.name = 'instanceOfCreatePrivilegedSuperClassPasses';
+                instanceOfCreatePrivilegedSuperClassPasses.createPrivilegedBy = instanceOfClassPrivilegesCreatePrivilegedSuperClassAllowed;
     
-                var instanceOfCreateControlledSuperClassFailsRelationship = new Instance(CreateControlledSuperClass);
-                instanceOfCreateControlledSuperClassFailsRelationship.name = 'instanceOfCreateControlledSuperClassFailsRelationship';
-                instanceOfCreateControlledSuperClassFailsRelationship.createControlledBy = instanceOfClassControlsCreateControlledSuperClassNotAllowed;
+                var instanceOfCreatePrivilegedSuperClassFailsRelationship = new Instance(CreatePrivilegedSuperClass);
+                instanceOfCreatePrivilegedSuperClassFailsRelationship.name = 'instanceOfCreatePrivilegedSuperClassFailsRelationship';
+                instanceOfCreatePrivilegedSuperClassFailsRelationship.createPrivilegedBy = instanceOfClassPrivilegesCreatePrivilegedSuperClassNotAllowed;
             }
 
-            // Set up updateControlled Instances
+            // Set up updatePrivileged Instances
             {
-                // ClassControlsUpdateControlledSuperClass Instances
-                var instanceOfClassControlsUpdateControlledSuperClassAllowed = new Instance(ClassControlsUpdateControlledSuperClass);
-                instanceOfClassControlsUpdateControlledSuperClassAllowed.allowed = true;
+                // ClassPrivilegesUpdatePrivilegedSuperClass Instances
+                var instanceOfClassPrivilegesUpdatePrivilegedSuperClassAllowed = new Instance(ClassPrivilegesUpdatePrivilegedSuperClass);
+                instanceOfClassPrivilegesUpdatePrivilegedSuperClassAllowed.allowed = true;
                 
-                var instanceOfClassControlsUpdateControlledSuperClassNotAllowed = new Instance(ClassControlsUpdateControlledSuperClass);
-                instanceOfClassControlsUpdateControlledSuperClassNotAllowed.allowed = false;
+                var instanceOfClassPrivilegesUpdatePrivilegedSuperClassNotAllowed = new Instance(ClassPrivilegesUpdatePrivilegedSuperClass);
+                instanceOfClassPrivilegesUpdatePrivilegedSuperClassNotAllowed.allowed = false;
     
-                // UpdateControlledSuperClass Instances
-                var instanceOfUpdateControlledSuperClassPasses = new Instance(UpdateControlledSuperClass);
-                instanceOfUpdateControlledSuperClassPasses.name = 'instanceOfUpdateControlledSuperClassPasses';
-                instanceOfUpdateControlledSuperClassPasses.updateControlledBy = instanceOfClassControlsUpdateControlledSuperClassAllowed;
+                // UpdatePrivilegedSuperClass Instances
+                var instanceOfUpdatePrivilegedSuperClassPasses = new Instance(UpdatePrivilegedSuperClass);
+                instanceOfUpdatePrivilegedSuperClassPasses.name = 'instanceOfUpdatePrivilegedSuperClassPasses';
+                instanceOfUpdatePrivilegedSuperClassPasses.updatePrivilegedBy = instanceOfClassPrivilegesUpdatePrivilegedSuperClassAllowed;
     
-                var instanceOfUpdateControlledSuperClassFailsRelationship = new Instance(UpdateControlledSuperClass);
-                instanceOfUpdateControlledSuperClassFailsRelationship.name = 'instanceOfUpdateControlledSuperClassFailsRelationship';
-                instanceOfUpdateControlledSuperClassFailsRelationship.updateControlledBy = instanceOfClassControlsUpdateControlledSuperClassNotAllowed;
+                var instanceOfUpdatePrivilegedSuperClassFailsRelationship = new Instance(UpdatePrivilegedSuperClass);
+                instanceOfUpdatePrivilegedSuperClassFailsRelationship.name = 'instanceOfUpdatePrivilegedSuperClassFailsRelationship';
+                instanceOfUpdatePrivilegedSuperClassFailsRelationship.updatePrivilegedBy = instanceOfClassPrivilegesUpdatePrivilegedSuperClassNotAllowed;
             }
     
             // Save all SecurityFilter Test Instances
             before(async () => {
-                await instanceOfClassControlsUpdateControlledSuperClassAllowed.save();
-                await instanceOfClassControlsUpdateControlledSuperClassNotAllowed.save();
-                await instanceOfClassControlsCreateControlledSuperClassAllowed.save();
-                await instanceOfClassControlsCreateControlledSuperClassNotAllowed.save();
+                await instanceOfClassPrivilegesUpdatePrivilegedSuperClassAllowed.save();
+                await instanceOfClassPrivilegesUpdatePrivilegedSuperClassNotAllowed.save();
+                await instanceOfClassPrivilegesCreatePrivilegedSuperClassAllowed.save();
+                await instanceOfClassPrivilegesCreatePrivilegedSuperClassNotAllowed.save();
     
             });
 
             after(async() => {
                 await AllFieldsRequiredClass.clear();
-                await ClassControlsUpdateControlledSuperClass.clear();
-                await UpdateControlledSuperClass.clear();
-                await UpdateControlledClassUpdateControlledByParameters.clear();
-                await CreateControlledSuperClass.clear();
-                await CreateControlledClassCreateControlledByParameters.clear();
-                await SensitiveControlledSuperClass.clear();
+                await ClassPrivilegesUpdatePrivilegedSuperClass.clear();
+                await UpdatePrivilegedSuperClass.clear();
+                await UpdatePrivilegedClassUpdatePrivilegedByParameters.clear();
+                await CreatePrivilegedSuperClass.clear();
+                await CreatePrivilegedClassCreatePrivilegedByParameters.clear();
+                await SensitivePrivilegedSuperClass.clear();
             });
 
             it('InstanceSet will not save any of the instances if any are invalid.', async () => {
@@ -2053,17 +2053,17 @@ describe('InstanceSet Tests', () => {
                     throw new Error('Found instances\'s saved properties were not set to true.' );
             });
 
-            describe('Save Create Controlled Instances', () => {
+            describe('Save Create Privileged Instances', () => {
 
-                it('Call save() on an InstanceSet of an create controlled class. InstanceSet saved.', async () => {
-                    const instance = new Instance(CreateControlledSuperClass);
-                    instance.name = 'instanceOfCreateControlledSuperClassPasses-saveAll';
-                    instance.createControlledBy = instanceOfClassControlsCreateControlledSuperClassAllowed;
+                it('Call save() on an InstanceSet of an create privilegeled class. InstanceSet saved.', async () => {
+                    const instance = new Instance(CreatePrivilegedSuperClass);
+                    instance.name = 'instanceOfCreatePrivilegedSuperClassPasses-saveAll';
+                    instance.createPrivilegedBy = instanceOfClassPrivilegesCreatePrivilegedSuperClassAllowed;
     
-                    const instanceSet = new InstanceSet(CreateControlledSuperClass, [instance]);
+                    const instanceSet = new InstanceSet(CreatePrivilegedSuperClass, [instance]);
                     await instanceSet.save();
     
-                    const instanceSaved = await CreateControlledSuperClass.findById(instance._id);
+                    const instanceSaved = await CreatePrivilegedSuperClass.findById(instance._id);
                     
                     if (!instanceSaved)
                         throw new Error('Instance was not saved.');
@@ -2071,18 +2071,18 @@ describe('InstanceSet Tests', () => {
                     await instance.delete(instance);
                 });
     
-                it('Save fails due to create control check.', async () => {
-                    const instanceSet = new InstanceSet(CreateControlledSuperClass, [
-                        instanceOfCreateControlledSuperClassPasses,
-                        instanceOfCreateControlledSuperClassFailsRelationship,
+                it('Save fails due to create privilege check.', async () => {
+                    const instanceSet = new InstanceSet(CreatePrivilegedSuperClass, [
+                        instanceOfCreatePrivilegedSuperClassPasses,
+                        instanceOfCreatePrivilegedSuperClassFailsRelationship,
                     ]);
-                    const expectedErrorMessage = 'Illegal attempt to create instances: ' + instanceOfCreateControlledSuperClassFailsRelationship.id;
+                    const expectedErrorMessage = 'Illegal attempt to create instances: ' + instanceOfCreatePrivilegedSuperClassFailsRelationship.id;
                     
                     await testForErrorAsync('InstanceSet.save()', expectedErrorMessage, async () => {
                         return instanceSet.save();
                     });
                     
-                    const instancesFound = await CreateControlledSuperClass.find({
+                    const instancesFound = await CreatePrivilegedSuperClass.find({
                         _id: {$in: instanceSet.getInstanceIds()}
                     });
     
@@ -2090,17 +2090,17 @@ describe('InstanceSet Tests', () => {
                         throw new Error('.save() threw an error, but the instance was saved anyway.');
                 });
     
-                it('Call save() on an InstanceSet of an create controlled class with createControlMethodParameters. InstanceSet saved.', async () => {
-                    const instance = new Instance(CreateControlledClassCreateControlledByParameters);
+                it('Call save() on an InstanceSet of an create privilegeled class with createPrivilegeMethodParameters. InstanceSet saved.', async () => {
+                    const instance = new Instance(CreatePrivilegedClassCreatePrivilegedByParameters);
                     const parameters = {
                         numberA: 1,
                         numberB: 1,
                         boolean: true,
                     };
-                    const instanceSet = new InstanceSet(CreateControlledClassCreateControlledByParameters, [instance]);
+                    const instanceSet = new InstanceSet(CreatePrivilegedClassCreatePrivilegedByParameters, [instance]);
                     
                     await instanceSet.save(parameters);
-                    const instanceSaved = CreateControlledClassCreateControlledByParameters.findById(instance._id);
+                    const instanceSaved = CreatePrivilegedClassCreatePrivilegedByParameters.findById(instance._id);
                     
                     if (!instanceSaved)
                         throw new Error('Instance was not saved.');
@@ -2108,21 +2108,21 @@ describe('InstanceSet Tests', () => {
                     await instance.delete();
                 });
     
-                it('Call save() on an InstanceSet of an create controlled class with createControlMethodParameters. Save fails due to create control check.', async () => {
-                    const instance = new Instance(CreateControlledClassCreateControlledByParameters);
+                it('Call save() on an InstanceSet of an create privilegeled class with createPrivilegeMethodParameters. Save fails due to create privilege check.', async () => {
+                    const instance = new Instance(CreatePrivilegedClassCreatePrivilegedByParameters);
                     const expectedErrorMessage = 'Illegal attempt to create instances: ' + instance.id;
                     const parameters = {
                         numberA: -2,
                         numberB: 1,
                         boolean: true,
                     };
-                    const instanceSet = new InstanceSet(CreateControlledClassCreateControlledByParameters, [instance]);
+                    const instanceSet = new InstanceSet(CreatePrivilegedClassCreatePrivilegedByParameters, [instance]);
     
                     await testForErrorAsync('InstanceSet.save()', expectedErrorMessage, async () => {
                         return instanceSet.save(parameters);
                     });
                     
-                    const instanceFound = await CreateControlledClassCreateControlledByParameters.findById(instance._id);
+                    const instanceFound = await CreatePrivilegedClassCreatePrivilegedByParameters.findById(instance._id);
     
                     if (instanceFound) 
                         throw new Error('.save() threw an error, but the instance was saved anyway.')
@@ -2130,21 +2130,21 @@ describe('InstanceSet Tests', () => {
 
             });
 
-            describe('Save Update Controlled Instances', () => {
+            describe('Save Update Privileged Instances', () => {
 
-                it('Call save() on an InstanceSet of an update controlled class. InstanceSet saved.', async () => {
-                    const instance = new Instance(UpdateControlledSuperClass);
-                    instance.name = 'instanceOfUpdateControlledSuperClassPasses-saveAll';
-                    instance.updateControlledBy = instanceOfClassControlsUpdateControlledSuperClassAllowed;
+                it('Call save() on an InstanceSet of an update privilegeled class. InstanceSet saved.', async () => {
+                    const instance = new Instance(UpdatePrivilegedSuperClass);
+                    instance.name = 'instanceOfUpdatePrivilegedSuperClassPasses-saveAll';
+                    instance.updatePrivilegedBy = instanceOfClassPrivilegesUpdatePrivilegedSuperClassAllowed;
     
-                    const instanceSet = new InstanceSet(UpdateControlledSuperClass, [instance]);
+                    const instanceSet = new InstanceSet(UpdatePrivilegedSuperClass, [instance]);
                     await instanceSet.save();
     
-                    instance.name = 'instanceOfUpdateControlledSuperClassPasses-saveAll2';
+                    instance.name = 'instanceOfUpdatePrivilegedSuperClassPasses-saveAll2';
     
                     await instanceSet.save();
     
-                    const instanceSaved = await UpdateControlledSuperClass.findById(instance._id);
+                    const instanceSaved = await UpdatePrivilegedSuperClass.findById(instance._id);
                     
                     if (!instanceSaved)
                         throw new Error('Instance was not saved.');
@@ -2152,23 +2152,23 @@ describe('InstanceSet Tests', () => {
                     await instance.delete(instance);
                 });
     
-                it('Save fails due to create control check.', async () => {
-                    const instanceSet = new InstanceSet(UpdateControlledSuperClass, [
-                        instanceOfUpdateControlledSuperClassPasses,
-                        instanceOfUpdateControlledSuperClassFailsRelationship,
+                it('Save fails due to create privilege check.', async () => {
+                    const instanceSet = new InstanceSet(UpdatePrivilegedSuperClass, [
+                        instanceOfUpdatePrivilegedSuperClassPasses,
+                        instanceOfUpdatePrivilegedSuperClassFailsRelationship,
                     ]);
-                    const expectedErrorMessage = 'Illegal attempt to update instances: ' + instanceOfUpdateControlledSuperClassFailsRelationship.id;
+                    const expectedErrorMessage = 'Illegal attempt to update instances: ' + instanceOfUpdatePrivilegedSuperClassFailsRelationship.id;
                     
                     await instanceSet.save();
     
-                    instanceOfUpdateControlledSuperClassPasses.name = instanceOfUpdateControlledSuperClassPasses.name + '1';
-                    instanceOfUpdateControlledSuperClassFailsRelationship.name = instanceOfUpdateControlledSuperClassFailsRelationship.name + '1';
+                    instanceOfUpdatePrivilegedSuperClassPasses.name = instanceOfUpdatePrivilegedSuperClassPasses.name + '1';
+                    instanceOfUpdatePrivilegedSuperClassFailsRelationship.name = instanceOfUpdatePrivilegedSuperClassFailsRelationship.name + '1';
     
                     await testForErrorAsync('InstanceSet.save()', expectedErrorMessage, async () => {
                         return instanceSet.save();
                     });
                     
-                    const instancesFound = await UpdateControlledSuperClass.find({
+                    const instancesFound = await UpdatePrivilegedSuperClass.find({
                         _id: {$in: instanceSet.getObjectIds()}
                     });
     
@@ -2176,14 +2176,14 @@ describe('InstanceSet Tests', () => {
                         throw new Error('Error was thrown but instances were updated anyway.');
                 });
     
-                it('Call save() on an InstanceSet of an update controlled class with updateControlMethodParameters. InstanceSet saved.', async () => {
-                    const instance = new Instance(UpdateControlledClassUpdateControlledByParameters);
+                it('Call save() on an InstanceSet of an update privilegeled class with updatePrivilegeMethodParameters. InstanceSet saved.', async () => {
+                    const instance = new Instance(UpdatePrivilegedClassUpdatePrivilegedByParameters);
                     const parameters = {
                         numberA: 1,
                         numberB: 1,
                         boolean: true,
                     };
-                    const instanceSet = new InstanceSet(UpdateControlledClassUpdateControlledByParameters, [instance]);
+                    const instanceSet = new InstanceSet(UpdatePrivilegedClassUpdatePrivilegedByParameters, [instance]);
                     
                     await instanceSet.save();
     
@@ -2191,7 +2191,7 @@ describe('InstanceSet Tests', () => {
     
                     await instanceSet.save(null, parameters);
     
-                    const instanceAfterUpdate = await UpdateControlledClassUpdateControlledByParameters.findById(instance._id);
+                    const instanceAfterUpdate = await UpdatePrivilegedClassUpdatePrivilegedByParameters.findById(instance._id);
     
                     if (!instanceAfterUpdate || !instanceAfterUpdate.name.includes('updated'))
                         throw new Error('Instance was not updated.');
@@ -2199,15 +2199,15 @@ describe('InstanceSet Tests', () => {
                     await instance.delete();
                 });
     
-                it('Call save() on an InstanceSet of an update controlled class with updateControlMethodParameters. Save fails due to update control check.', async () => {
-                    const instance = new Instance(UpdateControlledClassUpdateControlledByParameters);
+                it('Call save() on an InstanceSet of an update privilegeled class with updatePrivilegeMethodParameters. Save fails due to update privilege check.', async () => {
+                    const instance = new Instance(UpdatePrivilegedClassUpdatePrivilegedByParameters);
                     const expectedErrorMessage = 'Illegal attempt to update instances: ' + instance.id;
                     const parameters = {
                         numberA: -2,
                         numberB: 1,
                         boolean: true,
                     };
-                    const instanceSet = new InstanceSet(UpdateControlledClassUpdateControlledByParameters, [instance]);
+                    const instanceSet = new InstanceSet(UpdatePrivilegedClassUpdatePrivilegedByParameters, [instance]);
     
                     await instanceSet.save();
     
@@ -2217,7 +2217,7 @@ describe('InstanceSet Tests', () => {
                         return instanceSet.save(null, parameters);
                     })
                     
-                    const instanceFound = await UpdateControlledClassUpdateControlledByParameters.findById(instance._id);
+                    const instanceFound = await UpdatePrivilegedClassUpdatePrivilegedByParameters.findById(instance._id);
     
                     if (instanceFound.name) 
                         throw new Error('.save() threw an error, but the instance was updated anyway.')
@@ -3275,11 +3275,11 @@ describe('InstanceSet Tests', () => {
     
             });
 
-            describe('Saving Sensitive Controlled InstanceSets (Stripped Instances)', () => {
+            describe('Saving Sensitive Privileged InstanceSets (Stripped Instances)', () => {
                 
                 it('An instance which has been stripped of a sensitive attribute cannot be saved.', async () => {
                     const expectedErrorMessage = 'Attempt to save an InstanceSet which contains stripped instances.';
-                    const instance = new Instance(SensitiveControlledSuperClass);
+                    const instance = new Instance(SensitivePrivilegedSuperClass);
                     instance.assign({
                         name: 'StrippedInstance',
                         SSN: '123456789',
@@ -3287,7 +3287,7 @@ describe('InstanceSet Tests', () => {
     
                     await instance.save();
     
-                    const foundInstanceSet = await SensitiveControlledSuperClass.find({
+                    const foundInstanceSet = await SensitivePrivilegedSuperClass.find({
                         _id: instance._id,
                     });
     
@@ -3597,38 +3597,336 @@ describe('InstanceSet Tests', () => {
     
         });
 
+        describe('InstanceSet.walkPath()', () => {
+    
+            describe('Walking Relationships with Unsaved Instances', () => {
+    
+                it('Can walk singlular relationship.', async () => {
+                    const instance1 = new Instance(TwoWayRelationshipClass1);
+                    const instance2 = new Instance(TwoWayRelationshipClass2);
+        
+                    instance1.oneToOne = instance2;
+
+                    const instanceSet = new InstanceSet(TwoWayRelationshipClass1, [instance1]);
+        
+                    const walkResult = await instanceSet.walkPath(['oneToOne']);
+        
+                    if (walkResult.isEmpty()) {
+                        throw new Error('instance.walkPath did not return any instances.');
+                    }
+        
+                    if (!walkResult.instanceAt(0).equals(instance2)) {
+                        throw new Error('instance.walkPath did not return the expected instance(s).');
+                    }
+                });
+        
+                it('Can walk non-singlular relationship.', async () => {
+                    const instance1 = new Instance(TwoWayRelationshipClass1);
+                    const instance2 = new Instance(TwoWayRelationshipClass2);
+        
+                    instance1.oneToMany = new InstanceSet(TwoWayRelationshipClass2, [instance2]);
+
+                    const instanceSet = new InstanceSet(TwoWayRelationshipClass1, [instance1]);
+        
+                    const walkResult = await instanceSet.walkPath(['oneToMany']);
+        
+                    if (walkResult.isEmpty()) {
+                        throw new Error('instance.walkPath did not return any instances.');
+                    }
+        
+                    if (!walkResult.instanceAt(0).equals(instance2)) {
+                        throw new Error('instance.walkPath did not return the expected instance(s).');
+                    }
+                });
+        
+                it('Can walk two singular relationships.', async () => {
+                    const instance1 = new Instance(TwoWayRelationshipClass1);
+                    const instance2 = new Instance(TwoWayRelationshipClass2);
+                    const instance3 = new Instance(TwoWayRelationshipClass1);
+        
+                    instance1.oneToOne = instance2;
+                    instance2.manyToOne = instance3;
+
+                    const instanceSet = new InstanceSet(TwoWayRelationshipClass1, [instance1]);
+        
+                    const walkResult = await instanceSet.walkPath(['oneToOne', 'manyToOne']);
+        
+                    if (walkResult.isEmpty()) {
+                        throw new Error('instance.walkPath did not return any instances.');
+                    }
+        
+                    if (!walkResult.instanceAt(0).equals(instance3)) {
+                        throw new Error('instance.walkPath did not return the expected instance(s).');
+                    }
+                });
+        
+                it('Can walk two non-singular relationships.', async () => {
+                    const instance1 = new Instance(TwoWayRelationshipClass1);
+                    const instance2a = new Instance(TwoWayRelationshipClass2);
+                    const instance2b = new Instance(TwoWayRelationshipClass2);
+                    const instance3a = new Instance(TwoWayRelationshipClass1);
+                    const instance3b = new Instance(TwoWayRelationshipClass1);
+                    const instance3c = new Instance(TwoWayRelationshipClass1);
+                    const instance3d = new Instance(TwoWayRelationshipClass1);
+        
+                    instance1.oneToMany = new InstanceSet(TwoWayRelationshipClass2, [instance2a, instance2b]);
+                    instance2a.oneToMany = new InstanceSet(TwoWayRelationshipClass1, [instance3a, instance3b]);
+                    instance2b.oneToMany = new InstanceSet(TwoWayRelationshipClass1, [instance3c, instance3d]);
+
+                    const instanceSet = new InstanceSet(TwoWayRelationshipClass1, [instance1]);
+        
+                    const walkResult = await instanceSet.walkPath(['oneToMany', 'oneToMany']);
+        
+                    if (walkResult.isEmpty()) {
+                        throw new Error('instance.walkPath did not return any instances.');
+                    }
+        
+                    if (walkResult.size !== 4) {
+                        throw new Error('instance.walkPath did not return the expected number of instances.');
+                    }
+        
+                    if (!walkResult.hasInstance(instance3a) || !walkResult.hasInstance(instance3b)
+                        || !walkResult.hasInstance(instance3c) || !walkResult.hasInstance(instance3d)
+                    ) {
+                        throw new Error('instance.walkPath did not return the expected instance(s).');
+                    }
+                });
+        
+                it('Can walk three relationships.', async () => {
+                    const instance1 = new Instance(TwoWayRelationshipClass1);
+                    const instance2a = new Instance(TwoWayRelationshipClass2);
+                    const instance2b = new Instance(TwoWayRelationshipClass2);
+                    const instance3a = new Instance(TwoWayRelationshipClass1);
+                    const instance3b = new Instance(TwoWayRelationshipClass1);
+                    const instance3c = new Instance(TwoWayRelationshipClass1);
+                    const instance3d = new Instance(TwoWayRelationshipClass1);
+                    const instance4a = new Instance(TwoWayRelationshipClass2);
+                    const instance4b = new Instance(TwoWayRelationshipClass2);
+                    const instance4c = new Instance(TwoWayRelationshipClass2);
+                    const instance4d = new Instance(TwoWayRelationshipClass2);
+        
+                    instance1.oneToMany = new InstanceSet(TwoWayRelationshipClass2, [instance2a, instance2b]);
+                    instance2a.oneToMany = new InstanceSet(TwoWayRelationshipClass1, [instance3a, instance3b]);
+                    instance2b.oneToMany = new InstanceSet(TwoWayRelationshipClass1, [instance3c, instance3d]);
+                    instance3a.oneToOne = instance4a;
+                    instance3b.oneToOne = instance4b;
+                    instance3c.oneToOne = instance4c;
+                    instance3d.oneToOne = instance4d;
+
+                    const instanceSet = new InstanceSet(TwoWayRelationshipClass1, [instance1]);
+        
+                    const walkResult = await instanceSet.walkPath(['oneToMany', 'oneToMany', 'oneToOne']);
+        
+                    if (walkResult.isEmpty()) {
+                        throw new Error('instance.walkPath did not return any instances.');
+                    }
+        
+                    if (walkResult.size !== 4) {
+                        throw new Error('instance.walkPath did not return the expected number of instances.');
+                    }
+        
+                    if (!walkResult.hasInstance(instance4a) || !walkResult.hasInstance(instance4b)
+                        || !walkResult.hasInstance(instance4c) || !walkResult.hasInstance(instance4d)
+                    ) {
+                        throw new Error('instance.walkPath did not return the expected instance(s).');
+                    }
+                });
+    
+            });
+    
+            describe('Walking Relationships with Saved Instances', () => {
+    
+                it('Can walk singlular relationship.', async () => {
+                    let instance1 = new Instance(TwoWayRelationshipClass1);
+                    let instance2 = new Instance(TwoWayRelationshipClass2);
+        
+                    instance1.oneToOne = instance2;
+    
+                    await instance1.save();
+    
+                    const instanceSet = await TwoWayRelationshipClass1.find({_id: instance1._id});
+        
+                    const walkResult = await instanceSet.walkPath(['oneToOne']);
+        
+                    if (walkResult.isEmpty()) {
+                        throw new Error('instance.walkPath did not return any instances.');
+                    }
+        
+                    if (!walkResult.instanceAt(0).equals(instance2)) {
+                        throw new Error('instance.walkPath did not return the expected instance(s).');
+                    }
+                });
+        
+                it('Can walk non-singlular relationship.', async () => {
+                    let instance1 = new Instance(TwoWayRelationshipClass1);
+                    let instance2 = new Instance(TwoWayRelationshipClass2);
+        
+                    instance1.oneToMany = new InstanceSet(TwoWayRelationshipClass2, [instance2]);
+        
+                    await instance1.save();
+    
+                    const instanceSet = await TwoWayRelationshipClass1.find({_id: instance1._id});
+    
+                    const walkResult = await instanceSet.walkPath(['oneToMany']);
+        
+                    if (walkResult.isEmpty()) {
+                        throw new Error('instance.walkPath did not return any instances.');
+                    }
+        
+                    if (!walkResult.instanceAt(0).equals(instance2)) {
+                        throw new Error('instance.walkPath did not return the expected instance(s).');
+                    }
+                });
+        
+                it('Can walk two singular relationships.', async () => {
+                    let instance1 = new Instance(TwoWayRelationshipClass1);
+                    let instance2 = new Instance(TwoWayRelationshipClass2);
+                    let instance3 = new Instance(TwoWayRelationshipClass1);
+        
+                    instance1.oneToOne = instance2;
+                    instance2.manyToOne = instance3;
+    
+                    await instance1.save();
+                    await instance2.save();
+                    await instance3.save();
+    
+                    const instanceSet = await TwoWayRelationshipClass1.find({_id: instance1._id});
+        
+                    const walkResult = await instanceSet.walkPath(['oneToOne', 'manyToOne']);
+        
+                    if (walkResult.isEmpty()) {
+                        throw new Error('instance.walkPath did not return any instances.');
+                    }
+        
+                    if (!walkResult.instanceAt(0).equals(instance3)) {
+                        throw new Error('instance.walkPath did not return the expected instance(s).');
+                    }
+                });
+        
+                it('Can walk two non-singular relationships.', async () => {
+                    let instance1 = new Instance(TwoWayRelationshipClass1);
+                    let instance2a = new Instance(TwoWayRelationshipClass2);
+                    let instance2b = new Instance(TwoWayRelationshipClass2);
+                    let instance3a = new Instance(TwoWayRelationshipClass1);
+                    let instance3b = new Instance(TwoWayRelationshipClass1);
+                    let instance3c = new Instance(TwoWayRelationshipClass1);
+                    let instance3d = new Instance(TwoWayRelationshipClass1);
+        
+                    instance1.oneToMany = new InstanceSet(TwoWayRelationshipClass2, [instance2a, instance2b]);
+                    instance2a.oneToMany = new InstanceSet(TwoWayRelationshipClass1, [instance3a, instance3b]);
+                    instance2b.oneToMany = new InstanceSet(TwoWayRelationshipClass1, [instance3c, instance3d]);
+    
+                    await instance1.save();
+                    await instance2a.save();
+                    await instance2b.save();
+                    await instance3a.save();
+                    await instance3b.save();
+                    await instance3c.save();
+                    await instance3d.save();
+    
+                    const instanceSet = await TwoWayRelationshipClass1.find({_id: instance1._id});
+        
+                    const walkResult = await instanceSet.walkPath(['oneToMany', 'oneToMany']);
+        
+                    if (walkResult.isEmpty()) {
+                        throw new Error('instance.walkPath did not return any instances.');
+                    }
+        
+                    if (walkResult.size !== 4) {
+                        throw new Error('instance.walkPath did not return the expected number of instances.');
+                    }
+        
+                    if (!walkResult.hasInstance(instance3a) || !walkResult.hasInstance(instance3b)
+                        || !walkResult.hasInstance(instance3c) || !walkResult.hasInstance(instance3d)
+                    ) {
+                        throw new Error('instance.walkPath did not return the expected instance(s).');
+                    }
+                });
+        
+                it('Can walk three relationships.', async () => {
+                    let instance1 = new Instance(TwoWayRelationshipClass1);
+                    let instance2a = new Instance(TwoWayRelationshipClass2);
+                    let instance2b = new Instance(TwoWayRelationshipClass2);
+                    let instance3a = new Instance(TwoWayRelationshipClass1);
+                    let instance3b = new Instance(TwoWayRelationshipClass1);
+                    let instance3c = new Instance(TwoWayRelationshipClass1);
+                    let instance3d = new Instance(TwoWayRelationshipClass1);
+                    let instance4a = new Instance(TwoWayRelationshipClass2);
+                    let instance4b = new Instance(TwoWayRelationshipClass2);
+                    let instance4c = new Instance(TwoWayRelationshipClass2);
+                    let instance4d = new Instance(TwoWayRelationshipClass2);
+        
+                    instance1.oneToMany = new InstanceSet(TwoWayRelationshipClass2, [instance2a, instance2b]);
+                    instance2a.oneToMany = new InstanceSet(TwoWayRelationshipClass1, [instance3a, instance3b]);
+                    instance2b.oneToMany = new InstanceSet(TwoWayRelationshipClass1, [instance3c, instance3d]);
+                    instance3a.oneToOne = instance4a;
+                    instance3b.oneToOne = instance4b;
+                    instance3c.oneToOne = instance4c;
+                    instance3d.oneToOne = instance4d;
+    
+                    await instance1.save();
+                    await instance2a.save();
+                    await instance2b.save();
+                    await instance3a.save();
+                    await instance3b.save();
+                    await instance3c.save();
+                    await instance3d.save();
+    
+                    const instanceSet = await TwoWayRelationshipClass1.find({_id: instance1._id});
+        
+                    const walkResult = await instanceSet.walkPath(['oneToMany', 'oneToMany', 'oneToOne']);
+        
+                    if (walkResult.isEmpty()) {
+                        throw new Error('instance.walkPath did not return any instances.');
+                    }
+        
+                    if (walkResult.size !== 4) {
+                        throw new Error('instance.walkPath did not return the expected number of instances.');
+                    }
+        
+                    if (!walkResult.hasInstance(instance4a) || !walkResult.hasInstance(instance4b)
+                        || !walkResult.hasInstance(instance4c) || !walkResult.hasInstance(instance4d)
+                    ) {
+                        throw new Error('instance.walkPath did not return the expected instance(s).');
+                    }
+                });
+                
+            });
+    
+        });
+
         describe('InstanceSet.delete()', () => {
 
-            // Set up deleteControlled Instances
+            // Set up deletePrivileged Instances
             {
-                // ClassControlsDeleteControlledSuperClass Instances
-                var instanceOfClassControlsDeleteControlledSuperClassAllowed = new Instance(ClassControlsDeleteControlledSuperClass);
-                instanceOfClassControlsDeleteControlledSuperClassAllowed.allowed = true;
+                // ClassPrivilegesDeletePrivilegedSuperClass Instances
+                var instanceOfClassPrivilegesDeletePrivilegedSuperClassAllowed = new Instance(ClassPrivilegesDeletePrivilegedSuperClass);
+                instanceOfClassPrivilegesDeletePrivilegedSuperClassAllowed.allowed = true;
                 
-                var instanceOfClassControlsDeleteControlledSuperClassNotAllowed = new Instance(ClassControlsDeleteControlledSuperClass);
-                instanceOfClassControlsDeleteControlledSuperClassNotAllowed.allowed = false;
+                var instanceOfClassPrivilegesDeletePrivilegedSuperClassNotAllowed = new Instance(ClassPrivilegesDeletePrivilegedSuperClass);
+                instanceOfClassPrivilegesDeletePrivilegedSuperClassNotAllowed.allowed = false;
     
-                // DeleteControlledSuperClass Instances
-                var instanceOfDeleteControlledSuperClassPasses = new Instance(DeleteControlledSuperClass);
-                instanceOfDeleteControlledSuperClassPasses.name = 'instanceOfDeleteControlledSuperClassPasses';
-                instanceOfDeleteControlledSuperClassPasses.deleteControlledBy = instanceOfClassControlsDeleteControlledSuperClassAllowed;
+                // DeletePrivilegedSuperClass Instances
+                var instanceOfDeletePrivilegedSuperClassPasses = new Instance(DeletePrivilegedSuperClass);
+                instanceOfDeletePrivilegedSuperClassPasses.name = 'instanceOfDeletePrivilegedSuperClassPasses';
+                instanceOfDeletePrivilegedSuperClassPasses.deletePrivilegedBy = instanceOfClassPrivilegesDeletePrivilegedSuperClassAllowed;
     
-                var instanceOfDeleteControlledSuperClassFailsRelationship = new Instance(DeleteControlledSuperClass);
-                instanceOfDeleteControlledSuperClassFailsRelationship.name = 'instanceOfDeleteControlledSuperClassFailsRelationship';
-                instanceOfDeleteControlledSuperClassFailsRelationship.deleteControlledBy = instanceOfClassControlsDeleteControlledSuperClassNotAllowed;
+                var instanceOfDeletePrivilegedSuperClassFailsRelationship = new Instance(DeletePrivilegedSuperClass);
+                instanceOfDeletePrivilegedSuperClassFailsRelationship.name = 'instanceOfDeletePrivilegedSuperClassFailsRelationship';
+                instanceOfDeletePrivilegedSuperClassFailsRelationship.deletePrivilegedBy = instanceOfClassPrivilegesDeletePrivilegedSuperClassNotAllowed;
     
                 
             }
     
             before(async () => {
-                await instanceOfClassControlsDeleteControlledSuperClassAllowed.save();
-                await instanceOfClassControlsDeleteControlledSuperClassNotAllowed.save();
+                await instanceOfClassPrivilegesDeletePrivilegedSuperClassAllowed.save();
+                await instanceOfClassPrivilegesDeletePrivilegedSuperClassNotAllowed.save();
             });
     
             after(async () => {
                 await AllFieldsRequiredClass.clear();
-                await DeleteControlledSuperClass.clear();
-                await DeleteControlledClassDeleteControlledByParameters.clear();
+                await DeletePrivilegedSuperClass.clear();
+                await DeletePrivilegedClassDeletePrivilegedByParameters.clear();
                 await SuperClass.clear();
                 await TwoWayRelationshipClass1.clear();
                 await TwoWayRelationshipClass2.clear();
@@ -3675,6 +3973,42 @@ describe('InstanceSet Tests', () => {
                 });
             });
 
+            it('InstanceSet.delete() deletes all the instances in an InstanceSet of discriminated sub class.', async () => {
+                const instance1 = new Instance(SubClassOfDiscriminatedSubClassOfSuperClass);
+                const instance2 = new Instance(SubClassOfDiscriminatedSubClassOfSuperClass);
+                const instanceSet = new InstanceSet(SubClassOfDiscriminatedSubClassOfSuperClass, [instance1, instance2]);
+                await instanceSet.save();
+                await instanceSet.delete();
+
+                const instancesFound = await SubClassOfDiscriminatedSubClassOfSuperClass.find({ _id: { $in: instanceSet.getInstanceIds() } });
+
+                if (!instancesFound.isEmpty())
+                    throw new Error('instanceSet.delete() did not throw an error, but the instances were not deleted.');
+
+                instanceSet.forEach(instance => {
+                    if (instance.deleted() !== true)
+                        throw new Error('Not all of the instances were marked deleted.');
+                });
+            });
+
+            it('InstanceSet.delete() deletes all the instances in an InstanceSet of discriminated class.', async () => {
+                const instance1 = new Instance(DiscriminatedSubClassOfSuperClass);
+                const instance2 = new Instance(DiscriminatedSubClassOfSuperClass);
+                const instanceSet = new InstanceSet(DiscriminatedSubClassOfSuperClass, [instance1, instance2]);
+                await instanceSet.save();
+                await instanceSet.delete();
+
+                const instancesFound = await DiscriminatedSubClassOfSuperClass.find({ _id: { $in: instanceSet.getInstanceIds() } });
+
+                if (!instancesFound.isEmpty())
+                    throw new Error('instanceSet.delete() did not throw an error, but the instances were not deleted.');
+
+                instanceSet.forEach(instance => {
+                    if (instance.deleted() !== true)
+                        throw new Error('Not all of the instances were marked deleted.');
+                });
+            });
+
             it('InstanceSet.delete() deletes all the instances in a set containing sub class and discriminated instances.', async () => {
                 const instance1 = new Instance(SuperClass);
                 const instance2 = new Instance(SubClassOfSuperClass);
@@ -3698,30 +4032,30 @@ describe('InstanceSet Tests', () => {
                 });
             });
 
-            describe('Delete Delete Controlled Instances', () => {
+            describe('Delete Delete Privileged Instances', () => {
 
-                it('Call delete() on an InstanceSet of an delete controlled class. InstanceSet deleted.', async () => {
-                    const instance = new Instance(DeleteControlledSuperClass);
-                    instance.name = 'instanceOfDeleteControlledSuperClassPasses-deleteAll';
-                    instance.deleteControlledBy = instanceOfClassControlsDeleteControlledSuperClassAllowed;
+                it('Call delete() on an InstanceSet of an delete privilegeled class. InstanceSet deleted.', async () => {
+                    const instance = new Instance(DeletePrivilegedSuperClass);
+                    instance.name = 'instanceOfDeletePrivilegedSuperClassPasses-deleteAll';
+                    instance.deletePrivilegedBy = instanceOfClassPrivilegesDeletePrivilegedSuperClassAllowed;
     
-                    const instanceSet = new InstanceSet(DeleteControlledSuperClass, [instance]);
+                    const instanceSet = new InstanceSet(DeletePrivilegedSuperClass, [instance]);
                     await instanceSet.save();
     
                     await instanceSet.delete();
     
-                    const instanceSaved = await DeleteControlledSuperClass.findById(instance._id);
+                    const instanceSaved = await DeletePrivilegedSuperClass.findById(instance._id);
                     
                     if (instanceSaved !== null)
                         throw new Error('Instance was not deleted.');
                 });
     
-                it('Delete fails due to create control check.', async () => {
-                    const instanceSet = new InstanceSet(DeleteControlledSuperClass, [
-                        instanceOfDeleteControlledSuperClassPasses,
-                        instanceOfDeleteControlledSuperClassFailsRelationship,
+                it('Delete fails due to create privilege check.', async () => {
+                    const instanceSet = new InstanceSet(DeletePrivilegedSuperClass, [
+                        instanceOfDeletePrivilegedSuperClassPasses,
+                        instanceOfDeletePrivilegedSuperClassFailsRelationship,
                     ]);
-                    const expectedErrorMessage = 'Illegal attempt to delete instances: ' + instanceOfDeleteControlledSuperClassFailsRelationship.id;
+                    const expectedErrorMessage = 'Illegal attempt to delete instances: ' + instanceOfDeletePrivilegedSuperClassFailsRelationship.id;
                     
                     await instanceSet.save();
     
@@ -3729,7 +4063,7 @@ describe('InstanceSet Tests', () => {
                         return instanceSet.delete();
                     });
                     
-                    const instancesFound = await DeleteControlledSuperClass.find({
+                    const instancesFound = await DeletePrivilegedSuperClass.find({
                         _id: {$in: instanceSet.getObjectIds()}
                     });
     
@@ -3737,9 +4071,9 @@ describe('InstanceSet Tests', () => {
                         throw new Error('Error was thrown but instances were deleted anyway.');
                 });
     
-                it('Call delete() on an InstanceSet of an delete controlled class with deleteControlMethodParameters. InstanceSet deleted.', async () => {
-                    const instance = new Instance(DeleteControlledClassDeleteControlledByParameters);
-                    const instanceSet = new InstanceSet(DeleteControlledClassDeleteControlledByParameters, [instance]);
+                it('Call delete() on an InstanceSet of an delete privilegeled class with deletePrivilegeMethodParameters. InstanceSet deleted.', async () => {
+                    const instance = new Instance(DeletePrivilegedClassDeletePrivilegedByParameters);
+                    const instanceSet = new InstanceSet(DeletePrivilegedClassDeletePrivilegedByParameters, [instance]);
                     const parameters = {
                         numberA: 1, 
                         numberB: 1,
@@ -3750,21 +4084,21 @@ describe('InstanceSet Tests', () => {
     
                     await instanceSet.delete(parameters);
     
-                    const instanceAfterDelete = await DeleteControlledClassDeleteControlledByParameters.findById(instance._id);
+                    const instanceAfterDelete = await DeletePrivilegedClassDeletePrivilegedByParameters.findById(instance._id);
     
                     if (instanceAfterDelete !== null)
                         throw new Error('Instance was not deleted.');
                 });
     
-                it('Call delete() on an InstanceSet of an delete controlled class with deleteControlMethodParameters. Delete fails due to delete control check.', async () => {
-                    const instance = new Instance(DeleteControlledClassDeleteControlledByParameters);
+                it('Call delete() on an InstanceSet of an delete privilegeled class with deletePrivilegeMethodParameters. Delete fails due to delete privilege check.', async () => {
+                    const instance = new Instance(DeletePrivilegedClassDeletePrivilegedByParameters);
                     const expectedErrorMessage = 'Illegal attempt to delete instances: ' + instance.id;
                     const parameters = {
                         numberA: -2, 
                         numberB: 1,
                         boolean: true,
                     }
-                    const instanceSet = new InstanceSet(DeleteControlledClassDeleteControlledByParameters, [instance]);
+                    const instanceSet = new InstanceSet(DeletePrivilegedClassDeletePrivilegedByParameters, [instance]);
     
                     await instanceSet.save();
     
@@ -3772,7 +4106,7 @@ describe('InstanceSet Tests', () => {
                         return instanceSet.delete(parameters);
                     })
                     
-                    const instanceFound = await DeleteControlledClassDeleteControlledByParameters.findById(instance._id);
+                    const instanceFound = await DeletePrivilegedClassDeletePrivilegedByParameters.findById(instance._id);
     
                     if (instanceFound === null) 
                         throw new Error('.delete() threw an error, but the instance was deleted anyway.')
@@ -4156,6 +4490,31 @@ describe('InstanceSet Tests', () => {
                     throw new Error('getInstanceIds() returned a non empty array. ' + ids);
             });
     
+        });
+
+        describe('InstanceSet.toString()', () => {
+
+            it('InstanceSet.toString() returns expected string.', () => {
+                const instance1 = new Instance(CompareClass1);
+                const instance2 = new Instance(CompareClass1);
+                const instanceSet = new InstanceSet(CompareClass1, [instance1, instance2]);
+
+                const string = instanceSet.toString();
+                const obj = JSON.parse(string);
+
+                if (obj.className !== 'CompareClass1') {
+                    throw new Error('String is missing className');
+                }
+
+                if (obj.size !== 2) {
+                    throw new Error('String is missing size');
+                }
+
+                if (!Array.isArray(obj.instances) || obj.instances.length !== 2) {
+                    throw new Error('String is missing instances.');
+                }
+            });
+
         });
 
     });

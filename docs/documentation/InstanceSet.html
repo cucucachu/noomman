@@ -66,9 +66,10 @@
                 <li><a href="#getInstanceWithId">getInstanceWithId()</a></li>
                 <li><a href="#hasInstance">hasInstance()</a></li>
                 <li><a href="#hasInstanceWithId">hasInstanceWithId()</a></li>
+                <li><a href="#instanceAt">instanceAt()</a></li>
                 <li><a href="#isInstanceSetOf">isInstanceSetOf()</a></li>
                 <li><a href="#mapToInstanceSet">mapToInstanceSet()</a></li>
-                <li><a href="#readControlFilter">readControlFilter()</a></li>
+                <li><a href="#readPrivilegeFilter">readPrivilegeFilter()</a></li>
                 <li><a href="#remove">remove()</a></li>
                 <li><a href="#removeInstances">removeInstances()</a></li>
                 <li><a href="#save">save()</a></li>
@@ -77,6 +78,7 @@
                 <li><a href="#union">union()</a></li>
                 <li><a href="#validate">validate()</a></li>
                 <li><a href="#walk">walk()</a></li>
+                <li><a href="#walkPath">walkPath()</a></li>
         </ul>
     </div>
 
@@ -237,7 +239,7 @@
             </div>
             
             <div class="docs-section" id="delete">
-                <h5>delete(deleteControlMethodParameters) </h5>
+                <h5>delete(deletePrivilegeMethodParameter) </h5>
                 <div>
                     <strong>Description</strong>
                     <p>
@@ -252,9 +254,9 @@
                         </thead>
                         <tbody>
                             <tr>
-                                <td>deleteControlMethodParameters</td>
+                                <td>deletePrivilegeMethodParameter</td>
                                 <td>Object</td>
-                                <td>An object containing any parameters needed by a deleteControl method.</td>
+                                <td>An object containing any parameters needed by a deletePrivilege method.</td>
                             </tr>
                         </tbody>
                     </table>
@@ -276,7 +278,7 @@
                             </tr>
                             <tr>
                                 <td>NoommanDeleteError</td>
-                                <td>If deleteControlCheck() throws a NoommanDeleteError.</td>
+                                <td>If deletePrivilegeCheck() throws a NoommanDeleteError.</td>
                             </tr>
                         </tbody>
                     </table>
@@ -617,6 +619,35 @@
                 </div>
             </div>
             
+            <div class="docs-section" id="instanceAt">
+                <h5>instanceAt(index)</h5>
+                <div>
+                    <strong>Description</strong>
+                    <p>
+                        Returns the Instance at the given index as though this InstanceSet were an Array.
+                    </p>
+                    <strong>Parameters</strong>
+                    <table>
+                        <thead>
+                            <th>Name</th>
+                            <th>Type</th>
+                            <th>Description</th>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>index</td>
+                                <td>Number</td>
+                                <td>The index of the Instance you wish to retrieve.</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                    <strong>Returns</strong>
+                    <p>
+                        Instance - The Instance of the given index.
+                    </p>
+                </div>
+            </div>
+            
             <div class="docs-section" id="intersection">
                 <h5>intersection(instanceSet)</h5>
                 <div>
@@ -725,13 +756,13 @@
                 </div>
             </div>
             
-            <div class="docs-section" id="readControlFilter">
-                <h5>readControlFilter(readControlMethodParameters)</h5>
+            <div class="docs-section" id="readPrivilegeFilter">
+                <h5>readPrivilegeFilter(readPrivilegeMethodParameter)</h5>
                 <div>
                     <strong>Description</strong>
                     <p>
-                        Runs applicable readControl methods for each Instance in this InstanceSet, and filters out any
-                        Instances for which any readControl method returns false. Returns a new InstanceSet, does not
+                        Runs applicable readPrivilege methods for each Instance in this InstanceSet, and filters out any
+                        Instances for which any readPrivilege method returns false. Returns a new InstanceSet, does not
                         update this InstanceSet.
                     </p>
                     <strong>Parameters</strong>
@@ -743,10 +774,10 @@
                         </thead>
                         <tbody>
                             <tr>
-                                <td>readControlMethodParameters</td>
+                                <td>readPrivilegeMethodParameter</td>
                                 <td>Object</td>
                                 <td>
-                                    An object containing any parameters that the readControl method(s)
+                                    An object containing any parameters that the readPrivilege method(s)
                                     may need.
                                 </td>
                             </tr>
@@ -754,7 +785,7 @@
                     </table>
                     <strong>Returns</strong>
                     <p>
-                        Promise&lt;InstanceSet&gt; - An InstanceSet containing those Instances for which all readControl methods return true.
+                        Promise&lt;InstanceSet&gt; - An InstanceSet containing those Instances for which all readPrivilege methods return true.
                     </p>
                 </div>
             </div>
@@ -828,7 +859,7 @@
             </div>
             
             <div class="docs-section" id="save">
-                <h5>save(createControlMethodParameters, updateControlMethodParameters)</h5>
+                <h5>save(createPrivilegeMethodParameter, updatePrivilegeMethodParameter)</h5>
                 <div>
                     <strong>Description</strong>
                     <p>
@@ -844,14 +875,14 @@
                         </thead>
                         <tbody>
                             <tr>
-                                <td>createControlMethodParameters</td>
+                                <td>createPrivilegeMethodParameter</td>
                                 <td>Object</td>
-                                <td>An object containing parameters needed by a createControl method.</td>
+                                <td>An object containing parameters needed by a createPrivilege method.</td>
                             </tr>
                             <tr>
-                                <td>updateControlMethodParameters</td>
+                                <td>updatePrivilegeMethodParameter</td>
                                 <td>Object</td>
-                                <td>An object containing parameters needed by a updateControl method.</td>
+                                <td>An object containing parameters needed by a updatePrivilege method.</td>
                             </tr>
                         </tbody>
                     </table>
@@ -873,11 +904,11 @@
                             </tr>
                             <tr>
                                 <td>NoommanSaveError</td>
-                                <td>If any unsaved Instance in this InstanceSet fails a createControl method.</td>
+                                <td>If any unsaved Instance in this InstanceSet fails a createPrivilege method.</td>
                             </tr>
                             <tr>
                                 <td>NoommanSaveError</td>
-                                <td>If any previously saved Instance in this InstanceSet fails a updateControl method.</td>
+                                <td>If any previously saved Instance in this InstanceSet fails a updatePrivilege method.</td>
                             </tr>
                             <tr>
                                 <td>NoommanSaveError</td>
@@ -1063,6 +1094,59 @@
                                     If relationshipName does not match a relationship on the ClassModel
                                     for this InstanceSet.
                                 </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            
+            <div class="docs-section" id="walkPath">
+                <h5>walkPath(path)</h5>
+                <div>
+                    <strong>Description</strong>
+                    <p>
+                        Walks a path of multiple relationships from the Instances in this InstanceSet, 
+                        returning an InstanceSet containing all Instances at the end of the path.
+                    </p>
+                    <strong>Parameters</strong>
+                    <table>
+                        <thead>
+                            <th>Name</th>
+                            <th>Type</th>
+                            <th>Description</th>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>path</td>
+                                <td>Array&lt;String&gt;</td>
+                                <td>An Array containing the names of the relationships to walk.</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                    <strong>Returns</strong>
+                    <p>
+                        Promise&lt;InstanceSet&gt; - The InstanceSet of Instances related to the Instances in this InstanceSet 
+                        through the given relationships. If there are no Instances at the end of the path, or path cannot be 
+                        walked all the way to the end, the returned InstanceSet will be empty.
+                    </p>
+                    <strong>Throws</strong>
+                    <table>
+                        <thead>
+                            <th>Error Type</th>
+                            <th>Cause</th>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>NoommanArgumentError</td>
+                                <td>If path is not an Array.</td>
+                            </tr>
+                            <tr>
+                                <td>NoommanArgumentError</td>
+                                <td>If path contains any items that are not a string.</td>
+                            </tr>
+                            <tr>
+                                <td>NoommanArgumentError</td>
+                                <td>If path contains any items that are not a valid relationship for the relavant ClassModel.</td>
                             </tr>
                         </tbody>
                     </table>
