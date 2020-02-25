@@ -68,16 +68,16 @@
             <p>
                 Developers provide a schema for each class model in in the form of a Javascript object. The schema 
                 describes the attributes and relationships for a class, inheritance properties, instance-level privileges, 
-                auditablility, static and non-static methods, and validations. Noomman implements classical inheritance in its object model, 
+                auditablility, validations, and static and non-static methods. Noomman implements classical inheritance in its object model, 
                 allowing multi-level, and multi-parent inheritance, and providing easy querying with respect 
-                to inheritance. All properties of a schema, including validation and privilege functions,
+                to inheritance. All properties of a schema, including methods, validation, and privilege functions,
                 are inherited from a super class model to a sub class model. 
             </p>
             <h5>Data Consistency</h5>
             <p>
                 For each relationship on a class, the developer will also describe the cardinality, 
                 directionality, and ownership properties of the relationship in their database schema. 
-                With this information Noomman is able to ensure data consistency. Everytime you update 
+                With this information Noomman is able to ensure data consistency. Everytime you save an update to
                 one side of a two-way relationship on an instance, Noomman will update the relationships on the 
                 instances related through that relationship, ensuring that both directions of the 
                 relationship stay in sync. If you ask Noomman to delete an instance, it will be removed from 
@@ -90,17 +90,15 @@
                 Noomman provides a dynamic framework for controlling in what circumstances any object may be
                 created, read, updated, or deleted. Instance-level privileges can be programmatically defined by providing an
                 asynchronus function in the class model schema for a class. These functions should return true if an
-                opartion is allowed, and return false otherwise. Each CRUD operation can have its own function 
-                for determining if a particular operation is allowed, or you can use the same function for multiple 
+                opertion is allowed, and return false otherwise. Each operation can have its own function 
+                for determining if that particular operation is allowed, or you can use the same function for multiple 
                 operations.
             </p>
             <h5>Update History</h5>
             <p>
                 A Noomman class model has an option called auditable. With this option enabled, Noomman will 
-                keep a changelog for every update of every instance of the class model. This changelog will be 
-                viewable to the developer or admin account, and will keep track of who made each change and 
-                when each change was made. Objects can be completely reversed to any point in time using this 
-                changelog. If you choose not to delete the change log for an instance when that instance is deleted, 
+                keep a changelog for every update of every instance of the class model. Objects can be completely 
+                reversed to any point in time using this changelog. If you choose not to delete the change log for an instance when that instance is deleted, 
                 you can completely recover a deleted instance using the change log information.
             </p>
             <h5>Implementation</h5>

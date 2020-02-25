@@ -57,27 +57,27 @@
 
             <ul>
                 <li>
-                    <strong><a href="#schema">Defining Schema</a></strong>
+                    <strong><a href="#concepts">Concepts</a></strong>
+                </li>
+                <li>
+                    <strong><a href="#classModels">Class Models</a></strong>
                     <ul>
                         <li><a href="#classmodel_schema">Class Model Schema</a></li>
                         <li><a href="#attribute_schema">Attributes</a></li>
                         <li><a href="#relationship_schema">Relationships</a></li>
-                        <li><a href="#crud_schema">Privilege Functions</a></li>
+                        <li><a href="#privileges_schema">Privilege Functions</a></li>
                         <li><a href="#validation_schema">Validations</a></li>
-                    </ul>
-                </li>
-                <li>
-                    <strong><a href="#classmodel">Creating a Class Model</a></strong>
-                    <ul>
-                        <li><a href="#classmodel_schema">Validation And CRUD Functions</a></li>
                     </ul>
                 </li>
                 <li>
                     <strong><a href="#instances">Instances</a></strong>
                     <ul>
                         <li><a href="#creating_instances">Creating Instances</a></li>
+                        <li><a href="#instance_properties">Instance Properties</a></li>
                         <li><a href="#saving_instances">Saving Instances</a></li>
                         <li><a href="#deleting_instances">Deleting Instances</a></li>
+                        <li><a href="#instance_relationships">Instance Relationships</a></li>
+                        <li><a href="#miscillaneous_instance_methods">More Helpful Methods</a></li>
                     </ul>
                 </li>
                 <li>
@@ -86,6 +86,8 @@
                         <li><a href="#creating_instance_sets">Creating Instance Sets</a></li>
                         <li><a href="#adding_to_instance_sets">Adding Instances to an Instance Set</a></li>
                         <li><a href="#removing_from_instance_sets">Removing Instances from an Instance Set</a></li>
+                        <li><a href="#instance_set_has">Checking For Instances In An Instance Set</a></li>
+                        <li><a href="#instance_set_get">retrieving Instances From Instance Sets</a></li>
                         <li><a href="#instance_set_math">Set Math with Instance Sets</a></li>
                         <li><a href="#map_reduce_filter">ForEach, Map, Reduce, and Filter with Instance Sets</a></li>
                         <li><a href="#querying_instance_sets">Querying with Instance Sets</a></li>
@@ -113,63 +115,164 @@
         </div>
     </div>
 
-    
-    <div class="docs-section" id="schema">
+    <div class="docs-section" id="concepts">
+        <div class="container">
+            <h4>Noomman Concepts</h4>
+
+            <p>
+                Noomman is designed to make it super simple to take a project from a Class Model Diagram
+                to a working backend. As such, the terminology and methodology all stems from diagraming concepts.
+            </p>
+
+            <h5>Terminology</h5>
+
+            <div class="row">
+                <div class="two columns">
+                    <strong>Class Model</strong>
+                </div>
+                <div class="ten columns">
+                    What would be called a Class in object-oriented programing (we would call it a class too
+                    if that weren't a reserved word in javascript). A Class Model defines the shape of some data,
+                    and encapsulates code that works on Instances of that Class Model.
+                </div>
+            </div>
+            <br>
+
+            <div class="row">
+                <div class="two columns">
+                    <strong>Attributes</strong>
+                </div>
+                <div class="ten columns">
+                    An attribute is a simple-type property that is defined on a Class Model and stored on an
+                    Instance. Attributes might be a number, string, date, or boolean, or an array thereof.
+                </div>
+            </div>
+            <br>
+
+            <div class="row">
+                <div class="two columns">
+                    <strong>Relationships</strong>
+                </div>
+                <div class="ten columns">
+                    Relationships are properties defined on a Class Model and stored on an Instance, which
+                    represent a reference to another Instance or set of Instances. If you're familiar with 
+                    SQL databases, than you can think of relationships as those properties which hold foreign keys.
+                    Noomman uses MongoDB, so relationships actually hold an ObjectId (for singular relationships),
+                    or an array of ObjectIds (for non-singular relationships).
+                </div>
+            </div>
+            <br>
+
+            <div class="row">
+                <div class="two columns">
+                    <strong>Instance</strong>
+                </div>
+                <div class="ten columns">
+                    An Instance is the instantiation of some Class Model. It has the attributes and relationships
+                    defined on the Class Model, as well as a database id.
+                </div>
+            </div>
+            <br>
+
+            <div class="row">
+                <div class="two columns">
+                    <strong>Instance Set</strong>
+                </div>
+                <div class="ten columns">
+                    An Instance Set is a collection of Instances. Sets are often more useful than arrays
+                    when dealing with instances, due to the fact that a set will never have duplicates in it, 
+                    and the ability to use set math. 
+                </div>
+            </div>
+            <br>
+
+            <div class="row">
+                <div class="two columns">
+                    <strong>Walking Relationships</strong>
+                </div>
+                <div class="ten columns">
+                    To 'walk' a relationship is to retrieve the Instance or Instances related to some Instance 
+                    through that relationship. The mechanics of it are to get the ObjectIds of the related Instances,
+                    which are stored in the relationship, and then run a query on the related Class Model to 
+                    retrieve those Instances. Noomman abstracts this away from the user, and so you can simply 
+                    'walk' your relationships. 
+                </div>
+            </div>
+            <br>
+        </div>
+    </div>
+
+    <div class="docs-section" id="classModels">
         <div class="container">
             
             <div id="schema">
-                <h5><strong>Defining Schema</strong></h5>
+                <h4><strong>Class Models</strong></h4>
     
                 <p>
-                    Schemas are defined using a javascript object, with particular properties laid out below.
+                    Class Models are the core of noomman. Class Models define the shape of the data you 
+                    wish to store, as well as validations, privileges, and methods. 
                 </p>
-                <p>Here is an example Noomman ClassModel schema for a User Account.</p>
+    
+                <p>
+                    Class Models are created by calling 
+                    <a href="./documentation/ClassModel.html#constructor">new ClassModel()</a> 
+                    and passing as an argument a schema 
+                    object. The shape of the schema object is shown below with the types of each property. Only
+                    the className property is required, and in general omitting a property leads to the behavior
+                    that property represents being disabled. 
+                </p>
                 <pre>
                     <code>
-{
-    className: 'UserAccount',
-    attributes: [
-        {
-            name: 'username',
-            type: String,
-            required: true,
-            unique: true
+    {
+        className: String (required),
+        superClasses: [ ClassModel ],
+        abstract: Boolean,
+        useSuperClassCollection: Boolean,
+        auditable: Boolean,
+        attributes: [
+            {
+                name: String (required), 
+                type: String (required), 
+                list: Boolean,
+                required: Boolean,
+                unique: Boolean,
+                sensitive: Boolean,
+                mutex: String,
+                requiredGroup: String,
+            },
+        ],
+        relationships: [
+            {
+                name: String (required),
+                toClass: String (required),
+                singular: Boolean (required),
+                required: Boolean,
+                owns: Boolean,
+                mirrorRelationship: String,
+                mutex: String,
+                requiredGroup: String,
+            }
+        ],
+        privileges: {
+            create: Function,
+            read: Function,
+            update: Function,
+            delete: Function,
+            sensitive: Function,
         },
-        {
-            name: 'email',
-            type: String,
-            required: true,
-            unique: true
+        validations: [ Function ],
+        indices: [ fieldOrSpec ], 
+        staticMethods: {
+            methodName: Function,
+            methodName: Function,
+            ...
         },
-        {
-            name: 'password',
-            type: String,
-            required: true,
-            sensitive: true,
-        }
-    ],
-    relationships: [
-        {
-            name: 'person',
-            toClass: 'Person',
-            singular: true,
-            owns: true,
-            mirrorRelationship: 'userAccount',
-            required: true,
+        nonStaticMethods: {
+            methodName: Function,
+            methodName: Function,
+            ...
         },
-    ],
-    privileges: {
-        create: undefined,
-        read: requesterIsLoggedInAsThisAccount,
-        update: requesterIsLoggedInAsThisAccount,
-        delete: requesterIsLoggedInAsThisAccount,
-        sensitive: requesterIsLoggedInAsThisAccount,
-    },
-    validations: [
-        emailIsValid,
-        passwordMeetsRequirements,
-    ]
-}
+    }
                     </code>
                 </pre>
 
@@ -184,56 +287,68 @@
                 </div>
                 <p>The top-level properties of a schema object are the following:</p>
                 <div class="row">
-                    <div class="two columns">
+                    <div class="three columns">
                         <strong>className</strong>
                     </div>
-                    <div class="ten columns">
+                    <div class="nine columns">
                         A unique name for a ClassModel. This name is used in the 'toClass' field when defining relationships to this ClassModel.
                     </div>
                 </div>
                 <br>
     
                 <div class="row">
-                    <div class="two columns">
+                    <div class="three columns">
                         <strong>superClasses</strong>
                     </div>
-                    <div class="ten columns">
-                        An array containing all the ClassModels that this ClassModel inherits from.
+                    <div class="nine columns">
+                        An array containing all the ClassModels that this ClassModel directly inherits from.
                     </div>
                 </div>
                 <br>
     
                 <div class="row">
-                    <div class="two columns">
+                    <div class="three columns">
+                        <strong>abstract</strong>
+                    </div>
+                    <div class="nine columns">
+                        A boolean which indicates if this ClassModel is abstract. You cannot create Instances of an
+                        abstract ClassModel, but you can use an abstract ClassModel as a super class for other 
+                        ClassModels.
+                    </div>
+                </div>
+                <br>
+    
+                <div class="row">
+                    <div class="three columns">
                         <strong>useParentCollection</strong>
                     </div>
-                    <div class="ten columns">
+                    <div class="nine columns">
                         A boolean which indicates whether this ClassModel stores its instances in the
                         same collection as its super ClassModel. If true, this ClassModel's instances will
                         be stored in the same collection as its super ClassModel, if false or undefined, it will have 
                         its own collection. This can only be set to true if the ClassModel has one and only
-                        one super ClassModel. When multiple ClassModels share a collection, can be distinguised
-                        by an extra indexed field in the collection '__t', which will be set to the className of 
-                        the Class Model of each Instance.
+                        one super ClassModel. When multiple ClassModels share a collection, the Class Model of an Instance
+                        can be distinguised by an extra indexed field in the collection '__t', which will be set to 
+                        the className of the Class Model of each Instance.
                     </div>
                 </div>
                 <br>
     
                 <div class="row">
-                    <div class="two columns">
+                    <div class="three columns">
                         <strong>auditable</strong>
                     </div>
-                    <div class="ten columns">
+                    <div class="nine columns">
                         A boolean which indicates if a change log should be kept of all the updates to each instance of this ClassModel.
                     </div>
                 </div>
                 <br>
     
                 <div class="row">
-                    <div class="two columns">
+                    <div class="three columns">
                         <strong>attributes</strong>
                     </div>
-                    <div class="ten columns">
+                    <div class="nine columns">
                         An array containing objects which define each attribute. An attribute is simple-type property.
                         It can hold the following data types, or an array thereof: String, Number, Boolean, Date.
                     </div>
@@ -241,10 +356,10 @@
                 <br>
     
                 <div class="row">
-                    <div class="two columns">
+                    <div class="three columns">
                         <strong>relationships</strong>
                     </div>
-                    <div class="ten columns">
+                    <div class="nine columns">
                         An array containing objects which define each relationship from this ClassModel to another 
                         (or to this ClassModel).
                     </div>
@@ -252,30 +367,67 @@
                 <br>
     
                 <div class="row">
-                    <div class="two columns">
+                    <div class="three columns">
                         <strong>privileges</strong>
                     </div>
-                    <div class="ten columns">
+                    <div class="nine columns">
                         An object which can have up to five properties: create, read, update, 
-                        delete, and sensitive. Set each of these properties to an asynchonous function 
-                        which will resolve if the particular operation is allowed on a given instance of this ClassModel,
-                        and throw an error otherwise. If any of these properties is left undefined, it is equivalent to 
-                        setting the property to a function which returns a promise which immediately resolves to true.
+                        delete, and sensitive. Set each of these properties to a function 
+                        which will return true if the operation is allowed, and return false otherwise. 
+                        If any of these properties is left undefined, it is equivalent to 
+                        setting the property to a function which always returns true 
+                        (i.e. operation is allowed in all cases).
                     </div>
                 </div>
                 <br>
     
                 <div class="row">
-                    <div class="two columns">
+                    <div class="three columns">
                         <strong>validations</strong>
                     </div>
-                    <div class="ten columns">
-                        An array of asynchronus functions which will be executed before any create or update operation 
-                        saves an instance to the database. A validation function is expected to resolve if an instance
-                        can be saved, and throw an error otherwise. Validation functions are executed in the 
-                        context of a single instance, with 'this' properly set. 
+                    <div class="nine columns">
+                        An array of functions which will be executed before any create or update operation 
+                        saves an instance to the database. A validation function is expected to throw an 
+                        error if the instance is invalid and should not be saved. 
+                        Validation functions are executed in the context of a single instance, with 'this' properly set. 
                     </div>
                 </div>
+                <br>
+    
+                <div class="row">
+                    <div class="three columns">
+                        <strong>indices</strong>
+                    </div>
+                    <div class="nine columns">
+                        An array of names of attributes or relationships that you would like to index in the database. 
+                        Indexes can be used to improve query performance when filtering on those properties that have an index.
+                    </div>
+                </div>
+                <br>
+    
+                <div class="row">
+                    <div class="three columns">
+                        <strong>staticMethods</strong>
+                    </div>
+                    <div class="nine columns">
+                        An object used to define user created static methods for this ClassModel. Each property of this object 
+                        will be accessible as a method on the ClassModel, with the key acting as the name of the method. 
+                    </div>
+                </div>
+                <br>
+    
+                <div class="row">
+                    <div class="three columns">
+                        <strong>nonStaticMethods</strong>
+                    </div>
+                    <div class="nine columns">
+                        An object used to define user created non-static methods for this ClassModel. Each property of this object 
+                        will be accessible as a method on instances of this ClassModel, with the key acting as the name of the method. 
+                        In non-static methods, user can use the 'this' javascript keyword to access the Instance that the method was
+                        called on. 
+                    </div>
+                </div>
+                <br>
 
             </div>
             <br>
@@ -462,13 +614,25 @@
                     <div class="eight columns">
                         <p>
                             A boolean indicating whether this relationship is to a single related instance, or to many
-                            related instances. Marking this true means that the relationship is a one-to-one or a 
-                            many-to-one relationship. Marking this false means that the relationship is a one-to-many
-                            or a many-to-many relationship.
+                            related instances. Marking this true means that the cardinallity of the relationship is 
+                            'to-one', while marking this false means the cardinallity is 'to-many'.
                         </p>
                     </div>
                     <div class="two columns">
                         <p>Yes</p>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="two columns"><strong>mirrorRelationship</strong></div>
+                    <div class="eight columns">
+                        <p>
+                            A string which is equal to the name of the reverse/mirror/sibling relationship set on the 
+                            related classModel. Use this for defining two-way relationships, and Noomman will keep both
+                            relationships in sync for you. If undefined, then this will be treated as a one-way relationship.
+                        </p>
+                    </div>
+                    <div class="two columns">
+                        <p>No</p>
                     </div>
                 </div>
                 <div class="row">
@@ -480,19 +644,6 @@
                             to the deleted instance through an owns relationship will also be deleted. If false or
                             undefined, then deleting an instance of this ClassModel will not delete the related
                             instance.
-                        </p>
-                    </div>
-                    <div class="two columns">
-                        <p>No</p>
-                    </div>
-                </div>
-                <div class="row">
-                    <div class="two columns"><strong>mirrorRelationship</strong></div>
-                    <div class="eight columns">
-                        <p>
-                            A string which is equal to the name of the reverse/mirror/sibling relationship set on the 
-                            related classModel. Use this for defining two-way relationships, and Noomman will keep both
-                            relationships in sync for you. If undefined, then this will be treated as a one-way relationship.
                         </p>
                     </div>
                     <div class="two columns">
@@ -544,7 +695,7 @@
             <br>
 
 
-            <div id="crud_schema">
+            <div id="privileges_schema">
                 <div class="row">
                     <div class = "twelve columns">
                         <h5><strong>Privileges</strong></h5>
@@ -554,9 +705,10 @@
                     <div class="twelve columns">
                         <p>
                             The privileges object allows you to specify functions which will be called before 
-                            attempting a CRUD operation. These functions are expected to either resolve or 
-                            throw an error. If the function throws an error, the operation will not 
-                            be allowed to continue. There are four properties to set, one for each CRUD operation,
+                            attempting a particular operation. The functions can be synchronous or asynchronous, and
+                            are called in the context of a particular instance (with 'this' keyword set properly). Each function 
+                            should return true if the operation is allowed for a particular instance, or false if the operation
+                            should be blocked. There are four properties to set, one for each CRUD operation,
                             and an additional one which is used to determine if sensitive attributes need to be 
                             stripped before being returned from a query.
                         </p>
@@ -566,10 +718,10 @@
                     <div class="two columns"><strong>create</strong></div>
                     <div class="ten columns">
                         <p>
-                            An asynchronus function which will be called whenever a new instance is saved (i.e.
-                            an insert operation). If the function throws an error, the instance will not be saved. 
-                            If the function resolves, the save will be allowed to continue. If not set, all new instances
-                            of this ClassModel can be saved.
+                            A function which will be called whenever a new instance is saved (i.e.
+                            an insert operation). If the function returns false, the instance will not be saved and an error 
+                            will be thrown. If the function returns true, the save will be allowed to continue. If not set, 
+                            all new instances of this ClassModel can be saved.
                         </p>
                     </div>
                 </div>
@@ -577,8 +729,8 @@
                     <div class="two columns"><strong>read</strong></div>
                     <div class="ten columns">
                         <p>
-                            An asynchronus function which will be called for every instance returned by a query.
-                            Any instance for which this function throws an error will not be returned as part
+                            A function which will be called for every instance returned by a query.
+                            Any instance for which this function returns false will not be returned as part
                             of the query, however, other instances for which the function resolves will still be 
                             returned. If not set, any query will return all instances matching the query.
                         </p>
@@ -588,10 +740,10 @@
                     <div class="two columns"><strong>update</strong></div>
                     <div class="ten columns">
                         <p>
-                            An asynchronus function which will be called whenever an existing instance is saved (i.e.
-                            an update operation). If the function throws an error, the instance will not be saved. 
-                            If the function resolves, the save will be allowed to continue. If not set, all new 
-                            instances of this ClassModel can be saved.
+                            A function which will be called whenever an existing instance is saved (i.e.
+                            an update operation). If the function returns false, the instance will not be saved, 
+                            and an error will be thrown. If the function resolves, the save will be allowed 
+                            to continue. If not set, all new instances of this ClassModel can be saved.
                         </p>
                     </div>
                 </div>
@@ -599,10 +751,10 @@
                     <div class="two columns"><strong>delete</strong></div>
                     <div class="ten columns">
                         <p>
-                            An asynchronus function which will be called whenever an instance is deleted. 
-                            If the function throws an error, the instance will not be deleted. If the function
-                            resolves, the delete will be allowed to continue. If not set, all instances of this 
-                            ClassModel can be saved.
+                            A function which will be called whenever an instance is deleted. 
+                            If the function returns false, the instance will not be deleted, and an 
+                            error will be thrown. If the function resolves, the delete will be 
+                            allowed to continue. If not set, all instances of this ClassModel can be deleted.
                         </p>
                     </div>
                 </div>
@@ -610,10 +762,11 @@
                     <div class="two columns"><strong>sensitive</strong></div>
                     <div class="ten columns">
                         <p>
-                            An asynchronus function which will be called for each instance whenever a query
-                            is executed. If this function throws an error for a given instance, all the attributes
+                            A function which will be called for each instance whenever a query
+                            is executed. If this function returns false for a given instance, all the attributes
                             marked as sensitive will be stripped from the instance. If this function resolves,
-                            the sensitive attributes will not be stripped from the instance. 
+                            the sensitive attributes will not be stripped from the instance. If not set,
+                            no attributes ever be stripped from instances.
                         </p>
                     </div>
                 </div>
@@ -630,12 +783,12 @@
                 <div class="row">
                     <div class = "twelve columns">
                         <p>
-                            Validations is an array containing asynchronous functions which will be called before
+                            Validations is an array containing functions which will be called before
                             each create and update operation (i.e. everytime save is called). Each funtion will
                             execute in the context of a particular instance (with 'this' set properly). These 
-                            functions are expected to resolve if an instance is valid, otherwise they should throw an error 
-                            with a message indicating why the instance is invalid. The instance will only be 
-                            saved if all validations resolve. 
+                            functions are expected to return or resolve if an instance is valid, otherwise they 
+                            should throw an error with a message indicating why the instance is invalid. 
+                            The instance will only be saved if all validations run without throwing an error. 
                         </p>
                     </div>
                 </div>
@@ -644,108 +797,99 @@
 
             </div>
 
-        </div>
-    </div>
 
-    <div class="docs-section">
-        <div class="container" id="classmodel">
-            <h5><strong>Creating a Class Model</strong></h5>
-            <p>
-                The first class you will encounter when using Noomman is the ClassModel class. This class
-                is used to define a ClassModel. You create a new ClassModel by calling new ClassModel()
-                and passing in the schema you would like to use. 
-            </p>
-
-            <pre>
-                <code>
-const noomman = require('noomman');
-const ClassModel = noomman.ClassModel;
-
-const UserAccount = new ClassModel({
-    className: 'UserAccount',
-    attributes: [
-        ...
-    ],
-    relationships: [
-        ...
-    ],
-    privileges: {
-        ...
-    },
-    validations: [
-        ...
-    ],
-});
-
-module.exports = UserAccount;
-                </code>
-            </pre>
-            <p>
-                Once you have created the Class Model, save it in a variable, and export that variable
-                for the rest of you application to use.
-            </p>
-            <br>
-
-            <div id="functions">
-
-                <h5><strong>Validation and Privilege Methods.</strong></h5>
-                <p>
-                    For strong encapsilation, write your validation and privilege methods
-                    directly below your Class Model, and reference them within the schema.
-                </p>
-                
+            <div id="staticAndNonStaticMethods">
+                <div class="row">
+                    <div class = "twelve columns">
+                        <h5><strong>Static and Non-Static Methods</strong></h5>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="twelve columns">
+                        <p>
+                            The staticMethods and nonStaticMethods properties of the schema object are used to define
+                            static and non-static methods that can be called on this Class Model or Instances of this
+                            Class Model. The key or property name inside one of these objects represents the name of 
+                            the static or non-static method, while the value of the property is the function that will 
+                            be called. 
+                        </p>
+                        <p>
+                            Static methods can be called from the Class Model, while non-static methods are called from 
+                            an Instance of the Class Model, and are run in the context of the Instance (with 'this' keyword
+                            properly set). Static and non-static methods can be synchronous or asynchronous.
+                        </p>
+                        <p>
+                            Below is an example of how you might use static and non-static methods on a User Class Model.
+                        </p>
+                    </div>
+                </div>
                 <pre>
                     <code>
-const noomman = require('noomman');
-const ClassModel = noomman.ClassModel;
-
-const UserAccount = new ClassModel({
-    className: 'UserAccount',
+const User = new ClassModel({
+    className: 'User',
     attributes: [
-        ...
+        {
+            name: 'firstName',
+            type: String,
+        },
+        {
+            name: 'lastName',
+            type: String,
+        },
     ],
-    relationships: [
-        ...
-    ],
-    privileges: {
-        update: requesterIsLoggedInAsThisAccount
+    staticMethods: {
+        getAdults: async function() {
+            return User.find({age: {$gte: 18}});
+        },
     },
-    validations: [
-        emailIsValid,
-        passwordMeetsRequirements,
-    ],
+    nonStaticMethods: {
+        fullName: function() {
+            return this.firstName + ' ' + this.lastName;
+        },
+    },
 });
 
-async function requesterIsLoggedInAsThisAccount() {
-    ...
-}
+...
 
-async function emailIsValid() {
-    ...
-}
-
-async function passwordMeetsRequirements() {
-    ...
-}
-
-module.exports = UserAccount;
+const adults = await User.getAdults();
+console.log('Found these adults: ' + adults.map(user => user.fullName());
                     </code>
                 </pre>
-
             </div>
+            <br>
+
         </div>
     </div>
 
     <div class="docs-section" id="instances">
         <div class="container">
-            <div id="creating_instance">
+            <div>
+                
+                <h4><strong>Instances</strong></h4>
+
+                <p>
+                    The Instance Class in noomman provides a set of methods for working with your data. When creating
+                    an Instance, you provide the Class Model for that Instance, and all aspects of that Class Model 
+                    will be enforced for your Instanes. Any query run on a Class Model will return Instances.
+                </p>
+
+                <p>
+                    Any Instance you create or get from a query will have methods for editing, comparing, saving, and 
+                    deleting that Instance. When saving an Instance, all validations and requirements defined on the 
+                    Class Model for that Instance will be evaluated before save. 
+                </p>
+
+            </div>
+
+            <div id="creating_instances">
                 
                 <h5><strong>Creating Instances</strong></h5>
 
                 <p>
-                    The next Noomman class you'll need is the Instance class. Use the instance class
-                    to create instances of your ClassModel. Continuing with our example UserAccount
-                    ClassModel...
+                    Instances in noomman are created by calling 
+                    <a href="documentation/Instance.html#constructor">new Instance()</a> 
+                    and passing as an argument the Class
+                    Model for that Instance. The next example assumes that a Class Model has been created called User.
                 </p>
 
                 <pre>
@@ -753,9 +897,9 @@ module.exports = UserAccount;
     const noomman = require('noomman');
     const Instance = noomman.Instance;
 
-    const UserAccount = require('./path/to/UserAccount');
+    const User = require('./path/to/User');
 
-    const newUserAccount = new Instance(UserAccount);
+    const newUser = new Instance(User);
                     </code>
                 </pre>
 
@@ -767,7 +911,7 @@ module.exports = UserAccount;
 
                 <pre>
                     <code>
-    newUserAccount.assign({
+    newUser.assign({
         userName: 'coolUser1',
         email: 'cool@email.com',
         password: '***************',
@@ -779,11 +923,50 @@ module.exports = UserAccount;
 
                 <pre>
                     <code>
-    newUserAccount.userName = 'coolUser1';
-    newUserAccount.email = 'cool@email.com';
-    newUserAccount.password = '***************';          
+    newUser.userName = 'coolUser1';
+    newUser.email = 'cool@email.com';
+    newUser.password = '***************';          
                     </code>
                 </pre>
+            </div>
+
+            <div id="instance_properties">
+                
+                <h5><strong>Instance Properites</strong></h5>
+
+                <p>
+                    All Instances in noomman have share a few properties regardless of Class Model.
+                </p>
+                
+                <strong>The id Property</strong>
+
+                <p>
+                    All Instances have an id, which is the mongodb ObjectId of the Instance. You can access this
+                    property on an instance using '._id'. For convenience, you can also access this id as a String
+                    (rather than an ObjectId object) by using '.id'.
+                </p>
+
+                <pre>
+                    <code>
+const instance = new Instance(SomeClassModel);
+const objectId = instance._id; //Returns the id as an ObjectId object.
+const idAsString = instance.id; //Returns the id as the hexString representation of the ObjectId object.
+                    </code>
+                </pre>
+                
+                <strong>The classModel Property</strong>
+
+                <p>
+                    All Instances have a Class Model, which you can access with the classModel property.
+                </p>
+
+                <pre>
+                    <code>
+const instance = new Instance(SomeClassModel);
+console.log(instance.classModel === SomeClassModel) // logs true
+                    </code>
+                </pre>
+
             </div>
 
             <div id="saving_instances">
@@ -792,29 +975,28 @@ module.exports = UserAccount;
                 <h5><strong>Saving Instances</strong></h5>
 
                 <p>
-                    Now you'll probably want to save your instance. This can be done using the instance.save() method.
+                    Saving Instances in noomman is as easy as calling 
+                    <a href="documentation/Instance.html#save">save()</a>
+                    .  Behind the scenes, noomman will 
+                    validate the properties on the Instance to make sure they conform to the Class Model schema, and
+                    throw an error if they do not. 
                 </p>
 
                 <pre>
                     <code>
-await newUserAccount.save();
-                    </code>
-                </pre>
-                <strong>Or</strong>
-                <pre>
-                    <code>
-newUserAccount.save().then(savedInstance => {
-    doSomethihngElse();
-});
+await newUser.save();
                     </code>
                 </pre>
 
                 <p>
-                    This instance.save() method is an asynchronous function, so you should use await or 
+                    This 
+                    <a href="documentation/Instance.html#save">instance.save()</a>
+                    method is an asynchronous function, so you should use await or 
                     use a .then() to wait for the promise to resolve. 
                 </p>
                 <p>
-                    instance.save() returns a promise which resolves with the instance that was saved. 
+                    <a href="documentation/Instance.html#save">instance.save()</a> 
+                    returns a promise which resolves with the instance that was saved. 
                     It is the exact same object as the instance
                     that you called save on, so you don't necessarily have to use the returned instance if you
                     want to make more changes, you could use the one you already had. i.e. 
@@ -822,14 +1004,16 @@ newUserAccount.save().then(savedInstance => {
                 
                 <pre>
                     <code>
-const savedUserAccount = await newUserAccount.save();
+const savedUser = await newUser.save();
 // The next statement will print 'true' to the console.
-console.log(newUserAccount === savedUserAccount);
+console.log(newUser === savedUser);
                     </code>
                 </pre>
 
                 <p>
-                    If there is an error, instance.save() will throw the error for your code to handle. A save error
+                    If there is an error, 
+                    <a href="documentation/Instance.html#save">instance.save()</a> 
+                    will throw the error for your code to handle. A save error
                     may occur due to your custom validations defined on you ClassModel schema, a missing required 
                     attribute or relationship, or a mutex or required group validation. It is up to you to handle these
                     errors. If your code is assuming that your instance should pass all these validations, then you might
@@ -845,7 +1029,10 @@ console.log(newUserAccount === savedUserAccount);
                 <h5><strong>Deleting Instances</strong></h5>
 
                 <p>
-                    Instances can be deleted using the instance.delete() method. Instances can only be deleted if they
+                    Instances can be deleted using the 
+                    
+                    <a href="documentation/Instance.html#delete">instance.delete()</a> 
+                    method. Instances can only be deleted if they
                     are already in the database. Attempting to delete an instance which has never been saved, or which 
                     has already been deleted will throw an error. The delete method is asynchronous and will resolve if
                     the delete is successful.
@@ -853,10 +1040,18 @@ console.log(newUserAccount === savedUserAccount);
 
                 <pre>
                     <code>
-await newUserAccount.delete(); 
+await newUser.delete(); 
                     </code>
                 </pre>
 
+            </div>
+
+            <div id="instance_relationships">
+                <h5>Handling Relationships on Instances</h5>
+            </div>
+
+            <div id="miscillaneous_instance_methods">
+                <h5>More Helpful Methods</h5>
             </div>
 
 
@@ -869,10 +1064,11 @@ await newUserAccount.delete();
             <h5><strong>Instance Sets</strong></h5>
 
             <p>
-                Noomman uses the concept of instance sets to collect and manipulate multiple instances of 
+                Noomman uses the concept of Instance Sets to collect and manipulate multiple instances of 
                 the same ClassModel at the same time. This is done using the Noomman class InstanceSet.
                 InstanceSet is a sub class of the native JavaScript Set class, with added methods for 
-                set mathematics, instance manipulation, and querying. 
+                set mathematics, saving, and walking relationships. InstanceSets have a 'size' property
+                which will tell you how many Instances the InstanceSet contains.
             </p>
 
             <div id="creating_instance_sets">
@@ -880,7 +1076,9 @@ await newUserAccount.delete();
                 <h5><strong>Creating Instance Sets</strong></h5>
     
                 <p>
-                    InstanceSets are created using new InstanceSet(). At a minimum, you must supply the 
+                    InstanceSets are created using 
+                    <a href="./documentation/InstanceSet.html#constructor">new InstanceSet()</a> 
+                    At a minimum, you must supply the 
                     InstanceSet constructor with the ClassModel of the instances it is holding. There is
                     second arguemnt, instances, which you can use if you already have instances you would
                     like to add to the set. The second argument must be an iterable object containing instances.
@@ -890,7 +1088,7 @@ await newUserAccount.delete();
                 </p>
                 <pre>
                     <code>
-const userAccounts = new InstanceSet(UserAccount);
+const users = new InstanceSet(User);
                     </code>
                 </pre>
             </div>
@@ -901,45 +1099,61 @@ const userAccounts = new InstanceSet(UserAccount);
     
                 <p>
                     There are 3 ways to add instances to an InstanceSet. The first is during construction. 
-                    The other ways to add instances to an InstanceSet are using the instanceSet.add() and
-                    instanceSet.addInstances() methods. When adding instances using the instanceSet.add()
-                    method, you pass in a single instance you would like to add as the only argument to the 
-                    method. When adding instances using the constructor or with the instanceSet.addInstances()
-                    method, you must pass in an iterable object (array, set, or InstanceSet) containing instances.
-                    Whatever method you use, an error will be thrown if any instance you try to add is not 
-                    an instance of the ClassModel or a sub class of the ClassModel of the InstanceSet.
+                    When adding instances using the constructor you must pass in an iterable object 
+                    (array, set, or InstanceSet) containing instances.
                 </p>
                 <pre>
                     <code>
 // Adding instances during construction.
-const userAccount1 = new Instance(UserAccount);
-const userAccount2 = new Instance(UserAccount);
+const user1 = new Instance(User);
+const user2 = new Instance(User);
 
-const userAccounts = new InstanceSet(UserAccount, [userAccount1, userAccount2]);
+const users = new InstanceSet(User, [user1, user2]);
                     </code>
                 </pre>
+                <p>
+                    The next way to add instances to an InstanceSet is using the  
+                    <a href="./documentation/InstanceSet.html#add">instanceSet.add()</a> 
+                    method. When adding instances using the 
+                    <a href="./documentation/InstanceSet.html#add">instanceSet.add()</a> 
+                    method, you pass in a single instance you would like to add as the only argument to the 
+                    method. 
+                </p>
                 <pre>
                     <code>
 // Adding instances using the instanceSet.add() method.
-const userAccount1 = new Instance(UserAccount);
-const userAccount2 = new Instance(UserAccount);
+const user1 = new Instance(User);
+const user2 = new Instance(User);
 
-const userAccounts = new InstanceSet(UserAccount);
-userAccounts.add(userAccount1);
-userAccounts.add(userAccount2);
+const users = new InstanceSet(User);
+users.add(user1);
+users.add(user2);
                     </code>
                 </pre>
+                <p>
+                    The final way to add Instances to an InstanceSet is to use the instanceSet.addInstances() method.
+                    <a href="./documentation/InstanceSet.html#addInstances">instanceSet.addInstances()</a> 
+                    method. 
+                    When using the 
+                    <a href="./documentation/InstanceSet.html#addInstances">instanceSet.addInstances()</a> 
+                    method, you must pass in an iterable object (array, set, or InstanceSet) containing instances.
+                </p>
                 <pre>
                     <code>
 // Adding instances using the instanceSet.addInstances() method.
-const userAccount1 = new Instance(UserAccount);
-const userAccount2 = new Instance(UserAccount);
+const user1 = new Instance(User);
+const user2 = new Instance(User);
 
-const userAccounts = new InstanceSet(UserAccount);
-userAccounts.addInstances([userAccount1, userAccount2]);
+const users = new InstanceSet(User);
+users.addInstances([user1, user2]);
                     </code>
                 </pre>
             </div>
+
+            <p>
+                Whatever method you use, an error will be thrown if any instance you try to add is not 
+                an instance of the ClassModel or a sub class of the ClassModel of the InstanceSet.
+            </p>
 
             <div id="removing_from_instance_sets">
                 
@@ -947,9 +1161,16 @@ userAccounts.addInstances([userAccount1, userAccount2]);
     
                 <p>
                     Similar to adding instances to a InstanceSet, instances can be removed from an 
-                    InstanceSet using the instanceSet.remove() and instanceSet.removeInstances() methods. 
-                    The instanceSet.remove() method takes a single instance as an argument and the
-                    instanceSet.removeInstances() method takes an iterable object 
+                    InstanceSet using the 
+                    <a href="./documentation/InstanceSet.html#remove">instanceSet.remove()</a> 
+                    and 
+                    <a href="./documentation/InstanceSet.html#removeInstances">instanceSet.removeInstances()</a> 
+                    methods. 
+                    The 
+                    <a href="./documentation/InstanceSet.html#remove">instanceSet.remove()</a> 
+                    method takes a single instance as an argument and the
+                    <a href="./documentation/InstanceSet.html#removeInstances">instanceSet.removeInstances()</a> 
+                    method takes an iterable object 
                     (array, set, or InstanceSet) as an argument. The methods determine what Instance to remove
                     from an InstanceSet using the object Ids of the instance, rather than object equallity. 
                     Both methods return true if all given
@@ -960,15 +1181,103 @@ userAccounts.addInstances([userAccount1, userAccount2]);
                 <pre>
                     <code>
 // Removing instance using the instanceSet.remove() method.
-userAccounts.remove(userAccount1);
+users.remove(user1);
                     </code>
                 </pre>
                 <pre>
                     <code>
 // Removing instances using the instanceSet.removeInstances() method.
-userAccounts.removeInstances([userAccount1, userAccount2]);
+users.removeInstances([user1, user2]);
                     </code>
                 </pre>
+            </div>
+
+            <div id="instance_set_has">
+                
+                <h5><strong>Checking For Instances In An Instance Set</strong></h5>
+
+                <p>
+                    You can easily check if an InstanceSet contains a particular Instance in one of two ways.
+                </p>
+
+                <p>
+                    If you already have the Instance you're looking for in a variable, you can use the 
+                    <a href="./documentation/InstanceSet.html#hasInstance">instanceSet.hasInstance()</a> 
+                    method. This method takes an Instance as an argument and 
+                    returns true if the InstanceSet contains that instance, and returns false otherwise.
+                </p>
+
+                <pre>
+                    <code>
+const user = new Instance(User);
+const userSet = new InstanceSet(User, [user]);
+
+console.log(userSet.hasInstance(user)); // true
+                    </code>
+                </pre>
+
+                <p>
+                    If you only have the id of the Instance you are looking for, you can use the 
+                    <a href="./documentation/InstanceSet.html#hasInstanceWithId">instanceSet.hasInstanceWithId()</a> 
+                    method. This method takes an ObjectId object 
+                    or a string as a parameter.
+                </p>
+
+                <pre>
+                    <code>
+const user = new Instance(User);
+const userSet = new InstanceSet(User, [user]);
+
+console.log(userSet.hasInstanceWithId(user._id)); // true
+console.log(userSet.hasInstanceWithId(user.id)); // true
+                    </code>
+                </pre>
+                
+            </div>
+
+            <div id="instance_set_get">
+                
+                <h5><strong>Retrieving Instances from Instance Sets</strong></h5>
+
+                <p>
+                    It is easy to get individual Instances out of an InstanceSet.
+                </p>
+
+                <p>
+                    If you want to treat the InstanceSet as if it were an array, you can call the 
+                    <a href="./documentation/InstanceSet.html#instanceAt">instanceSet.instanceAt()</a> 
+                    method. This method takes a single parameter, index, which
+                    should be a positive number. The method will create an Array from the InstanceSet and 
+                    return to you the Instance at the given index.
+                </p>
+
+                <pre>
+                    <code>
+const user = new Instance(User);
+const userSet = new InstanceSet(User, [user]);
+
+const alsoUser = userSet.instanceAt(0);
+console.log(alsoUser === user); // true
+                    </code>
+                </pre>
+
+                <p>
+                    If you have the id of the Instance you are looking for, you can use the 
+                    <a href="./documentation/InstanceSet.html#getInstanceWithId">instanceSet.getInstanceWithId()</a> 
+                    method. This method takes an ObjectId object 
+                    or a string as a parameter.
+                </p>
+
+                <pre>
+                    <code>
+const user = new Instance(User);
+const userSet = new InstanceSet(User, [user]);
+
+console.log(userSet.getInstanceWithId(user._id) === user); // true
+console.log(userSet.getInstanceWithId(user.id) === user); // true
+                    </code>
+                </pre>
+                
             </div>
 
             <div id="instance_set_math">
@@ -979,32 +1288,38 @@ userAccounts.removeInstances([userAccount1, userAccount2]);
                     The InstanceSet class provides non-static methods for set math on InstanceSets. All 
                     of these methods return a new InstanceSet, with the ClassModel of the InstanceSet that 
                     the method was called on. These methods do not update the original InstanceSets.
-                    There are four set math methods, union(), difference(), intersection(),
-                    and symmetricDifference(). These correspond to the basic set math opperations. For information on
+                </p>
+                <p>
+                    There are four set math methods, 
+                    <a href="./documentation/InstanceSet.html#union">union()</a>, 
+                    <a href="./documentation/InstanceSet.html#difference">difference()</a>, 
+                    <a href="./documentation/InstanceSet.html#intersection">intersection()</a>, 
+                    <a href="./documentation/InstanceSet.html#symmetricDifference">symmetricDifference()</a>.
+                    These correspond to the basic set math opperations. For information on
                     set math, see this 
                     <a href="https://en.wikipedia.org/wiki/Set_(mathematics)#Basic_operations">wikipedia page</a>.
                     (Note that another name for difference is relative compliment.)
                 </p>
                 <pre>
                     <code>
-const userAccount1 = new Instance(UserAccount);
-const userAccount2 = new Instance(UserAccount);
-const userAccount3 = new Instance(UserAccount);
+const user1 = new Instance(User);
+const user2 = new Instance(User);
+const user3 = new Instance(User);
 
-const userAccounts1 = new InstanceSet(UserAccount, [userAccount1, userAccount2]);
-const userAccounts2 = new InstanceSet(UserAccount, [userAccount2, userAccount3]);
+const users1 = new InstanceSet(User, [user1, user2]);
+const users2 = new InstanceSet(User, [user2, user3]);
 
-// union is a new InstanceSet containing userAccount1, userAccount2, userAccount3
-const union = userAccounts1.union(userAccounts2);
+// union is a new InstanceSet containing user1, user2, user3
+const union = users1.union(users2);
 
-// difference is a new InstanceSet containing userAccount1
-const difference = userAccounts1.difference(userAccounts2);
+// difference is a new InstanceSet containing user1
+const difference = users1.difference(users2);
 
-// intersection is a new InstanceSet containing userAccount2
-const intersection = userAccounts1.intersection(userAccounts2);
+// intersection is a new InstanceSet containing user2
+const intersection = users1.intersection(users2);
 
-// symmetricDifference is a new InstanceSet containing userAccount1, userAccount3
-const symmetricDifference = userAccounts1.symmetricDifference(userAccounts2);
+// symmetricDifference is a new InstanceSet containing user1, user3
+const symmetricDifference = users1.symmetricDifference(users2);
                     </code>
                 </pre>
             </div>
@@ -1018,9 +1333,13 @@ const symmetricDifference = userAccounts1.symmetricDifference(userAccounts2);
                     <p>
                         InstanceSet has non-static methods for looping, mapping, reducing, and filtering
                         instance sets. These methods each follow the same conventions as the 
-                        native javascript methods on the Array class. instanceSet.map() and 
-                        instanceSet.filter() each return an Array, while reduce returns a single
-                        value or object (or an Array if you code it that way). instanceSet.forEach() 
+                        native javascript methods on the Array class. 
+                        <a href="./documentation/InstanceSet.html#map">instanceSet.map()</a> 
+                        and 
+                        <a href="./documentation/InstanceSet.html#filter">instanceSet.filter()</a> 
+                        each return an Array, while reduce returns a single
+                        value or object (or an Array if you code it that way). 
+                        <a href="./documentation/InstanceSet.html#forEach">instanceSet.forEach()</a> 
                         will iterate through all the instances in an InstanceSet and call your callback
                         for each one, passing the instance as an argument.
                         For general information on these functions, see this 
@@ -1031,19 +1350,22 @@ const symmetricDifference = userAccounts1.symmetricDifference(userAccounts2);
 
                     <p>
                         InstanceSet also has versions of map and filter which return a new InstanceSet
-                        instead of an Array. These methods are instanceSet.mapToInstanceSet() and 
-                        instanceSet.filterToInstanceSet(). They take the same arguments and operate the
+                        instead of an Array. These methods are 
+                        <a href="./documentation/InstanceSet.html#mapToInstanceSet">instanceSet.mapToInstanceSet()</a> 
+                        and 
+                        <a href="./documentation/InstanceSet.html#filterToInstanceSet">instanceSet.filterToInstanceSet()</a>. 
+                        They take the same arguments and operate the
                         same as the regular map and filter methods, except that they return an InstanceSet
                         with the same ClassModel as the InstanceSet that the method was called on. 
                     </p>
 
                     <pre>
                         <code>
-const filteredUserAccounts = userAccounts.filterToInstanceSet(userAccount => userAccount.userName === "coolUser1");
+const filteredUsers = users.filterToInstanceSet(user => user.userName === "coolUser1");
 
 // The above is the equivalent of the following:
-const filteredUserAccountsArray = userAccounts.filter(userAccount => userAccount.userName === "coolUser1");
-const filteredUserAccounts = new InstanceSet(UserAccount, filteredUserAccountsArray);
+const filteredUsersArray = users.filter(user => user.userName === "coolUser1");
+const filteredUsers = new InstanceSet(User, filteredUsersArray);
                         </code>
                     </pre>
                 </div>
@@ -1052,7 +1374,7 @@ const filteredUserAccounts = new InstanceSet(UserAccount, filteredUserAccountsAr
 
                 <div id="querying_instance_sets">
                     
-                        <h5><strong>Querying with Instance Sets</strong></h5>
+                        <h5><strong>Querying with Instance Sets (For Future Release)</strong></h5>
             
                         <p>
                             InstanceSet has a non-static query method, which allows you to filter the InstanceSet
@@ -1064,10 +1386,10 @@ const filteredUserAccounts = new InstanceSet(UserAccount, filteredUserAccountsAr
     
                         <pre>
                             <code>
-const filteredUserAccounts = userAccounts.filterToInstanceSet(userAccount => userAccount.userName === "coolUser1");
+const filteredUsers = Users.filterToInstanceSet(User => User.userName === "coolUser1");
 
 // The above is the equivalent of the following:
-const filteredUserAccounts = userAccounts.query({ userName: "coolUser1" });
+const filteredUsers = Users.query({ userName: "coolUser1" });
                             </code>
                         </pre>
                     </div>
@@ -1079,7 +1401,9 @@ const filteredUserAccounts = userAccounts.query({ userName: "coolUser1" });
                         <h5><strong>Saving Instance Sets</strong></h5>
             
                         <p>
-                            InstanceSet has non-static method save which will save all the instances in the set.
+                            InstanceSet has non-static method 
+                            <a href="./documentation/InstanceSet.html#save">instanceSet.save()</a>
+                             which will save all the instances in the set.
                             It is smart enough to only save those instances which you have made changes to or 
                             are brand new instances. 
                             It also will run the correct validations for each instance in the Instance Set
@@ -1092,7 +1416,7 @@ const filteredUserAccounts = userAccounts.query({ userName: "coolUser1" });
     
                         <pre>
                             <code>
-await userAccounts.save();
+await Users.save();
                             </code>
                         </pre>
                     </div>
@@ -1104,7 +1428,9 @@ await userAccounts.save();
                         <h5><strong>Deleting Instance Sets</strong></h5>
             
                         <p>
-                            InstanceSet has non-static method delete which will delete all of the
+                            InstanceSet has non-static method 
+                            <a href="./documentation/InstanceSet.html#delete">instanceSet.delete()</a> 
+                            which will delete all of the
                             instances in the InstanceSet. It will run the delete function(s) for 
                             each instance using the instances ClassModel. If an error is thrown for
                             any instance by a delete function, the error will be thrown by the
@@ -1113,7 +1439,7 @@ await userAccounts.save();
     
                         <pre>
                             <code>
-await userAccounts.delete();
+await Users.delete();
                             </code>
                         </pre>
                     </div>
@@ -1134,10 +1460,12 @@ await userAccounts.delete();
                 All database queries in Noomman are done through non-static methods on the ClassModel
                 of the instances you wish to find. All the query methods take a mongo compliant filter
                 object as an argument. Each method is asynchronus and will resolve with the instances found.
+            </p>
+            <p>
                 Queries respect inheritance, so running a query on 
                 a ClassModel which is a super class will also query/return instances of all its sub
                 ClassModels. If there are multiple levels of inheritance, this will proceed all the way
-                down the tree of ClassModels. If no instances are found matching the query, an empty
+                down the inheritance tree. If no instances are found matching the query, an empty
                 InstanceSet is returned.
             </p>
 
@@ -1146,20 +1474,22 @@ await userAccounts.delete();
                 <h5><strong>Find</strong></h5>
     
                 <p>
-                    The find method is the most basic query method. It will return an InstanceSet
+                    The 
+                    <a href="./documentation/ClassModel.html#find">find()</a> 
+                    method is the most basic query method. It will return an InstanceSet
                     with the same ClassModel as the ClassModel that you called find on. The returned
                     InstanceSet will contain all the instances of the ClassModel (and its sub ClassModels)
                     from the database matching your query. 
                 </p>
 
                 <p>
-                    Assuming there is a UserAccount saved with the 
+                    Assuming there is a User saved with the 
                     user name 'coolUser1', the following example will return an InstanceSet containing 
                     that instance.
                 </p>
                 <pre>
                     <code>
-const coolUser1InstanceSet = await UserAccount.find({ userName: 'coolUser1' });
+const coolUser1InstanceSet = await User.find({ userName: 'coolUser1' });
                     </code>
                 </pre>
             </div>
@@ -1169,23 +1499,23 @@ const coolUser1InstanceSet = await UserAccount.find({ userName: 'coolUser1' });
                 <h5><strong>Find One</strong></h5>
     
                 <p>
-                    The findOne method is similar to the find method, except that it will only return a
+                    The 
+                    <a href="./documentation/ClassModel.html#findOne">findOne()</a> 
+                    method is similar to the find method, except that it will only return a
                     single instance, rather than an InstanceSet. If multiple instances would match
                     your query, only the first one found will be returned (there is no guarantee
-                    which instance would be the 'first one found'). Note that even if you query from 
-                    a super ClassModel, and an instance of a sub ClassModel is found, 
-                    that sub ClassModel instance will have its ClassModel properly set to the sub 
-                    ClassModel. If no instance is found matching the query, null will be returned.
+                    which instance would be the 'first one found'). If no instance is found matching the 
+                    query, null will be returned.
                 </p>
 
                 <p>
-                    Assuming there is a UserAccount saved with the 
-                    user name 'coolUser1', the following example will return the UserAccount instance
+                    Assuming there is a User saved with the 
+                    user name 'coolUser1', the following example will return the User instance
                     for that user name.
                 </p>
                 <pre>
                     <code>
-const coolUser1 = await UserAccount.findOne({ userName: 'coolUser1' });
+const coolUser1 = await User.findOne({ userName: 'coolUser1' });
                     </code>
                 </pre>
             </div>
@@ -1195,20 +1525,21 @@ const coolUser1 = await UserAccount.findOne({ userName: 'coolUser1' });
                 <h5><strong>Find By Id</strong></h5>
     
                 <p>
-                    The findById behaves the same as findOne, except that it accepts an object id as an
+                    The 
+                    <a href="./documentation/ClassModel.html#findById">findById()</a> 
+                    method behaves the same as findOne, except that it accepts an ObjectId as an
                     argument. The object id can either me an ObjectId object or its hex string equivalent.
-                    One key difference between findById and findOne is that findById will return null if 
+                    One key difference between findById() and findOne() is that findById() will return null if 
                     you don't pass it an object id, while calling findOne with a query { _id: undefined } will 
                     return the first instance it evaluates. If no instance is found matching a query, null
                     will be returned.
                 </p>
                 <pre>
                     <code>
-const coolUser1 = await UserAccount.findOne({ userName: 'coolUser1' });
-const coolUser1UsingFindById = await UserAccount.findById(coolUser1.id);
+const coolUser1 = await User.findOne({ userName: 'coolUser1' });
+const coolUser1UsingFindById = await User.findById(coolUser1.id);
 
-// The next statement will print 'true' to the console.
-console.log(coolUser1.equals(coolUser1UsingFindById));
+console.log(coolUser1.equals(coolUser1UsingFindById)); // true
                     </code>
                 </pre>
             </div>
@@ -1228,12 +1559,12 @@ console.log(coolUser1.equals(coolUser1UsingFindById));
             <p>
                 Relationships in Noomman abstract away the underlying foriegn key management and
                 querying a developer would normally need to worry about when working with a database. 
-                Relationships are well defined in ClassModel schema, so that Noomman can do the querying
+                Relationships are well defined in ClassModel schema, so Noomman can do the querying
                 for you, properly respecting inheritance.
             </p>
 
             <p>
-                For the following examples, we'll be using the UserAccount ClassModel we have been 
+                For the following examples, we'll be using the User ClassModel we have been 
                 working with, along with a new ClassModel called Person, defined below.
             </p>
 
@@ -1265,8 +1596,8 @@ const Person = new ClassModel({
     ],
     relationships: [
         {
-            name: 'userAccount',
-            toClass: 'UserAccount',
+            name: 'user',
+            toClass: 'User',
             singular: true,
             mirrorRelationship: 'person',
             required: true
@@ -1303,7 +1634,7 @@ module.exports = Person;
 
             <p>
                 Notice that our new Person ClassModel has a singular relationship to the 
-                UserAccount for this Person, and a two non-singular relationships to other 
+                User for this Person, and a two non-singular relationships to other 
                 Persons. The two non-singular relationships are actually the two sides of 
                 the same relationship, i.e. a person can have many 'friends', and a person 
                 can be the 'friendOf' many persons. We also add a validation function so 
@@ -1328,7 +1659,7 @@ module.exports = Person;
 const noomman = require('noomman');
 const Instance = noomman.Instance;
 
-const UserAccount = require('./path/to/UserAccount');
+const User = require('./path/to/User');
 const Person = require('./path/to/Person');
 
 async function createAccountForJohnny() {
@@ -1339,14 +1670,14 @@ async function createAccountForJohnny() {
         dateOfBirth: new Date('1984-05-16');
     });
     
-    const johnnyAccount = new Instance(UserAccount);
+    const johnnyAccount = new Instance(User);
     johnnyAccount.assign({
         userName: 'johnny84',
         email: 'johnnynanners@email.com',
         password: 'ih8CT',
     });
     
-    johnny.userAccount = johnnyAccount;
+    johnny.user = johnnyAccount;
     
     await johnny.save();
 }
@@ -1357,13 +1688,13 @@ createAccountForJohnny().catch(error => console.error(error.message));
 
                 <p>
                     In the above example, we create two instances: johnny and johnnyAccount. We set the attributes of 
-                    each, and then we set the 'userAccount' relationship of johnny (a Person) to johnnyAccount (a 
-                    UserAccount). Then we save both instances. 
+                    each, and then we set the 'user' relationship of johnny (a Person) to johnnyAccount (a 
+                    User). Then we save both instances. 
                 </p>
 
                 <p>
                     You may be wondering why we did not set the relationship
-                    'person' on johnnyAccount (the UserAccount) to johnny (the Person). Noomman will do this automatically
+                    'person' on johnnyAccount (the User) to johnny (the Person). Noomman will do this automatically
                     for us when we call save. It will see that the one Instance is related to the other, and that the
                     other side of the relationship is not set (the mirrorRelationship). You might also wonder why we
                     only call save on johnny. The reasoning is the same, Noomman knows that johnny is related to
@@ -1380,14 +1711,12 @@ createAccountForJohnny().catch(error => console.error(error.message));
                     the same code with the extra relationship set and the second call to save.
                 </p>
 
-                
-
                 <pre>
                     <code>
 const noomman = require('noomman');
 const Instance = noomman.Instance;
 
-const UserAccount = require('./path/to/UserAccount');
+const User = require('./path/to/User');
 const Person = require('./path/to/Person');
 
 async function createAccountForJohnny() {
@@ -1398,14 +1727,14 @@ async function createAccountForJohnny() {
         dateOfBirth: new Date('1984-05-16');
     });
     
-    const johnnyAccount = new Instance(UserAccount);
+    const johnnyAccount = new Instance(User);
     johnnyAccount.assign({
         userName: 'johnny84',
         email: 'johnnynanners@email.com',
         password: 'ih8CT',
     });
     
-    johnny.userAccount = johnnyAccount;
+    johnny.user = johnnyAccount;
 
     // This next line is not necessary, but causes no harm.
     johnnyAccount.person = johnny;
@@ -1454,7 +1783,7 @@ createAccountForJohnny().catch(error => console.error(error.message));
 const noomman = require('noomman');
 const Instance = noomman.Instance;
 
-const UserAccount = require('./path/to/UserAccount');
+const User = require('./path/to/User');
 const Person = require('./path/to/Person');
 
 async function testWalkingRelationship() {
@@ -1465,18 +1794,18 @@ async function testWalkingRelationship() {
         dateOfBirth: new Date('1984-05-16');
     });
     
-    const johnnyAccount = new Instance(UserAccount);
+    const johnnyAccount = new Instance(User);
     johnnyAccount.assign({
         userName: 'johnny84',
         email: 'johnnynanners@email.com',
         password: 'ih8CT',
     });
     
-    johnny.userAccount = johnnyAccount;
+    johnny.user = johnnyAccount;
 
     // Here we walk the relationship. Because we just 
     // set the relationship, no query is executed. 
-    const shouldBeJohnnyAccount = await johnny.userAccount;
+    const shouldBeJohnnyAccount = await johnny.user;
 
     // Next statement prints 'true' to the console.
     console.log(johnnyAccount.equals(shouldBeJohnnyAccount));
@@ -1493,7 +1822,7 @@ testWalkingRelationship().catch(error => console.error(error.message));
 
                 <pre>
                     <code>
-const johnnyAccount = await UserAccount.findOne({
+const johnnyAccount = await User.findOne({
     userName: 'johnny84',
 });
 
