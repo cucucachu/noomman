@@ -582,8 +582,11 @@ class ClassModel {
                         toClass.className + '.' + relationship.mirrorRelationship + '.'
                     );
                 }
+                
+                const validMirrorToClass = this.allSuperClasses().map(c => c.className);
+                validMirrorToClass.push(this.className);
 
-                if (mirrorRelationship.toClass !== this.className) {
+                if (!validMirrorToClass.includes(mirrorRelationship.toClass)) {
                     throw new NoommanErrors.NoommanClassModelError('Invalid two-way relationship. ' + 
                         this.className + '.' + relationship.name + '. Mirror relationship ' + 
                         toClass.className + '.' + relationship.mirrorRelationship + 
