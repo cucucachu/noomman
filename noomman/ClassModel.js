@@ -1495,6 +1495,22 @@ class ClassModel {
         return cursorsWithClassName;
     }
 
+    async count(queryFilter) {
+        if (this.abstract && !this.isSuperClass())
+            throw new NoommanErrors.NoommanClassModelError('Error in ' + this.className + '.count(). This class is abstract and non-discriminated, but it has no sub-classes.');
+
+        queryFilter = queryFilter ? queryFilter : {};
+        const cursors = await this.findPageRecursive(queryFilter);
+       
+        let totalNumberOfInstances = 0;
+
+        for (const cursor of cursors) {
+            totalNumberOfInstances += await cursor.cursor.count();
+        }
+
+        return totalNumberOfInstances;
+    }
+
     /*
      * updateRelatedInstancesForInstance(instance) 
      * Analyzes the changes to two-way relationships for the given Instance to determine which related instances also

@@ -4110,6 +4110,116 @@ describe('Class Model Tests', () => {
 
         });
 
+        describe('ClassModel.count()', () => {
+
+            before(async () => {
+                const uniuqeNumberInstancesToCreate = 300;
+                await UniqueNumberSubClass.clear();
+
+                if ((await UniqueNumberClass.find()).size !== uniuqeNumberInstancesToCreate) {
+                    await UniqueNumberClass.clear();
+    
+                    const uniqueNumbers = new InstanceSet(UniqueNumberClass);
+    
+                    for (let i = 0; i < uniuqeNumberInstancesToCreate; i++) {
+                        const instance = new Instance(UniqueNumberClass);
+                        instance.number = i;
+                        uniqueNumbers.add(instance);
+                    }
+    
+                    await uniqueNumbers.save();
+                }
+            });
+
+            describe('count() With No SubClasses', () => {
+
+                it('Count of all instances returned.', async () => {
+                    const filter = {};
+
+                    const result = await UniqueNumberClass.count(filter);
+
+                    if (result !== 300) {
+                        throw new Error('Incorrect count returned.');
+                    }
+                });
+
+            });
+
+            describe('count() With Inheritance', () => {
+
+                before(async () => {
+                    await UniqueNumberSubClass.clear();
+
+                    const uniuqeNumberSubClassInstancesToCreate = 100;
+    
+                    const uniqueSubNumbers = new InstanceSet(UniqueNumberSubClass);
+    
+                    for (let i = 300; i < uniuqeNumberSubClassInstancesToCreate + 300; i++) {
+                        const instance = new Instance(UniqueNumberSubClass);
+                        instance.number = i;
+                        uniqueSubNumbers.add(instance);
+                    }
+    
+                    await uniqueSubNumbers.save();
+    
+                    const uniuqeNumberDiscriminatedSubSubClassInstancesToCreate = 50;
+    
+                    const uniqueSubSubNumbers = new InstanceSet(UniqueNumberDiscriminatedSubSubClass);
+    
+                    for (let i = 400; i < uniuqeNumberDiscriminatedSubSubClassInstancesToCreate + 400; i++) {
+                        const instance = new Instance(UniqueNumberDiscriminatedSubSubClass);
+                        instance.number = i;
+                        uniqueSubSubNumbers.add(instance);
+                    }
+    
+                    await uniqueSubSubNumbers.save();
+                });
+
+                describe('Finding Instances of Top-level Class', () => {
+
+                    it('Count returned.', async () => {
+                        const filter = {};
+    
+                        const result = await UniqueNumberClass.count(filter);
+
+                        if (result !== 450) {
+                            throw new Error('Incorrect count.');
+                        }
+                    });
+
+                });
+
+                describe('Finding Instances from Sub Class', () => {
+
+                    it('Count returned for instances of Sub Class.', async () => {
+                        const filter = {};
+    
+                        const result = await UniqueNumberSubClass.count(filter);
+
+                        if (result !== 150) {
+                            throw new Error('Incorrect count.');
+                        }
+                    });
+
+                });
+
+                describe('Finding Instances from Discriminated Sub Sub Class', () => {
+
+                    it('Count returned for instances of Discriminated Sub Sub Class.', async () => {
+                        const filter = {};
+                        const result = await UniqueNumberDiscriminatedSubSubClass.count(filter);
+    
+                        if (result !== 50) {
+                            throw new Error('Incorrect count.');
+                        }
+                    });
+
+                });
+
+            });
+
+        });
+
     });
 
     describe('Privilege Methods', () => {
