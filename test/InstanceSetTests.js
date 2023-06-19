@@ -3417,6 +3417,19 @@ describe('InstanceSet Tests', () => {
     
             describe('Walking Relationships', () => {
 
+                describe('Empty Instance Set', () => {
+        
+                    it('Walking on an Empty Instance Set', async () => {
+                        const instanceSet = new InstanceSet(SingularRelationshipClass);
+                        const expectedInstanceSet = new InstanceSet(NonSingularRelationshipClass);
+                        const returnedInstanceSet = await instanceSet.walk('singularRelationship');
+                        
+                        if (!expectedInstanceSet.equals(returnedInstanceSet))
+                            throw new Error('walk() on empty instance set did not return the correct InstanceSet.');
+                    });
+                
+                });
+
                 describe('Relationships Already Populated', () => {
     
                     describe('Walking Relationships on InstanceSets with Only One Instance', () => {

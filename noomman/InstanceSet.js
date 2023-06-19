@@ -629,14 +629,14 @@ class InstanceSet extends SuperSet {
      */
     async walk(relationshipName) {
         this.walkValidations(relationshipName);
-
-        if(this.isEmpty())
-            return new InstanceSet(relatedClass);
         
         const relationshipDefinition = this.classModel.relationships.filter(relationship => relationship.name ===relationshipName)[0];
         const relatedClass = this.classModel.getRelatedClassModel(relationshipName);
         const instanceIdsToFind = [];
         const walkResult = new InstanceSet(relatedClass);
+
+        if(this.isEmpty())
+            return new InstanceSet(relatedClass);
 
         // Determine which instances we need to get from the database.
         if (relationshipDefinition.singular) {
