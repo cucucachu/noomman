@@ -1,4 +1,5 @@
-const mongo_uri = "mongodb+srv://cody_jones:cody_jones@publicsquaredev-d3ue6.gcp.mongodb.net/test?retryWrites=true";
+// const mongo_uri = "mongodb+srv://cody_jones:cody_jones@publicsquaredev-d3ue6.gcp.mongodb.net/test?retryWrites=true";
+const mongo_uri = "mongodb+srv://gmarnheiter:UzDWNEtUgCyqvvKE@cluster0.im5ndjz.mongodb.net/?retryWrites=true&w=majority";
 const testDatabase = 'noomman-test';
 const noomman = require('../../noomman');
 
